@@ -44,12 +44,20 @@ tests/
 
 ## Roadmap
 ### 0.1 Alpha
-- Application kernel
+- Application kernel and lifecycle
 - Bootstrap file
 - Service container
+- Service providers
 - Configuration repository
 - Environment loader
-- CLI `core about` command
+- Error handler
+- File logger
+- Filesystem helper
+- Health check
+- Maintenance mode state
+- Performance timer
+- Memory monitor
+- CLI `about`, `env`, `health`, `down`, and `up` commands
 - Initial PHPUnit, PHPStan, and PHP-CS-Fixer setup
 
 ### 0.5 Beta

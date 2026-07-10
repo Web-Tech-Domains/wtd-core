@@ -6,6 +6,7 @@ namespace WTD\Application;
 
 use WTD\Config\Repository;
 use WTD\Container\Container;
+use WTD\Support\ServiceProvider;
 
 /**
  * Coordinates the core framework lifecycle and shared services.
@@ -13,6 +14,13 @@ use WTD\Container\Container;
 final class Application
 {
     public const VERSION = '0.1.0-alpha';
+
+    /**
+     * @var list<ServiceProvider>
+     */
+    private array $providers = [];
+
+    private bool $booted = false;
 
     /**
      * @param non-empty-string $basePath
@@ -67,5 +75,50 @@ final class Application
     public function config(): Repository
     {
         return $this->config;
+    }
+
+    /**
+     * Register a service provider with the application.
+     */
+    public function register(ServiceProvider|string $provider): ServiceProvider
+    {
+        $instance = is_string($provider) ? $this->container->get($provider) : $provider;
+
+        if (!$instance instanceof ServiceProvider) {
+            throw new \InvalidArgumentException('Service provider must extend ' . ServiceProvider::class . '.');
+        }
+
+        $instance->register();
+        $this->providers[] = $instance;
+
+        if ($this->booted) {
+            $instance->boot();
+        }
+
+        return $instance;
+    }
+
+    /**
+     * Boot all registered service providers once.
+     */
+    public function boot(): void
+    {
+        if ($this->booted) {
+            return;
+        }
+
+        foreach ($this->providers as $provider) {
+            $provider->boot();
+        }
+
+        $this->booted = true;
+    }
+
+    /**
+     * Determine whether the application has completed provider booting.
+     */
+    public function isBooted(): bool
+    {
+        return $this->booted;
     }
 }

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use WTD\Application\Application;
+use WTD\Application\CoreServiceProvider;
 use WTD\Config\Repository;
 use WTD\Container\Container;
 
@@ -16,4 +17,8 @@ $config = new Repository([
     'app.debug' => ($_ENV['APP_DEBUG'] ?? 'false') === 'true',
 ]);
 
-return new Application($basePath, $container, $config);
+$app = new Application($basePath, $container, $config);
+$app->register(CoreServiceProvider::class);
+$app->boot();
+
+return $app;

@@ -33,4 +33,9 @@ composer test
 composer analyse
 composer cs:fix
 php core about
+php core health
 ```
+
+## Current Phase
+
+WTD Core is in `0.1.0-alpha` foundation work. The current implementation includes the application lifecycle, service providers, dependency injection, configuration, environment loading, filesystem helpers, file logging, error handling, health reporting, maintenance state, timing, memory metrics, and a small CLI.

@@ -4,16 +4,81 @@
 declare(strict_types=1);
 
 use WTD\Application\Application;
+use WTD\Application\HealthCheck;
+use WTD\Application\MaintenanceMode;
+use WTD\Application\MemoryMonitor;
 
 /** @var Application $app */
 $app = require __DIR__ . '/bootstrap/app.php';
 
 $command = $argv[1] ?? 'about';
 
-if ($command === 'about') {
+match ($command) {
+    'about' => about($app),
+    'env' => environment($app),
+    'health' => health($app),
+    'down' => maintenance($app, true),
+    'up' => maintenance($app, false),
+    default => unknown($command),
+};
+
+/**
+ * Print framework identity.
+ */
+function about(Application $app): never
+{
     echo $app->name() . ' ' . $app->version() . PHP_EOL;
     exit(0);
 }
 
-fwrite(STDERR, sprintf('Unknown command: %s%s', $command, PHP_EOL));
-exit(1);
+/**
+ * Print current application environment.
+ */
+function environment(Application $app): never
+{
+    echo (string) $app->config()->get('app.env', 'production') . PHP_EOL;
+    exit(0);
+}
+
+/**
+ * Print a JSON health report.
+ */
+function health(Application $app): never
+{
+    /** @var HealthCheck $health */
+    $health = $app->container()->get(HealthCheck::class);
+    /** @var MemoryMonitor $memory */
+    $memory = $app->container()->get(MemoryMonitor::class);
+
+    echo json_encode([
+        ...$health->report(),
+        'memory' => [
+            'usage' => $memory->usage(),
+            'peak' => $memory->peak(),
+        ],
+    ], JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT) . PHP_EOL;
+    exit(0);
+}
+
+/**
+ * Toggle maintenance mode for the current process.
+ */
+function maintenance(Application $app, bool $enabled): never
+{
+    /** @var MaintenanceMode $maintenance */
+    $maintenance = $app->container()->get(MaintenanceMode::class);
+    $enabled ? $maintenance->enable() : $maintenance->disable();
+
+    echo $maintenance->enabled() ? 'Maintenance mode enabled' : 'Maintenance mode disabled';
+    echo PHP_EOL;
+    exit(0);
+}
+
+/**
+ * Print an unknown command error.
+ */
+function unknown(string $command): never
+{
+    fwrite(STDERR, sprintf('Unknown command: %s%s', $command, PHP_EOL));
+    exit(1);
+}
