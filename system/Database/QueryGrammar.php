@@ -87,6 +87,11 @@ final class QueryGrammar
         return sprintf('%s %s ?', $this->wrap($column), $operator);
     }
 
+    public function compileWhereNull(string $column, bool $not = false): string
+    {
+        return sprintf('%s IS %sNULL', $this->wrap($column), $not ? 'NOT ' : '');
+    }
+
     public function wrap(string $identifier): string
     {
         if ($identifier === '*') {

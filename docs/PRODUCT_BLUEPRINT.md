@@ -144,6 +144,13 @@ tests/
 - ORM model foundation
 - ORM query builder and local scopes
 - HasOne, HasMany, and BelongsTo ORM relationships
+- Many-to-many ORM relationships
+- Polymorphic ORM relationships
+- ORM lifecycle events and observers
+- ORM soft deletes
+- ORM UUID primary key support
+- ORM casting, accessors, and mutators
+- ORM repository abstraction
 - Authentication
 - Authorization
 - Queue

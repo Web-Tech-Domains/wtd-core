@@ -64,6 +64,26 @@ final class QueryBuilder
     }
 
     /**
+     * Add a null where condition.
+     */
+    public function whereNull(string $column): self
+    {
+        $this->wheres[] = $this->grammar->compileWhereNull($column);
+
+        return $this;
+    }
+
+    /**
+     * Add a not-null where condition.
+     */
+    public function whereNotNull(string $column): self
+    {
+        $this->wheres[] = $this->grammar->compileWhereNull($column, not: true);
+
+        return $this;
+    }
+
+    /**
      * Limit the number of rows returned.
      */
     public function limit(int $limit): self

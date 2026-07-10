@@ -21,6 +21,7 @@ final class ModelTest extends TestCase
     {
         $this->connection = $this->makeConnection();
         OrmUser::setConnection($this->connection);
+        OrmUser::flushModelEvents();
         $schema = new Schema($this->connection);
         $schema->create('users', static function (Blueprint $table): void {
             $table->id();
@@ -68,6 +69,60 @@ final class ModelTest extends TestCase
         UnconfiguredModel::all();
     }
 
+    public function testModelCastsAttributesAndUsesAccessorsAndMutators(): void
+    {
+        CastUser::setConnection($this->connection);
+        $schema = new Schema($this->connection);
+        $schema->create('cast_users', static function (Blueprint $table): void {
+            $table->id();
+            $table->string('name');
+            $table->integer('active');
+            $table->text('settings');
+        });
+
+        $user = new CastUser([
+            'name' => 'taylor',
+            'active' => '1',
+            'settings' => '{"theme":"dark"}',
+        ]);
+
+        self::assertTrue($user->save());
+
+        $found = CastUser::find(1);
+
+        self::assertInstanceOf(CastUser::class, $found);
+        self::assertSame('TAYLOR', $found->getAttribute('name'));
+        self::assertTrue($found->getAttribute('active'));
+        self::assertSame(['theme' => 'dark'], $found->getAttribute('settings'));
+        self::assertSame('taylor', $found->attributes()['name']);
+    }
+
+    public function testModelEventsAndObserversRunForLifecycleActions(): void
+    {
+        $events = [];
+        $observer = new UserObserver($events);
+        OrmUser::registerModelEvent('saving', static function (Model $user) use (&$events): void {
+            $events[] = 'listener:saving:' . $user->getAttribute('name');
+        });
+        OrmUser::observe($observer);
+
+        $user = new OrmUser(['name' => 'Taylor', 'active' => 1]);
+        $user->save();
+        $user->setAttribute('name', 'Updated');
+        $user->save();
+        $user->delete();
+
+        self::assertSame([
+            'listener:saving:Taylor',
+            'observer:creating:Taylor',
+            'observer:created:Taylor',
+            'listener:saving:Updated',
+            'observer:updated:Updated',
+            'observer:deleted:Updated',
+        ], $events);
+        self::assertSame($events, $observer->events());
+    }
+
     private function makeConnection(): Connection
     {
         return (new DatabaseManager(new Repository([
@@ -85,4 +140,65 @@ final class OrmUser extends Model
 
 final class UnconfiguredModel extends Model
 {
+}
+
+final class CastUser extends Model
+{
+    protected ?string $table = 'cast_users';
+
+    /**
+     * @var array<string, string>
+     */
+    protected array $casts = [
+        'active' => 'bool',
+        'settings' => 'array',
+    ];
+
+    public function getNameAttribute(mixed $value): string
+    {
+        return strtoupper((string) $value);
+    }
+
+    public function setNameAttribute(mixed $value): string
+    {
+        return strtolower((string) $value);
+    }
+}
+
+final class UserObserver
+{
+    /**
+     * @param list<string> $events
+     */
+    public function __construct(private array &$events)
+    {
+    }
+
+    public function creating(OrmUser $user): void
+    {
+        $this->events[] = 'observer:creating:' . $user->getAttribute('name');
+    }
+
+    public function created(OrmUser $user): void
+    {
+        $this->events[] = 'observer:created:' . $user->getAttribute('name');
+    }
+
+    public function updated(OrmUser $user): void
+    {
+        $this->events[] = 'observer:updated:' . $user->getAttribute('name');
+    }
+
+    public function deleted(OrmUser $user): void
+    {
+        $this->events[] = 'observer:deleted:' . $user->getAttribute('name');
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function events(): array
+    {
+        return $this->events;
+    }
 }

@@ -36,6 +36,26 @@ final class ModelQueryBuilder
     /**
      * @return self<TModel>
      */
+    public function whereNull(string $column): self
+    {
+        $this->query->whereNull($column);
+
+        return $this;
+    }
+
+    /**
+     * @return self<TModel>
+     */
+    public function whereNotNull(string $column): self
+    {
+        $this->query->whereNotNull($column);
+
+        return $this;
+    }
+
+    /**
+     * @return self<TModel>
+     */
     public function limit(int $limit): self
     {
         $this->query->limit($limit);
