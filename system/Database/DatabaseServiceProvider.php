@@ -24,5 +24,9 @@ final class DatabaseServiceProvider extends ServiceProvider
             Connection::class,
             fn (): Connection => $this->container()->get(DatabaseManager::class)->connection(),
         );
+        $this->container()->singleton(
+            Schema::class,
+            fn (): Schema => new Schema($this->container()->get(Connection::class)),
+        );
     }
 }

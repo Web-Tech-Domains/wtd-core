@@ -102,6 +102,13 @@ tests/
 - HTTP 422 JSON validation error responses
 - Common scalar, comparison, exact size, regex, confirmation, date, URL, accepted/declined, and membership rules
 
+### 0.7 Database
+- PDO connection manager
+- Schema builder
+- Table creation and dropping
+- Basic column definitions
+- Database service provider bindings
+
 ### 1.0 LTS
 - ORM
 - Authentication
