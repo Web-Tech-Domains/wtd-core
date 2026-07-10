@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace Tests\Routing;
 
+use Closure;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use WTD\Container\Container;
 use WTD\Filesystem\Filesystem;
 use WTD\Http\Request;
+use WTD\Http\Response;
+use WTD\Middleware\Middleware;
+use WTD\Middleware\MiddlewareResolver;
+use WTD\Middleware\Pipeline;
 use WTD\Routing\ControllerDispatcher;
 use WTD\Routing\RouteCache;
 use WTD\Routing\Router;
@@ -23,7 +28,9 @@ final class RouteCacheTest extends TestCase
 
         $router = $this->router();
         $router->domain('cache.example.test', function (Router $router): void {
-            $router->get('/cached/{id}', [CachedController::class, 'show'])->name('cached.show');
+            $router->get('/cached/{id}', [CachedController::class, 'show'])
+                ->name('cached.show')
+                ->middleware(CachedRouteMiddleware::class);
         });
 
         $cache->write($router);
@@ -32,11 +39,13 @@ final class RouteCacheTest extends TestCase
         $cache->load($loaded);
 
         self::assertSame('Cached 7', $loaded->dispatch(new Request('GET', '/cached/7', ['host' => 'cache.example.test']))->content());
+        self::assertSame('cached', $loaded->dispatch(new Request('GET', '/cached/8', ['host' => 'cache.example.test']))->headers()['X-Cached-Route-Middleware']);
         $route = $loaded->route('cached.show');
 
         self::assertNotNull($route);
         self::assertSame('/cached/{id}', $route->path());
         self::assertSame('cache.example.test', $route->getDomain());
+        self::assertSame([CachedRouteMiddleware::class], $route->getMiddleware());
     }
 
     public function testRouteCacheRejectsClosureRoutes(): void
@@ -54,7 +63,11 @@ final class RouteCacheTest extends TestCase
         $container = new Container();
         $container->instance(Container::class, $container);
 
-        return new Router(new ControllerDispatcher($container));
+        return new Router(
+            new ControllerDispatcher($container),
+            new MiddlewareResolver($container),
+            new Pipeline(),
+        );
     }
 }
 
@@ -66,5 +79,16 @@ final class CachedController
     public function show(Request $request, array $parameters): string
     {
         return 'Cached ' . $parameters['id'];
+    }
+}
+
+final class CachedRouteMiddleware implements Middleware
+{
+    /**
+     * @param Closure(Request): Response $next
+     */
+    public function handle(Request $request, Closure $next): Response
+    {
+        return $next($request)->withHeader('X-Cached-Route-Middleware', 'cached');
     }
 }

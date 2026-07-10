@@ -86,9 +86,10 @@ tests/
 - Cookies
 - File-backed sessions
 - Configurable middleware
+- Route middleware
 - Middleware pipeline
-- Validation
-- Database foundation
+- Validation foundation with pipe-style rules
+- PDO database foundation
 
 ### 1.0 LTS
 - ORM

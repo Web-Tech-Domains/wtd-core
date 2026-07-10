@@ -10,9 +10,11 @@ use WTD\Config\Loader;
 use WTD\Config\Repository;
 use WTD\Container\Container;
 use WTD\Console\ConsoleServiceProvider;
+use WTD\Database\DatabaseServiceProvider;
 use WTD\Filesystem\Filesystem;
 use WTD\Http\HttpServiceProvider;
 use WTD\Support\Env;
+use WTD\Validation\ValidationServiceProvider;
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
@@ -34,6 +36,8 @@ $app = new Application($basePath, $container, $config);
 $app->register(CoreServiceProvider::class);
 $app->register(ConsoleServiceProvider::class);
 $app->register(HttpServiceProvider::class);
+$app->register(ValidationServiceProvider::class);
+$app->register(DatabaseServiceProvider::class);
 
 $providers = $config->get('app.providers', []);
 if (is_array($providers)) {

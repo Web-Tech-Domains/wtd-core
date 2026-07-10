@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace Tests\Routing;
 
+use Closure;
 use PHPUnit\Framework\TestCase;
 use WTD\Container\Container;
 use WTD\Exception\MethodNotAllowedHttpException;
 use WTD\Exception\NotFoundHttpException;
 use WTD\Http\Request;
 use WTD\Http\Response;
+use WTD\Middleware\Middleware;
+use WTD\Middleware\MiddlewareResolver;
+use WTD\Middleware\Pipeline;
 use WTD\Routing\ControllerDispatcher;
 use WTD\Routing\Router;
 use WTD\Routing\UrlGenerator;
@@ -165,12 +169,36 @@ final class RouterTest extends TestCase
         self::assertSame('v1', $router->dispatch(new Request('GET', '/api/v1/status'))->content());
     }
 
+    public function testRouterRunsRouteMiddleware(): void
+    {
+        $router = $this->routerWithMiddleware();
+        $router->get('/guarded', static fn (): string => 'Guarded')
+            ->middleware(RouteHeaderMiddleware::class);
+
+        $response = $router->dispatch(new Request('GET', '/guarded'));
+
+        self::assertSame('Guarded', $response->content());
+        self::assertSame('yes', $response->headers()['X-Route-Middleware']);
+    }
+
     private function router(): Router
     {
         $container = new Container();
         $container->instance(Container::class, $container);
 
         return new Router(new ControllerDispatcher($container));
+    }
+
+    private function routerWithMiddleware(): Router
+    {
+        $container = new Container();
+        $container->instance(Container::class, $container);
+
+        return new Router(
+            new ControllerDispatcher($container),
+            new MiddlewareResolver($container),
+            new Pipeline(),
+        );
     }
 }
 
@@ -193,5 +221,16 @@ final class InvokableController
     public function __invoke(Request $request, array $parameters): string
     {
         return 'Invokable';
+    }
+}
+
+final class RouteHeaderMiddleware implements Middleware
+{
+    /**
+     * @param Closure(Request): Response $next
+     */
+    public function handle(Request $request, Closure $next): Response
+    {
+        return $next($request)->withHeader('X-Route-Middleware', 'yes');
     }
 }

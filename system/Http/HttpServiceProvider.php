@@ -40,11 +40,18 @@ final class HttpServiceProvider extends ServiceProvider
                 $this->app->basePath('storage/sessions'),
             ),
         );
-        $this->container()->singleton(Router::class);
-        $this->container()->singleton(UrlGenerator::class);
         $this->container()->singleton(Pipeline::class);
         $this->container()->singleton(ExceptionRenderer::class);
         $this->container()->singleton(MiddlewareResolver::class);
+        $this->container()->singleton(
+            Router::class,
+            fn (): Router => new Router(
+                $this->container()->get(ControllerDispatcher::class),
+                $this->container()->get(MiddlewareResolver::class),
+                $this->container()->get(Pipeline::class),
+            ),
+        );
+        $this->container()->singleton(UrlGenerator::class);
         $this->container()->singleton(HttpKernel::class, function (): HttpKernel {
             $middleware = $this->app->config()->get('http.middleware', []);
             $middleware = is_array($middleware) ? array_values($middleware) : [];

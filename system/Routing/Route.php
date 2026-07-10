@@ -7,6 +7,7 @@ namespace WTD\Routing;
 use Closure;
 use WTD\Http\Request;
 use WTD\Http\Response;
+use WTD\Middleware\Middleware;
 
 /**
  * Defines an HTTP route.
@@ -19,7 +20,13 @@ final class Route
     private array $parameters = [];
 
     /**
+     * @var list<class-string<Middleware>>
+     */
+    private array $middleware = [];
+
+    /**
      * @param \Closure(Request, array<string, string>): (Response|string|array<string, mixed>)|class-string|array{0: class-string, 1: non-empty-string} $action
+     * @param list<class-string<Middleware>> $middleware
      */
     public function __construct(
         private readonly string $method,
@@ -27,7 +34,9 @@ final class Route
         private readonly Closure|array|string $action,
         private ?string $name = null,
         private ?string $domain = null,
+        array $middleware = [],
     ) {
+        $this->middleware = array_values($middleware);
     }
 
     /**
@@ -80,6 +89,28 @@ final class Route
     public function getDomain(): ?string
     {
         return $this->domain;
+    }
+
+    /**
+     * Add route-specific middleware.
+     *
+     * @param class-string<Middleware> ...$middleware
+     */
+    public function middleware(string ...$middleware): self
+    {
+        array_push($this->middleware, ...$middleware);
+
+        return $this;
+    }
+
+    /**
+     * Return route-specific middleware.
+     *
+     * @return list<class-string<Middleware>>
+     */
+    public function getMiddleware(): array
+    {
+        return $this->middleware;
     }
 
     /**

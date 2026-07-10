@@ -50,6 +50,7 @@ final class RouteCache
                 'action' => $action,
                 'name' => $route->getName(),
                 'domain' => $route->getDomain(),
+                'middleware' => $route->getMiddleware(),
             ];
         }
 
@@ -78,13 +79,14 @@ final class RouteCache
                 continue;
             }
 
-            /** @var array{method: string, path: string, action: class-string|array{0: class-string, 1: non-empty-string}, name?: string|null, domain?: string|null} $route */
+            /** @var array{method: string, path: string, action: class-string|array{0: class-string, 1: non-empty-string}, name?: string|null, domain?: string|null, middleware?: list<class-string<\WTD\Middleware\Middleware>>} $route */
             $router->addCached(
                 $route['method'],
                 $route['path'],
                 $route['action'],
                 $route['name'] ?? null,
                 $route['domain'] ?? null,
+                $route['middleware'] ?? [],
             );
         }
     }

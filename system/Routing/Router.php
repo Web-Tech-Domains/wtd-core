@@ -5,10 +5,14 @@ declare(strict_types=1);
 namespace WTD\Routing;
 
 use Closure;
+use RuntimeException;
 use WTD\Exception\MethodNotAllowedHttpException;
 use WTD\Exception\NotFoundHttpException;
 use WTD\Http\Request;
 use WTD\Http\Response;
+use WTD\Middleware\Middleware;
+use WTD\Middleware\MiddlewareResolver;
+use WTD\Middleware\Pipeline;
 
 /**
  * Stores and resolves HTTP routes.
@@ -30,8 +34,11 @@ final class Router
      */
     private array $groupDomains = [];
 
-    public function __construct(private readonly ControllerDispatcher $dispatcher)
-    {
+    public function __construct(
+        private readonly ControllerDispatcher $dispatcher,
+        private readonly ?MiddlewareResolver $middlewareResolver = null,
+        private readonly ?Pipeline $pipeline = null,
+    ) {
     }
 
     /**
@@ -98,10 +105,17 @@ final class Router
      * Register a route from cached metadata.
      *
      * @param class-string|array{0: class-string, 1: non-empty-string} $action
+     * @param list<class-string<Middleware>> $middleware
      */
-    public function addCached(string $method, string $path, string|array $action, ?string $name = null, ?string $domain = null): Route
-    {
-        $route = new Route($method, $path, $action, $name, $domain);
+    public function addCached(
+        string $method,
+        string $path,
+        string|array $action,
+        ?string $name = null,
+        ?string $domain = null,
+        array $middleware = [],
+    ): Route {
+        $route = new Route($method, $path, $action, $name, $domain, $middleware);
         $this->routes[] = $route;
 
         return $route;
@@ -188,7 +202,7 @@ final class Router
             throw new NotFoundHttpException();
         }
 
-        return $route->run($request, $this->dispatcher);
+        return $this->runRoute($route, $request);
     }
 
     /**
@@ -253,6 +267,28 @@ final class Router
         sort($methods);
 
         return array_values($methods);
+    }
+
+    /**
+     * Execute route-specific middleware before the route action.
+     */
+    private function runRoute(Route $route, Request $request): Response
+    {
+        $middleware = $route->getMiddleware();
+
+        if ($middleware === []) {
+            return $route->run($request, $this->dispatcher);
+        }
+
+        if ($this->middlewareResolver === null || $this->pipeline === null) {
+            throw new RuntimeException('Route middleware requires a middleware resolver and pipeline.');
+        }
+
+        return $this->pipeline->handle(
+            $request,
+            $this->middlewareResolver->resolve($middleware),
+            fn (Request $request): Response => $route->run($request, $this->dispatcher),
+        );
     }
 
     /**
