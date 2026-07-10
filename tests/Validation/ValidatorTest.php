@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 use WTD\Application\Application;
 use WTD\Config\Repository;
 use WTD\Container\Container;
+use WTD\Validation\Rule;
 use WTD\Validation\ValidationException;
 use WTD\Validation\ValidationServiceProvider;
 use WTD\Validation\Validator;
@@ -100,6 +101,26 @@ final class ValidatorTest extends TestCase
         self::assertSame(['Use a valid user email.'], $result->errors()['user.email']);
     }
 
+    public function testValidatedNestedFieldsPreserveNestedOutput(): void
+    {
+        $validated = (new Validator())->validate(
+            ['user' => ['email' => 'taylor@example.test'], 'extra' => 'ignored'],
+            ['user.email' => 'required|email'],
+        );
+
+        self::assertSame(['user' => ['email' => 'taylor@example.test']], $validated);
+    }
+
+    public function testLiteralDottedFieldsArePreservedWhenPresent(): void
+    {
+        $validated = (new Validator())->validate(
+            ['metadata.version' => '1'],
+            ['metadata.version' => 'required|string'],
+        );
+
+        self::assertSame(['metadata.version' => '1'], $validated);
+    }
+
     public function testValidatorSupportsConditionalRules(): void
     {
         $validator = new Validator();
@@ -141,6 +162,50 @@ final class ValidatorTest extends TestCase
         self::assertSame('https://example.test', $validated['website']);
     }
 
+    public function testValidatorSupportsAcceptedDeclinedSizeAndRegexRules(): void
+    {
+        $validated = (new Validator())->validate(
+            [
+                'terms' => 'on',
+                'marketing' => 'no',
+                'code' => 'WTD-001',
+                'roles' => ['admin', 'editor'],
+            ],
+            [
+                'terms' => 'accepted',
+                'marketing' => 'declined',
+                'code' => 'regex:/^WTD-[0-9]{3}$/',
+                'roles' => 'array|size:2',
+            ],
+        );
+
+        self::assertSame('WTD-001', $validated['code']);
+        self::assertSame(['admin', 'editor'], $validated['roles']);
+    }
+
+    public function testValidatorCollectsAcceptedDeclinedSizeAndRegexFailures(): void
+    {
+        $result = (new Validator())->make(
+            [
+                'terms' => 'off',
+                'marketing' => 'yes',
+                'code' => 'BAD',
+                'roles' => ['admin'],
+            ],
+            [
+                'terms' => 'accepted',
+                'marketing' => 'declined',
+                'code' => 'regex:/^WTD-[0-9]{3}$/',
+                'roles' => 'array|size:2',
+            ],
+        );
+
+        self::assertArrayHasKey('terms', $result->errors());
+        self::assertArrayHasKey('marketing', $result->errors());
+        self::assertArrayHasKey('code', $result->errors());
+        self::assertArrayHasKey('roles', $result->errors());
+    }
+
     public function testSometimesSkipsMissingFields(): void
     {
         $result = (new Validator())->make([], ['nickname' => 'sometimes|required|string']);
@@ -162,6 +227,40 @@ final class ValidatorTest extends TestCase
         self::assertArrayHasKey('name', $result->errors());
     }
 
+    public function testValidatorSupportsClosureRules(): void
+    {
+        $validator = (new Validator())->extend(
+            'starts_with',
+            /**
+             * @param array<string, mixed> $data
+             */
+            static fn (string $field, mixed $value, ?string $parameter, array $data): bool => is_string($value)
+                && is_string($parameter)
+                && str_starts_with($value, $parameter),
+            'The :field field has an invalid prefix.',
+        );
+
+        $result = $validator->make(['code' => 'WTD-001'], ['code' => 'required|starts_with:APP']);
+
+        self::assertSame(['The code field has an invalid prefix.'], $result->errors()['code']);
+    }
+
+    public function testValidatorSupportsObjectRules(): void
+    {
+        $validator = (new Validator())->extend('uppercase', new UppercaseRule());
+
+        $result = $validator->make(['code' => 'abc'], ['code' => 'required|uppercase']);
+
+        self::assertSame(['The code field must be uppercase.'], $result->errors()['code']);
+    }
+
+    public function testUnknownRulesFailValidation(): void
+    {
+        $result = (new Validator())->make(['code' => 'abc'], ['code' => 'unknown_rule']);
+
+        self::assertSame(['The code field failed unknown_rule validation.'], $result->errors()['code']);
+    }
+
     public function testApplicationRegistersValidator(): void
     {
         /** @var non-empty-string $basePath */
@@ -170,5 +269,21 @@ final class ValidatorTest extends TestCase
         $app->register(ValidationServiceProvider::class);
 
         self::assertInstanceOf(Validator::class, $app->container()->get(Validator::class));
+    }
+}
+
+final class UppercaseRule implements Rule
+{
+    /**
+     * @param array<string, mixed> $data
+     */
+    public function passes(string $field, mixed $value, ?string $parameter, array $data): bool
+    {
+        return is_string($value) && strtoupper($value) === $value;
+    }
+
+    public function message(string $field, ?string $parameter): string
+    {
+        return sprintf('The %s field must be uppercase.', $field);
     }
 }

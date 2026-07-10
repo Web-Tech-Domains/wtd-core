@@ -62,7 +62,7 @@ final class ValidationResult
 
         foreach ($this->fields as $field) {
             if ($this->exists($field)) {
-                $validated[$field] = $this->value($field);
+                $this->set($validated, $field, $this->value($field));
             }
         }
 
@@ -105,5 +105,28 @@ final class ValidationResult
         }
 
         return $current;
+    }
+
+    /**
+     * @param array<string, mixed> $target
+     */
+    private function set(array &$target, string $field, mixed $value): void
+    {
+        if (array_key_exists($field, $this->data)) {
+            $target[$field] = $value;
+            return;
+        }
+
+        $current = &$target;
+
+        foreach (explode('.', $field) as $segment) {
+            if (!isset($current[$segment]) || !is_array($current[$segment])) {
+                $current[$segment] = [];
+            }
+
+            $current = &$current[$segment];
+        }
+
+        $current = $value;
     }
 }

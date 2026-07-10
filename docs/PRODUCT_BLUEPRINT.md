@@ -95,11 +95,12 @@ tests/
 - Request validation helpers
 - Form request validation classes
 - Controller form request injection
-- Nested input validation with dot notation
+- Nested input validation and validated output with dot notation
 - Conditional validation rules
 - Custom validation messages
+- Custom validation rule extensions
 - HTTP 422 JSON validation error responses
-- Common scalar, comparison, confirmation, date, URL, and membership rules
+- Common scalar, comparison, exact size, regex, confirmation, date, URL, accepted/declined, and membership rules
 
 ### 1.0 LTS
 - ORM

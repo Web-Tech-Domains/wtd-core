@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace WTD\Validation;
 
+use Closure;
+
 /**
  * Validates associative input arrays against pipe-style rules.
  */
@@ -13,6 +15,32 @@ final class Validator
      * @var array<string, mixed>
      */
     private array $activeData = [];
+
+    /**
+     * @var array<string, Rule|Closure(string, mixed, ?string, array<string, mixed>): bool>
+     */
+    private array $extensions = [];
+
+    /**
+     * @var array<string, string>
+     */
+    private array $extensionMessages = [];
+
+    /**
+     * Register a custom validation rule.
+     *
+     * @param Rule|Closure(string, mixed, ?string, array<string, mixed>): bool $rule
+     */
+    public function extend(string $name, Rule|Closure $rule, ?string $message = null): self
+    {
+        $this->extensions[$name] = $rule;
+
+        if ($message !== null) {
+            $this->extensionMessages[$name] = $message;
+        }
+
+        return $this;
+    }
 
     /**
      * Build a validation result without throwing.
@@ -51,7 +79,7 @@ final class Validator
                 }
 
                 if (!$this->passesRule($name, $rule[1] ?? null, $field, $value, $data, $exists)) {
-                    $errors[$field][] = $this->message($field, $name, $messages);
+                    $errors[$field][] = $this->message($field, $name, $rule[1] ?? null, $messages);
                 }
             }
         }
@@ -158,12 +186,24 @@ final class Validator
      */
     private function passesRule(string $rule, ?string $parameter, string $field, mixed $value, array $data, bool $exists): bool
     {
+        if (array_key_exists($rule, $this->extensions)) {
+            $extension = $this->extensions[$rule];
+
+            if ($extension instanceof Rule) {
+                return $extension->passes($field, $value, $parameter, $data);
+            }
+
+            return $extension($field, $value, $parameter, $data);
+        }
+
         return match ($rule) {
             'required' => $exists && !$this->isEmpty($value),
             'required_if' => !$this->requiredIf($parameter) || ($exists && !$this->isEmpty($value)),
             'required_unless' => !$this->requiredUnless($parameter) || ($exists && !$this->isEmpty($value)),
             'present' => $exists,
             'filled' => !$exists || !$this->isEmpty($value),
+            'accepted' => in_array($value, ['yes', 'on', '1', 1, true], true),
+            'declined' => in_array($value, ['no', 'off', '0', 0, false], true),
             'string' => is_string($value),
             'integer' => is_int($value) || (is_string($value) && filter_var($value, FILTER_VALIDATE_INT) !== false),
             'numeric' => is_int($value) || is_float($value) || (is_string($value) && is_numeric($value)),
@@ -174,13 +214,15 @@ final class Validator
             'date' => is_string($value) && strtotime($value) !== false,
             'min' => $this->compareSize($value, $parameter, static fn (float $size, float $limit): bool => $size >= $limit),
             'max' => $this->compareSize($value, $parameter, static fn (float $size, float $limit): bool => $size <= $limit),
+            'size' => $this->compareSize($value, $parameter, static fn (float $size, float $limit): bool => $size === $limit),
             'between' => $this->between($value, $parameter),
             'in' => $parameter !== null && in_array((string) $value, explode(',', $parameter), true),
             'not_in' => $parameter !== null && !in_array((string) $value, explode(',', $parameter), true),
+            'regex' => $parameter !== null && is_string($value) && @preg_match($parameter, $value) === 1,
             'same' => $parameter !== null && $this->value($data, $parameter) === $value,
             'different' => $parameter !== null && $this->value($data, $parameter) !== $value,
             'confirmed' => $this->value($data, $field . '_confirmation') === $value,
-            default => true,
+            default => false,
         };
     }
 
@@ -238,7 +280,7 @@ final class Validator
     /**
      * @param array<string, string> $messages
      */
-    private function message(string $field, string $rule, array $messages): string
+    private function message(string $field, string $rule, ?string $parameter, array $messages): string
     {
         if (array_key_exists($field . '.' . $rule, $messages)) {
             return $messages[$field . '.' . $rule];
@@ -246,6 +288,14 @@ final class Validator
 
         if (array_key_exists($rule, $messages)) {
             return $messages[$rule];
+        }
+
+        if (array_key_exists($rule, $this->extensionMessages)) {
+            return str_replace([':field', ':parameter'], [$field, $parameter ?? ''], $this->extensionMessages[$rule]);
+        }
+
+        if (array_key_exists($rule, $this->extensions) && $this->extensions[$rule] instanceof Rule) {
+            return $this->extensions[$rule]->message($field, $parameter);
         }
 
         return sprintf('The %s field failed %s validation.', $field, $rule);
