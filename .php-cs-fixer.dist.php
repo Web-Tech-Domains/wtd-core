@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 $finder = PhpCsFixer\Finder::create()
     ->in([__DIR__ . '/system', __DIR__ . '/tests'])
+    ->exclude('tmp')
     ->append([__FILE__, __DIR__ . '/bootstrap/app.php', __DIR__ . '/public/index.php', __DIR__ . '/core']);
 
 return (new PhpCsFixer\Config())
