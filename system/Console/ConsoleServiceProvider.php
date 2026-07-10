@@ -5,11 +5,16 @@ declare(strict_types=1);
 namespace WTD\Console;
 
 use WTD\Console\Commands\AboutCommand;
+use WTD\Console\Commands\ConfigCacheCommand;
+use WTD\Console\Commands\ConfigClearCommand;
 use WTD\Console\Commands\DiagnosticsCommand;
 use WTD\Console\Commands\DownCommand;
 use WTD\Console\Commands\EnvironmentCommand;
 use WTD\Console\Commands\HealthCommand;
+use WTD\Console\Commands\HelpCommand;
 use WTD\Console\Commands\ListCommand;
+use WTD\Console\Commands\OptimizeClearCommand;
+use WTD\Console\Commands\OptimizeCommand;
 use WTD\Console\Commands\UpCommand;
 use WTD\Support\ServiceProvider;
 
@@ -31,6 +36,7 @@ final class ConsoleServiceProvider extends ServiceProvider
             }
 
             $kernel->register(new ListCommand($kernel));
+            $kernel->register(new HelpCommand($kernel));
 
             return $kernel;
         });
@@ -45,10 +51,14 @@ final class ConsoleServiceProvider extends ServiceProvider
     {
         return [
             AboutCommand::class,
+            ConfigCacheCommand::class,
+            ConfigClearCommand::class,
             DiagnosticsCommand::class,
             DownCommand::class,
             EnvironmentCommand::class,
             HealthCommand::class,
+            OptimizeCommand::class,
+            OptimizeClearCommand::class,
             UpCommand::class,
         ];
     }

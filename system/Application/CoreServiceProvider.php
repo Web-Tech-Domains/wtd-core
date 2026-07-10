@@ -6,6 +6,7 @@ namespace WTD\Application;
 
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use WTD\Config\Cache;
 use WTD\Exception\ErrorHandler;
 use WTD\Filesystem\Filesystem;
 use WTD\Logging\Logger;
@@ -23,6 +24,13 @@ final class CoreServiceProvider extends ServiceProvider
     {
         $this->container()->singleton(Filesystem::class);
         $this->container()->singleton(
+            Cache::class,
+            fn (): Cache => new Cache(
+                $this->container()->get(Filesystem::class),
+                $this->app->basePath('storage/framework/config.php'),
+            ),
+        );
+        $this->container()->singleton(
             MaintenanceMode::class,
             fn (): MaintenanceMode => new MaintenanceMode(
                 $this->container()->get(Filesystem::class),
@@ -38,5 +46,15 @@ final class CoreServiceProvider extends ServiceProvider
         $this->container()->singleton(ErrorHandler::class);
         $this->container()->singleton(HealthCheck::class);
         $this->container()->singleton(Diagnostics::class);
+    }
+
+    /**
+     * Boot core framework services.
+     */
+    public function boot(): void
+    {
+        /** @var ErrorHandler $handler */
+        $handler = $this->container()->get(ErrorHandler::class);
+        $handler->register();
     }
 }

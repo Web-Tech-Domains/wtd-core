@@ -49,8 +49,29 @@ final class KernelTest extends TestCase
         $kernel = $app->container()->get(Kernel::class);
 
         self::assertArrayHasKey('about', $kernel->commands());
+        self::assertArrayHasKey('config:cache', $kernel->commands());
+        self::assertArrayHasKey('config:clear', $kernel->commands());
         self::assertArrayHasKey('diagnostics', $kernel->commands());
+        self::assertArrayHasKey('help', $kernel->commands());
         self::assertArrayHasKey('list', $kernel->commands());
+        self::assertArrayHasKey('optimize', $kernel->commands());
+        self::assertArrayHasKey('optimize:clear', $kernel->commands());
+    }
+
+    public function testHelpCommandCanDescribeSpecificCommand(): void
+    {
+        $app = $this->application();
+        $app->register(CoreServiceProvider::class);
+        $app->register(ConsoleServiceProvider::class);
+        /** @var Kernel $kernel */
+        $kernel = $app->container()->get(Kernel::class);
+        [$output, $stdout] = $this->consoleOutput();
+
+        $status = $kernel->handle(new Input(['help', 'about']), $output);
+
+        rewind($stdout);
+        self::assertSame(0, $status);
+        self::assertStringContainsString('Print framework name and version.', (string) stream_get_contents($stdout));
     }
 
     /**

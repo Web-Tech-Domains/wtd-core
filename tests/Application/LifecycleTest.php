@@ -14,6 +14,7 @@ use WTD\Application\HealthCheck;
 use WTD\Application\MaintenanceMode;
 use WTD\Application\MemoryMonitor;
 use WTD\Application\PerformanceTimer;
+use WTD\Application\ProviderBootstrapper;
 use WTD\Application\Version;
 use WTD\Config\Repository;
 use WTD\Container\Container;
@@ -32,6 +33,17 @@ final class LifecycleTest extends TestCase
         self::assertTrue($provider->registered);
         self::assertTrue($provider->booted);
         self::assertTrue($app->isBooted());
+        self::assertSame([$provider], $app->providers());
+    }
+
+    public function testProviderBootstrapperRegistersConfiguredProviders(): void
+    {
+        $app = $this->application();
+
+        (new ProviderBootstrapper($app))->bootstrap([ExampleProvider::class]);
+
+        self::assertCount(1, $app->providers());
+        self::assertInstanceOf(ExampleProvider::class, $app->providers()[0]);
     }
 
     public function testCoreProviderRegistersPsrContracts(): void

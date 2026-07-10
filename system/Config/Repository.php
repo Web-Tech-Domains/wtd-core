@@ -41,6 +41,16 @@ final class Repository
     }
 
     /**
+     * Replace all configuration values.
+     *
+     * @param array<string, mixed> $items
+     */
+    public function replace(array $items): void
+    {
+        $this->items = $items;
+    }
+
+    /**
      * Merge a nested configuration array under a namespace.
      *
      * @param array<string, mixed> $items

@@ -34,12 +34,18 @@ composer analyse
 composer cs:fix
 php core about
 php core list
+php core help
+php core help health
+php core config:cache
+php core config:clear
+php core optimize
+php core optimize:clear
 php core health
 php core diagnostics
 ```
 
 ## Current Phase
 
-WTD Core is in `0.1.0-alpha` foundation work. The current implementation includes the application lifecycle, service providers, dependency injection, file-based configuration loading, environment loading, filesystem helpers, file logging, error handling, health reporting, persistent maintenance state, timing, memory metrics, and a console kernel with built-in CLI commands.
+WTD Core is in `0.1.0-alpha` foundation work. The current implementation includes the application lifecycle, service providers, configurable provider bootstrapping, dependency injection, file-based configuration loading and caching, environment loading, filesystem helpers, file logging, boot-time error handling, health reporting, persistent maintenance state, timing, memory metrics, and a console kernel with parsed input, help output, and built-in CLI commands.
 
 Current PSR contract support includes PSR-4 autoloading, PSR-11 container interfaces, and PSR-3 logger interfaces.

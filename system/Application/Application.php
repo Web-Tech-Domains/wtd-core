@@ -7,6 +7,7 @@ namespace WTD\Application;
 use WTD\Config\Repository;
 use WTD\Container\Container;
 use WTD\Support\ServiceProvider;
+use InvalidArgumentException;
 
 /**
  * Coordinates the core framework lifecycle and shared services.
@@ -85,7 +86,7 @@ final class Application
         $instance = is_string($provider) ? $this->container->get($provider) : $provider;
 
         if (!$instance instanceof ServiceProvider) {
-            throw new \InvalidArgumentException('Service provider must extend ' . ServiceProvider::class . '.');
+            throw new InvalidArgumentException('Service provider must extend ' . ServiceProvider::class . '.');
         }
 
         $instance->register();
@@ -120,5 +121,15 @@ final class Application
     public function isBooted(): bool
     {
         return $this->booted;
+    }
+
+    /**
+     * Return registered service providers.
+     *
+     * @return list<ServiceProvider>
+     */
+    public function providers(): array
+    {
+        return $this->providers;
     }
 }

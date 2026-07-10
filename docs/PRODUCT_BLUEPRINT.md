@@ -48,19 +48,20 @@ tests/
 - Bootstrap file
 - Service container
 - Service providers
+- Configurable provider bootstrapping
 - PSR-11 container contract support
 - PSR-3 logger contract support
-- Configuration repository and PHP config loader
+- Configuration repository, PHP config loader, and config cache
 - Environment loader
-- Error handler
+- Boot-time error handler registration
 - File logger
 - Filesystem helper
 - Health check
 - Persistent maintenance mode state
 - Performance timer
 - Memory monitor
-- Console kernel and command registry
-- CLI `about`, `env`, `health`, `diagnostics`, `down`, `up`, and `list` commands
+- Console kernel, parsed input, and command registry
+- CLI `about`, `env`, `health`, `diagnostics`, `down`, `up`, `list`, `help`, `config:cache`, `config:clear`, `optimize`, and `optimize:clear` commands
 - Initial PHPUnit, PHPStan, and PHP-CS-Fixer setup
 
 ### 0.5 Beta
