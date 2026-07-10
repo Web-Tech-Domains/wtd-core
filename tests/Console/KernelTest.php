@@ -15,6 +15,7 @@ use WTD\Console\Kernel;
 use WTD\Console\Output;
 use WTD\Console\UnknownCommandException;
 use WTD\Container\Container;
+use WTD\Http\HttpServiceProvider;
 
 final class KernelTest extends TestCase
 {
@@ -43,6 +44,7 @@ final class KernelTest extends TestCase
     {
         $app = $this->application();
         $app->register(CoreServiceProvider::class);
+        $app->register(HttpServiceProvider::class);
         $app->register(ConsoleServiceProvider::class);
 
         /** @var Kernel $kernel */
@@ -56,12 +58,15 @@ final class KernelTest extends TestCase
         self::assertArrayHasKey('list', $kernel->commands());
         self::assertArrayHasKey('optimize', $kernel->commands());
         self::assertArrayHasKey('optimize:clear', $kernel->commands());
+        self::assertArrayHasKey('route:cache', $kernel->commands());
+        self::assertArrayHasKey('route:clear', $kernel->commands());
     }
 
     public function testHelpCommandCanDescribeSpecificCommand(): void
     {
         $app = $this->application();
         $app->register(CoreServiceProvider::class);
+        $app->register(HttpServiceProvider::class);
         $app->register(ConsoleServiceProvider::class);
         /** @var Kernel $kernel */
         $kernel = $app->container()->get(Kernel::class);

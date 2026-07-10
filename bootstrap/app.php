@@ -11,6 +11,7 @@ use WTD\Config\Repository;
 use WTD\Container\Container;
 use WTD\Console\ConsoleServiceProvider;
 use WTD\Filesystem\Filesystem;
+use WTD\Http\HttpServiceProvider;
 use WTD\Support\Env;
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
@@ -32,6 +33,7 @@ if ($configCache->exists()) {
 $app = new Application($basePath, $container, $config);
 $app->register(CoreServiceProvider::class);
 $app->register(ConsoleServiceProvider::class);
+$app->register(HttpServiceProvider::class);
 
 $providers = $config->get('app.providers', []);
 if (is_array($providers)) {

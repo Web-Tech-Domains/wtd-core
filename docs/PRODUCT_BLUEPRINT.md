@@ -66,8 +66,22 @@ tests/
 
 ### 0.5 Beta
 - HTTP kernel
+- Request and response objects
+- HTTP exception rendering
 - Routing
-- Middleware
+- Route parameters
+- Route groups
+- Named routes
+- URL generator
+- Route cache
+- Controllers
+- Redirect responses
+- File downloads
+- Streaming responses
+- Cookies
+- File-backed sessions
+- Configurable middleware
+- Middleware pipeline
 - Validation
 - Database foundation
 

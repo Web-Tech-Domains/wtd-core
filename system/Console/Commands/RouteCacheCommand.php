@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace WTD\Console\Commands;
 
 use WTD\Application\Application;
-use WTD\Config\Cache;
-use WTD\Config\Loader;
-use WTD\Config\Repository;
 use WTD\Console\Command;
 use WTD\Console\Input;
 use WTD\Console\Output;
@@ -16,34 +13,29 @@ use WTD\Routing\RouteCache;
 use WTD\Routing\Router;
 
 /**
- * Builds framework optimization caches.
+ * Builds the route cache.
  */
-final class OptimizeCommand implements Command
+final class RouteCacheCommand implements Command
 {
     public function __construct(
         private readonly Application $app,
-        private readonly Cache $configCache,
         private readonly ControllerDispatcher $dispatcher,
-        private readonly RouteCache $routeCache,
+        private readonly RouteCache $cache,
     ) {
     }
 
     public function name(): string
     {
-        return 'optimize';
+        return 'route:cache';
     }
 
     public function description(): string
     {
-        return 'Build framework optimization caches.';
+        return 'Build the route cache.';
     }
 
     public function handle(Input $input, Output $output): int
     {
-        $repository = new Repository();
-        (new Loader($repository))->loadDirectory($this->app->basePath('config'));
-        $this->configCache->write($repository->all());
-
         $router = new Router($this->dispatcher);
         $routes = $this->app->basePath('routes/web.php');
 
@@ -51,9 +43,8 @@ final class OptimizeCommand implements Command
             require $routes;
         }
 
-        $this->routeCache->write($router);
-
-        $output->line('Framework optimized');
+        $this->cache->write($router);
+        $output->line('Routes cached');
 
         return 0;
     }
