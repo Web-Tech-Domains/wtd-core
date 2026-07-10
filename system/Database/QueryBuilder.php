@@ -99,9 +99,63 @@ final class QueryBuilder
      */
     public function first(): ?array
     {
-        $rows = $this->limit(1)->get();
+        $query = clone $this;
+        $rows = $query->limit(1)->get();
 
         return $rows[0] ?? null;
+    }
+
+    /**
+     * Count matching rows.
+     */
+    public function count(): int
+    {
+        $rows = $this->connection->select(sprintf(
+            'SELECT COUNT(*) AS aggregate FROM %s%s',
+            $this->quote($this->table),
+            $this->whereSql(),
+        ), $this->bindings);
+
+        return (int) ($rows[0]['aggregate'] ?? 0);
+    }
+
+    /**
+     * Paginate matching rows.
+     */
+    public function paginate(int $perPage = 15, int $page = 1): Paginator
+    {
+        $perPage = max(1, $perPage);
+        $page = max(1, $page);
+        $query = clone $this;
+        $items = $query->limit($perPage)->offset(($page - 1) * $perPage)->get();
+
+        return new Paginator($items, $this->count(), $perPage, $page);
+    }
+
+    /**
+     * Iterate through matching rows in chunks.
+     *
+     * @param callable(list<array<string, mixed>>, int): (bool|void) $callback
+     */
+    public function chunk(int $size, callable $callback): void
+    {
+        $size = max(1, $size);
+        $page = 1;
+
+        do {
+            $query = clone $this;
+            $rows = $query->limit($size)->offset(($page - 1) * $size)->get();
+
+            if ($rows === []) {
+                return;
+            }
+
+            if ($callback($rows, $page) === false) {
+                return;
+            }
+
+            $page++;
+        } while (count($rows) === $size);
     }
 
     /**

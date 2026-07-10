@@ -129,6 +129,8 @@ tests/
 - Migration contract
 - Migration repository and batch tracking
 - Migration runner and rollback support
+- Pagination
+- Chunking
 - CLI `migrate` and `migrate:rollback` commands
 - Database service provider bindings
 

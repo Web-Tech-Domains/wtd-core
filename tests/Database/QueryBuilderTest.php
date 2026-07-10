@@ -30,13 +30,15 @@ final class QueryBuilderTest extends TestCase
     {
         $connection = $this->connection();
         $this->seedUsers($connection);
+        $query = $connection->table('users')->select('name')->where('active', 1);
 
-        $row = $connection->table('users')
-            ->select('name')
-            ->where('name', 'Taylor')
-            ->first();
+        $row = $query->first();
 
         self::assertSame(['name' => 'Taylor'], $row);
+        self::assertSame([
+            ['name' => 'Taylor'],
+            ['name' => 'Ada'],
+        ], $query->get());
     }
 
     public function testQueryBuilderCanInsertUpdateAndDeleteRows(): void
@@ -67,6 +69,74 @@ final class QueryBuilderTest extends TestCase
             ->toSql();
 
         self::assertSame('SELECT "id", "name" FROM "users" WHERE "active" = ? LIMIT 10', $sql);
+    }
+
+    public function testQueryBuilderCountsMatchingRows(): void
+    {
+        $connection = $this->connection();
+        $this->seedUsers($connection);
+
+        self::assertSame(2, $connection->table('users')->where('active', 1)->count());
+    }
+
+    public function testQueryBuilderPaginatesRows(): void
+    {
+        $connection = $this->connection();
+        $this->seedUsers($connection);
+
+        $page = $connection->table('users')
+            ->select('name')
+            ->paginate(perPage: 2, page: 2);
+
+        self::assertSame([['name' => 'Grace']], $page->items());
+        self::assertSame(3, $page->total());
+        self::assertSame(2, $page->perPage());
+        self::assertSame(2, $page->currentPage());
+        self::assertSame(2, $page->lastPage());
+        self::assertFalse($page->hasMorePages());
+        self::assertSame(3, $page->toArray()['total']);
+    }
+
+    public function testQueryBuilderChunksRows(): void
+    {
+        $connection = $this->connection();
+        $this->seedUsers($connection);
+        $chunks = [];
+
+        $connection->table('users')->select('name')->chunk(2, /**
+         * @param list<array<string, mixed>> $rows
+         */
+            function (array $rows, int $page) use (&$chunks): void {
+                $chunks[$page] = $rows;
+            });
+
+        self::assertSame([
+            1 => [
+                ['name' => 'Taylor'],
+                ['name' => 'Ada'],
+            ],
+            2 => [
+                ['name' => 'Grace'],
+            ],
+        ], $chunks);
+    }
+
+    public function testQueryBuilderCanStopChunkingEarly(): void
+    {
+        $connection = $this->connection();
+        $this->seedUsers($connection);
+        $pages = [];
+
+        $connection->table('users')->select('name')->chunk(1, /**
+         * @param list<array<string, mixed>> $rows
+         */
+            function (array $rows, int $page) use (&$pages): bool {
+                $pages[] = $page;
+
+                return false;
+            });
+
+        self::assertSame([1], $pages);
     }
 
     private function seedUsers(Connection $connection): void
