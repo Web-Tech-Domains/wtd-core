@@ -25,6 +25,29 @@ final class Container implements ContainerInterface
     private array $instances = [];
 
     /**
+     * @var array<string, mixed>
+     */
+    private array $scopedInstances = [];
+
+    /**
+     * @var array<string, list<string>>
+     */
+    private array $tags = [];
+
+    /**
+     * @var array<string, array<string, Closure(self): mixed>>
+     */
+    private array $contextual = [];
+
+    /**
+     * Bind an abstract type as a transient service.
+     */
+    public function transient(string $abstract, Closure|string|null $concrete = null): void
+    {
+        $this->bind($abstract, $concrete);
+    }
+
+    /**
      * Bind an abstract type to a factory.
      */
     public function bind(string $abstract, Closure|string|null $concrete = null): void
@@ -47,11 +70,79 @@ final class Container implements ContainerInterface
     }
 
     /**
+     * Bind an abstract type as a scoped service.
+     */
+    public function scoped(string $abstract, Closure|string|null $concrete = null): void
+    {
+        $this->bindings[$abstract] = function (self $container) use ($abstract, $concrete): mixed {
+            if (!array_key_exists($abstract, $this->scopedInstances)) {
+                $this->scopedInstances[$abstract] = $this->factory($abstract, $concrete)($container);
+            }
+
+            return $this->scopedInstances[$abstract];
+        };
+    }
+
+    /**
+     * Forget all scoped service instances.
+     */
+    public function flushScoped(): void
+    {
+        $this->scopedInstances = [];
+    }
+
+    /**
      * Register an existing instance.
      */
     public function instance(string $abstract, mixed $instance): void
     {
         $this->instances[$abstract] = $instance;
+    }
+
+    /**
+     * Start a contextual binding definition.
+     *
+     * @param class-string $concrete
+     */
+    public function when(string $concrete): ContextualBindingBuilder
+    {
+        return new ContextualBindingBuilder($this, $concrete);
+    }
+
+    /**
+     * Add a contextual binding.
+     *
+     * @param class-string $concrete
+     * @param class-string $abstract
+     * @param Closure(self): mixed|class-string $implementation
+     */
+    public function addContextualBinding(string $concrete, string $abstract, Closure|string $implementation): void
+    {
+        $this->contextual[$concrete][$abstract] = $this->factory($abstract, $implementation);
+    }
+
+    /**
+     * Assign abstracts to a tag.
+     *
+     * @param class-string|list<class-string> $abstracts
+     */
+    public function tag(string|array $abstracts, string $tag): void
+    {
+        foreach ((array) $abstracts as $abstract) {
+            $this->tags[$tag][] = $abstract;
+        }
+
+        $this->tags[$tag] = array_values(array_unique($this->tags[$tag] ?? []));
+    }
+
+    /**
+     * Resolve all services for a tag.
+     *
+     * @return list<mixed>
+     */
+    public function tagged(string $tag): array
+    {
+        return array_map(fn (string $abstract): mixed => $this->get($abstract), $this->tags[$tag] ?? []);
     }
 
     /**
@@ -131,7 +222,12 @@ final class Container implements ContainerInterface
                 ));
             }
 
-            $dependencies[] = $this->get($type->getName());
+            $dependency = $type->getName();
+            $contextual = $this->contextual[$concrete][$dependency] ?? null;
+
+            $dependencies[] = $contextual instanceof Closure
+                ? $contextual($this)
+                : $this->get($dependency);
         }
 
         return $reflection->newInstanceArgs($dependencies);

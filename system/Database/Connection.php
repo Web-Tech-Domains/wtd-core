@@ -27,6 +27,14 @@ final class Connection
     }
 
     /**
+     * Start a query builder for a table.
+     */
+    public function table(string $table): QueryBuilder
+    {
+        return new QueryBuilder($this, $table);
+    }
+
+    /**
      * Run a select query and return associative rows.
      *
      * @param array<int|string, mixed> $bindings

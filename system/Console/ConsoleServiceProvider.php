@@ -13,6 +13,8 @@ use WTD\Console\Commands\EnvironmentCommand;
 use WTD\Console\Commands\HealthCommand;
 use WTD\Console\Commands\HelpCommand;
 use WTD\Console\Commands\ListCommand;
+use WTD\Console\Commands\MigrateCommand;
+use WTD\Console\Commands\MigrateRollbackCommand;
 use WTD\Console\Commands\OptimizeClearCommand;
 use WTD\Console\Commands\OptimizeCommand;
 use WTD\Console\Commands\RouteCacheCommand;
@@ -59,6 +61,8 @@ final class ConsoleServiceProvider extends ServiceProvider
             DownCommand::class,
             EnvironmentCommand::class,
             HealthCommand::class,
+            MigrateCommand::class,
+            MigrateRollbackCommand::class,
             OptimizeCommand::class,
             OptimizeClearCommand::class,
             RouteCacheCommand::class,

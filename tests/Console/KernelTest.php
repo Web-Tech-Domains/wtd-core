@@ -15,6 +15,7 @@ use WTD\Console\Kernel;
 use WTD\Console\Output;
 use WTD\Console\UnknownCommandException;
 use WTD\Container\Container;
+use WTD\Database\DatabaseServiceProvider;
 use WTD\Http\HttpServiceProvider;
 
 final class KernelTest extends TestCase
@@ -45,6 +46,7 @@ final class KernelTest extends TestCase
         $app = $this->application();
         $app->register(CoreServiceProvider::class);
         $app->register(HttpServiceProvider::class);
+        $app->register(DatabaseServiceProvider::class);
         $app->register(ConsoleServiceProvider::class);
 
         /** @var Kernel $kernel */
@@ -56,6 +58,8 @@ final class KernelTest extends TestCase
         self::assertArrayHasKey('diagnostics', $kernel->commands());
         self::assertArrayHasKey('help', $kernel->commands());
         self::assertArrayHasKey('list', $kernel->commands());
+        self::assertArrayHasKey('migrate', $kernel->commands());
+        self::assertArrayHasKey('migrate:rollback', $kernel->commands());
         self::assertArrayHasKey('optimize', $kernel->commands());
         self::assertArrayHasKey('optimize:clear', $kernel->commands());
         self::assertArrayHasKey('route:cache', $kernel->commands());
@@ -67,6 +71,7 @@ final class KernelTest extends TestCase
         $app = $this->application();
         $app->register(CoreServiceProvider::class);
         $app->register(HttpServiceProvider::class);
+        $app->register(DatabaseServiceProvider::class);
         $app->register(ConsoleServiceProvider::class);
         /** @var Kernel $kernel */
         $kernel = $app->container()->get(Kernel::class);
@@ -102,7 +107,12 @@ final class KernelTest extends TestCase
         return new Application(
             $basePath,
             new Container(),
-            new Repository(['app.name' => 'Console Test']),
+            new Repository([
+                'app.name' => 'Console Test',
+                'database.default' => 'sqlite',
+                'database.connections.sqlite.driver' => 'sqlite',
+                'database.connections.sqlite.database' => ':memory:',
+            ]),
         );
     }
 }

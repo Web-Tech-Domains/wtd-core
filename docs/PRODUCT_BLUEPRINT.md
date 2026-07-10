@@ -98,10 +98,18 @@ tests/
 - Configurable middleware
 - Route middleware
 - Middleware pipeline
-- Validation foundation with pipe-style rules
-- PDO database foundation
 
-### 0.6 Validation
+### 0.6 Dependency Injection
+- Transient bindings
+- Singleton bindings
+- Scoped bindings
+- Interface bindings
+- Factory bindings
+- Auto resolution
+- Tagged services
+- Contextual bindings
+
+### 0.7 Validation
 - Request validation helpers
 - Form request validation classes
 - Controller form request injection
@@ -112,11 +120,16 @@ tests/
 - HTTP 422 JSON validation error responses
 - Common scalar, comparison, exact size, regex, confirmation, date, URL, accepted/declined, and membership rules
 
-### 0.7 Database
+### 0.8 Database
 - PDO connection manager
+- Query builder
 - Schema builder
 - Table creation and dropping
 - Basic column definitions
+- Migration contract
+- Migration repository and batch tracking
+- Migration runner and rollback support
+- CLI `migrate` and `migrate:rollback` commands
 - Database service provider bindings
 
 ### 1.0 LTS

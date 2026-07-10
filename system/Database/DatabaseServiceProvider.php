@@ -28,5 +28,17 @@ final class DatabaseServiceProvider extends ServiceProvider
             Schema::class,
             fn (): Schema => new Schema($this->container()->get(Connection::class)),
         );
+        $this->container()->singleton(
+            MigrationRepository::class,
+            fn (): MigrationRepository => new MigrationRepository($this->container()->get(Connection::class)),
+        );
+        $this->container()->singleton(
+            MigrationRunner::class,
+            fn (): MigrationRunner => new MigrationRunner(
+                $this->container()->get(MigrationRepository::class),
+                $this->container()->get(Schema::class),
+                $this->app->basePath('database/migrations'),
+            ),
+        );
     }
 }
