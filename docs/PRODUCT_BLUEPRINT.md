@@ -48,16 +48,16 @@ tests/
 - Bootstrap file
 - Service container
 - Service providers
-- Configuration repository
+- Configuration repository and PHP config loader
 - Environment loader
 - Error handler
 - File logger
 - Filesystem helper
 - Health check
-- Maintenance mode state
+- Persistent maintenance mode state
 - Performance timer
 - Memory monitor
-- CLI `about`, `env`, `health`, `down`, and `up` commands
+- CLI `about`, `env`, `health`, `diagnostics`, `down`, and `up` commands
 - Initial PHPUnit, PHPStan, and PHP-CS-Fixer setup
 
 ### 0.5 Beta

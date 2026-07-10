@@ -10,6 +10,10 @@ composer.lock
 /storage/logs/*
 !/storage/logs/.gitignore
 
+# Framework runtime state
+/storage/framework/*
+!/storage/framework/.gitignore
+
 # Cache
 /storage/cache/*
 !/storage/cache/.gitignore

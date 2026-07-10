@@ -41,6 +41,18 @@ final class Repository
     }
 
     /**
+     * Merge a nested configuration array under a namespace.
+     *
+     * @param array<string, mixed> $items
+     */
+    public function merge(string $namespace, array $items): void
+    {
+        foreach ($this->flatten($items, $namespace) as $key => $value) {
+            $this->set($key, $value);
+        }
+    }
+
+    /**
      * Return all configuration values.
      *
      * @return array<string, mixed>
@@ -48,5 +60,30 @@ final class Repository
     public function all(): array
     {
         return $this->items;
+    }
+
+    /**
+     * Flatten nested configuration values into dot notation.
+     *
+     * @param array<string, mixed> $items
+     *
+     * @return array<string, mixed>
+     */
+    private function flatten(array $items, string $prefix): array
+    {
+        $flattened = [];
+
+        foreach ($items as $key => $value) {
+            $path = $prefix . '.' . $key;
+
+            if (is_array($value)) {
+                $flattened += $this->flatten($value, $path);
+                continue;
+            }
+
+            $flattened[$path] = $value;
+        }
+
+        return $flattened;
     }
 }

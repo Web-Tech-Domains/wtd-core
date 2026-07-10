@@ -4,13 +4,17 @@ declare(strict_types=1);
 
 namespace WTD\Application;
 
+use WTD\Filesystem\Filesystem;
+
 /**
  * Tracks whether the application should reject normal traffic for maintenance.
  */
 final class MaintenanceMode
 {
-    public function __construct(private bool $enabled = false)
-    {
+    public function __construct(
+        private readonly Filesystem $filesystem,
+        private readonly string $path,
+    ) {
     }
 
     /**
@@ -18,7 +22,9 @@ final class MaintenanceMode
      */
     public function enable(): void
     {
-        $this->enabled = true;
+        $this->filesystem->put($this->path, json_encode([
+            'enabled_at' => gmdate('Y-m-d\TH:i:s\Z'),
+        ], JSON_THROW_ON_ERROR));
     }
 
     /**
@@ -26,7 +32,7 @@ final class MaintenanceMode
      */
     public function disable(): void
     {
-        $this->enabled = false;
+        $this->filesystem->delete($this->path);
     }
 
     /**
@@ -34,6 +40,6 @@ final class MaintenanceMode
      */
     public function enabled(): bool
     {
-        return $this->enabled;
+        return $this->filesystem->exists($this->path);
     }
 }

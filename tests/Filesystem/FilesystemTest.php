@@ -18,5 +18,9 @@ final class FilesystemTest extends TestCase
 
         self::assertTrue($filesystem->exists($path));
         self::assertSame('example', $filesystem->get($path));
+
+        $filesystem->delete($path);
+
+        self::assertFalse($filesystem->exists($path));
     }
 }

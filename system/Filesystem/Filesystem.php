@@ -48,4 +48,18 @@ final class Filesystem
             throw new RuntimeException(sprintf('Unable to write file [%s].', $path));
         }
     }
+
+    /**
+     * Delete a file when it exists.
+     */
+    public function delete(string $path): void
+    {
+        if (!file_exists($path)) {
+            return;
+        }
+
+        if (!unlink($path)) {
+            throw new RuntimeException(sprintf('Unable to delete file [%s].', $path));
+        }
+    }
 }

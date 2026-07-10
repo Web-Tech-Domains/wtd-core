@@ -6,6 +6,7 @@ namespace Tests\Application;
 
 use PHPUnit\Framework\TestCase;
 use WTD\Application\Application;
+use WTD\Application\Diagnostics;
 use WTD\Application\HealthCheck;
 use WTD\Application\MaintenanceMode;
 use WTD\Application\MemoryMonitor;
@@ -13,6 +14,7 @@ use WTD\Application\PerformanceTimer;
 use WTD\Application\Version;
 use WTD\Config\Repository;
 use WTD\Container\Container;
+use WTD\Filesystem\Filesystem;
 use WTD\Support\ServiceProvider;
 
 final class LifecycleTest extends TestCase
@@ -31,7 +33,7 @@ final class LifecycleTest extends TestCase
 
     public function testMaintenanceModeCanBeToggled(): void
     {
-        $maintenance = new MaintenanceMode();
+        $maintenance = $this->maintenanceMode('down');
 
         self::assertFalse($maintenance->enabled());
 
@@ -45,7 +47,7 @@ final class LifecycleTest extends TestCase
     public function testHealthCheckReportsApplicationState(): void
     {
         $app = $this->application();
-        $maintenance = new MaintenanceMode();
+        $maintenance = $this->maintenanceMode('health-down');
         $health = new HealthCheck($app, $maintenance);
 
         self::assertSame('ok', $health->report()['status']);
@@ -64,6 +66,16 @@ final class LifecycleTest extends TestCase
         self::assertGreaterThan(0, $memory->peak());
     }
 
+    public function testDiagnosticsReportsRuntimeState(): void
+    {
+        $app = $this->application();
+        $maintenance = $this->maintenanceMode('diagnostics-down');
+        $diagnostics = new Diagnostics($app, $maintenance, new MemoryMonitor(), new PerformanceTimer());
+
+        self::assertSame('Lifecycle Test', $diagnostics->report()['application']);
+        self::assertFalse($diagnostics->report()['maintenance']);
+    }
+
     public function testVersionReportsApplicationVersion(): void
     {
         self::assertSame(Application::VERSION, (new Version())->current());
@@ -80,6 +92,14 @@ final class LifecycleTest extends TestCase
             new Container(),
             new Repository(['app.name' => 'Lifecycle Test']),
         );
+    }
+
+    private function maintenanceMode(string $name): MaintenanceMode
+    {
+        $maintenanceMode = new MaintenanceMode(new Filesystem(), dirname(__DIR__) . '/tmp/framework/' . $name);
+        $maintenanceMode->disable();
+
+        return $maintenanceMode;
     }
 }
 

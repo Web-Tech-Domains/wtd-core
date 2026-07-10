@@ -4,6 +4,7 @@
 declare(strict_types=1);
 
 use WTD\Application\Application;
+use WTD\Application\Diagnostics;
 use WTD\Application\HealthCheck;
 use WTD\Application\MaintenanceMode;
 use WTD\Application\MemoryMonitor;
@@ -17,6 +18,7 @@ match ($command) {
     'about' => about($app),
     'env' => environment($app),
     'health' => health($app),
+    'diagnostics' => diagnostics($app),
     'down' => maintenance($app, true),
     'up' => maintenance($app, false),
     default => unknown($command),
@@ -61,7 +63,19 @@ function health(Application $app): never
 }
 
 /**
- * Toggle maintenance mode for the current process.
+ * Print a JSON diagnostics report.
+ */
+function diagnostics(Application $app): never
+{
+    /** @var Diagnostics $diagnostics */
+    $diagnostics = $app->container()->get(Diagnostics::class);
+
+    echo json_encode($diagnostics->report(), JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT) . PHP_EOL;
+    exit(0);
+}
+
+/**
+ * Toggle persistent maintenance mode.
  */
 function maintenance(Application $app, bool $enabled): never
 {
