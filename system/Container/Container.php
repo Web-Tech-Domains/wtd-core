@@ -5,15 +5,14 @@ declare(strict_types=1);
 namespace WTD\Container;
 
 use Closure;
-use InvalidArgumentException;
+use Psr\Container\ContainerInterface;
 use ReflectionClass;
 use ReflectionNamedType;
-use RuntimeException;
 
 /**
  * Minimal dependency injection container with singleton and auto-resolution support.
  */
-final class Container
+final class Container implements ContainerInterface
 {
     /**
      * @var array<string, Closure(self): mixed>
@@ -58,27 +57,27 @@ final class Container
     /**
      * Resolve an abstract type.
      */
-    public function get(string $abstract): mixed
+    public function get(string $id): mixed
     {
-        if (array_key_exists($abstract, $this->instances)) {
-            return $this->instances[$abstract];
+        if (array_key_exists($id, $this->instances)) {
+            return $this->instances[$id];
         }
 
-        if (array_key_exists($abstract, $this->bindings)) {
-            return $this->bindings[$abstract]($this);
+        if (array_key_exists($id, $this->bindings)) {
+            return $this->bindings[$id]($this);
         }
 
-        return $this->build($abstract);
+        return $this->build($id);
     }
 
     /**
      * Determine whether the container can resolve an abstract type.
      */
-    public function has(string $abstract): bool
+    public function has(string $id): bool
     {
-        return array_key_exists($abstract, $this->instances)
-            || array_key_exists($abstract, $this->bindings)
-            || class_exists($abstract);
+        return array_key_exists($id, $this->instances)
+            || array_key_exists($id, $this->bindings)
+            || class_exists($id);
     }
 
     /**
@@ -99,13 +98,13 @@ final class Container
     private function build(string $concrete): object
     {
         if (!class_exists($concrete)) {
-            throw new InvalidArgumentException(sprintf('Service [%s] is not resolvable.', $concrete));
+            throw new NotFoundException(sprintf('Service [%s] is not resolvable.', $concrete));
         }
 
         $reflection = new ReflectionClass($concrete);
 
         if (!$reflection->isInstantiable()) {
-            throw new RuntimeException(sprintf('Service [%s] is not instantiable.', $concrete));
+            throw new ContainerException(sprintf('Service [%s] is not instantiable.', $concrete));
         }
 
         $constructor = $reflection->getConstructor();
@@ -125,7 +124,7 @@ final class Container
                     continue;
                 }
 
-                throw new RuntimeException(sprintf(
+                throw new ContainerException(sprintf(
                     'Unable to resolve parameter [$%s] for service [%s].',
                     $parameter->getName(),
                     $concrete,

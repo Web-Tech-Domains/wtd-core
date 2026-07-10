@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace Tests\Application;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 use WTD\Application\Application;
+use WTD\Application\CoreServiceProvider;
 use WTD\Application\Diagnostics;
 use WTD\Application\HealthCheck;
 use WTD\Application\MaintenanceMode;
@@ -29,6 +32,15 @@ final class LifecycleTest extends TestCase
         self::assertTrue($provider->registered);
         self::assertTrue($provider->booted);
         self::assertTrue($app->isBooted());
+    }
+
+    public function testCoreProviderRegistersPsrContracts(): void
+    {
+        $app = $this->application();
+        $app->register(CoreServiceProvider::class);
+
+        self::assertSame($app->container(), $app->container()->get(ContainerInterface::class));
+        self::assertInstanceOf(LoggerInterface::class, $app->container()->get(LoggerInterface::class));
     }
 
     public function testMaintenanceModeCanBeToggled(): void

@@ -48,6 +48,8 @@ tests/
 - Bootstrap file
 - Service container
 - Service providers
+- PSR-11 container contract support
+- PSR-3 logger contract support
 - Configuration repository and PHP config loader
 - Environment loader
 - Error handler
