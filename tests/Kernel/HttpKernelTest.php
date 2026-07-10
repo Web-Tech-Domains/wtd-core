@@ -17,6 +17,7 @@ use WTD\Middleware\Middleware;
 use WTD\Middleware\Pipeline;
 use WTD\Routing\ControllerDispatcher;
 use WTD\Routing\Router;
+use WTD\Validation\Validator;
 
 final class HttpKernelTest extends TestCase
 {
@@ -72,6 +73,24 @@ final class HttpKernelTest extends TestCase
 
         self::assertSame(500, $response->status());
         self::assertSame('Server Error', $response->content());
+    }
+
+    public function testHttpKernelRendersValidationFailures(): void
+    {
+        $container = new Container();
+        $container->instance(Container::class, $container);
+        $container->singleton(Validator::class);
+        $router = new Router(new ControllerDispatcher($container));
+        $router->post('/users', static fn (Request $request): array => $request->validate(new Validator(), [
+            'email' => 'required|email',
+        ]));
+        $kernel = new HttpKernel($router, new Pipeline(), $this->renderer());
+
+        $response = $kernel->handle(new Request('POST', '/users', body: ['email' => 'invalid']));
+
+        self::assertSame(422, $response->status());
+        self::assertSame('application/json', $response->headers()['Content-Type']);
+        self::assertStringContainsString('"email"', $response->content());
     }
 
     private function renderer(): ExceptionRenderer

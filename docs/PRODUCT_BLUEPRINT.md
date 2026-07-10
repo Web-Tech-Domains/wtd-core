@@ -96,6 +96,7 @@ tests/
 - Nested input validation with dot notation
 - Conditional validation rules
 - Custom validation messages
+- HTTP 422 JSON validation error responses
 - Common scalar, comparison, confirmation, date, URL, and membership rules
 
 ### 1.0 LTS

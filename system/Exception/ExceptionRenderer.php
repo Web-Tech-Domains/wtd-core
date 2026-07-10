@@ -8,6 +8,7 @@ use Throwable;
 use WTD\Config\Repository;
 use WTD\Http\Response;
 use WTD\Logging\Logger;
+use WTD\Validation\ValidationException;
 
 /**
  * Converts HTTP exceptions into responses.
@@ -25,6 +26,13 @@ final class ExceptionRenderer
      */
     public function render(Throwable $throwable): Response
     {
+        if ($throwable instanceof ValidationException) {
+            return Response::json([
+                'message' => $throwable->getMessage(),
+                'errors' => $throwable->errors(),
+            ], 422);
+        }
+
         $status = $throwable instanceof HttpException ? $throwable->statusCode() : 500;
 
         if ($status >= 500) {

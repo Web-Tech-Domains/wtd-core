@@ -10,6 +10,7 @@ use WTD\Config\Repository;
 use WTD\Exception\ExceptionRenderer;
 use WTD\Exception\NotFoundHttpException;
 use WTD\Logging\Logger;
+use WTD\Validation\ValidationException;
 
 final class ExceptionRendererTest extends TestCase
 {
@@ -27,6 +28,20 @@ final class ExceptionRendererTest extends TestCase
 
         self::assertSame(500, $response->status());
         self::assertStringContainsString('Detailed failure', $response->content());
+    }
+
+    public function testRendererRendersValidationExceptionsAsJson(): void
+    {
+        $response = $this->renderer(false)->render(new ValidationException([
+            'email' => ['The email field failed email validation.'],
+        ]));
+
+        self::assertSame(422, $response->status());
+        self::assertSame('application/json', $response->headers()['Content-Type']);
+        self::assertSame(
+            '{"message":"The given data was invalid.","errors":{"email":["The email field failed email validation."]}}',
+            $response->content(),
+        );
     }
 
     private function renderer(bool $debug): ExceptionRenderer
