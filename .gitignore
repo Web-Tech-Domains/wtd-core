@@ -1,0 +1,40 @@
+# Composer
+/vendor/
+
+# Environment
+.env
+.env.*
+
+# Logs
+/storage/logs/*
+!/storage/logs/.gitignore
+
+# Cache
+/storage/cache/*
+!/storage/cache/.gitignore
+
+# Sessions
+/storage/sessions/*
+!/storage/sessions/.gitignore
+
+# Uploads
+/storage/uploads/*
+!/storage/uploads/.gitignore
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# PHPUnit
+.phpunit.result.cache
+
+# Coverage
+coverage/
+build/
+
+# Composer lock (remove this line if this is an application instead of a framework)
+# composer.lock
