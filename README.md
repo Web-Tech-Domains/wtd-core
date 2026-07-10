@@ -9,6 +9,8 @@ A modern, lightweight, enterprise-ready PHP framework by Web Tech Domains.
 - PSR-compliant
 - Cloud-ready
 
+The architecture baseline is documented in [docs/SOFTWARE_ARCHITECTURE_SPECIFICATION.md](docs/SOFTWARE_ARCHITECTURE_SPECIFICATION.md).
+
 ## Initial Roadmap
 1. Foundation: kernel, bootstrap, container, config, environment, CLI
 2. HTTP engine: request/response, middleware, routing

@@ -41,6 +41,16 @@ tests/
 - PHP-CS-Fixer
 - SemVer
 - Conventional Commits
+- SOLID, DRY, KISS, YAGNI
+- Clean Architecture
+- DDD compatible
+- Hexagonal Architecture friendly
+
+## Architecture Specification
+- Source: `docs/SOFTWARE_ARCHITECTURE_SPECIFICATION.md`
+- Project type: Open source / enterprise PHP framework
+- Target use cases: APIs, SaaS applications, enterprise software, and cloud-native deployments
+- Architectural intent: Laravel-like developer experience with Slim-like lightness and Symfony-like flexibility
 
 ## Roadmap
 ### 0.1 Alpha
