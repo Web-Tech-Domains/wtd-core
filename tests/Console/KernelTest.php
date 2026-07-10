@@ -64,6 +64,7 @@ final class KernelTest extends TestCase
         self::assertArrayHasKey('optimize:clear', $kernel->commands());
         self::assertArrayHasKey('route:cache', $kernel->commands());
         self::assertArrayHasKey('route:clear', $kernel->commands());
+        self::assertArrayHasKey('db:seed', $kernel->commands());
     }
 
     public function testHelpCommandCanDescribeSpecificCommand(): void

@@ -40,5 +40,12 @@ final class DatabaseServiceProvider extends ServiceProvider
                 $this->app->basePath('database/migrations'),
             ),
         );
+        $this->container()->singleton(
+            SeederRunner::class,
+            fn (): SeederRunner => new SeederRunner(
+                $this->container()->get(Connection::class),
+                $this->app->basePath('database/seeders'),
+            ),
+        );
     }
 }

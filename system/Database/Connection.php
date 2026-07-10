@@ -14,6 +14,11 @@ use Throwable;
  */
 final class Connection
 {
+    /**
+     * @var list<Closure(QueryExecuted): void>
+     */
+    private array $listeners = [];
+
     public function __construct(private readonly PDO $pdo)
     {
     }
@@ -32,6 +37,16 @@ final class Connection
     public function table(string $table): QueryBuilder
     {
         return new QueryBuilder($this, $table);
+    }
+
+    /**
+     * Register a listener for executed database queries.
+     *
+     * @param Closure(QueryExecuted): void $listener
+     */
+    public function listen(Closure $listener): void
+    {
+        $this->listeners[] = $listener;
     }
 
     /**
@@ -95,6 +110,7 @@ final class Connection
      */
     private function run(string $sql, array $bindings): PDOStatement
     {
+        $startedAt = microtime(true);
         $statement = $this->pdo->prepare($sql);
 
         foreach ($bindings as $key => $value) {
@@ -103,7 +119,24 @@ final class Connection
         }
 
         $statement->execute();
+        $this->dispatchQueryExecuted($sql, $bindings, (microtime(true) - $startedAt) * 1000);
 
         return $statement;
+    }
+
+    /**
+     * @param array<int|string, mixed> $bindings
+     */
+    private function dispatchQueryExecuted(string $sql, array $bindings, float $timeMs): void
+    {
+        if ($this->listeners === []) {
+            return;
+        }
+
+        $event = new QueryExecuted($sql, $bindings, $timeMs, $this);
+
+        foreach ($this->listeners as $listener) {
+            $listener($event);
+        }
     }
 }

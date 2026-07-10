@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 use WTD\Config\Repository;
 use WTD\Database\Connection;
 use WTD\Database\DatabaseManager;
+use WTD\Database\QueryGrammar;
 
 final class QueryBuilderTest extends TestCase
 {
@@ -69,6 +70,14 @@ final class QueryBuilderTest extends TestCase
             ->toSql();
 
         self::assertSame('SELECT "id", "name" FROM "users" WHERE "active" = ? LIMIT 10', $sql);
+    }
+
+    public function testQueryGrammarWrapsQualifiedIdentifiers(): void
+    {
+        $grammar = new QueryGrammar();
+
+        self::assertSame('"users"."name"', $grammar->wrap('users.name'));
+        self::assertSame('"contains""quote"', $grammar->wrap('contains"quote'));
     }
 
     public function testQueryBuilderCountsMatchingRows(): void

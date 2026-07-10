@@ -123,6 +123,7 @@ tests/
 ### 0.8 Database
 - PDO connection manager
 - Query builder
+- Query grammar
 - Schema builder
 - Table creation and dropping
 - Basic column definitions
@@ -132,10 +133,17 @@ tests/
 - Pagination
 - Chunking
 - CLI `migrate` and `migrate:rollback` commands
+- Seeder contract
+- Seeder runner
+- CLI `db:seed` command
+- Database factory base
+- Query executed database events
 - Database service provider bindings
 
 ### 1.0 LTS
-- ORM
+- ORM model foundation
+- ORM query builder and local scopes
+- HasOne, HasMany, and BelongsTo ORM relationships
 - Authentication
 - Authorization
 - Queue

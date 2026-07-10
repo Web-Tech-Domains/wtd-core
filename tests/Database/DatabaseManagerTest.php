@@ -13,6 +13,7 @@ use WTD\Container\Container;
 use WTD\Database\Connection;
 use WTD\Database\DatabaseManager;
 use WTD\Database\DatabaseServiceProvider;
+use WTD\Database\QueryExecuted;
 
 final class DatabaseManagerTest extends TestCase
 {
@@ -33,6 +34,25 @@ final class DatabaseManagerTest extends TestCase
         $rows = $connection->select('SELECT name FROM users WHERE id = ?', [1]);
 
         self::assertSame([['name' => 'Taylor']], $rows);
+    }
+
+    public function testConnectionDispatchesQueryExecutedEvents(): void
+    {
+        $connection = (new DatabaseManager($this->config()))->connection();
+        $events = [];
+
+        $connection->listen(static function (QueryExecuted $event) use (&$events): void {
+            $events[] = $event;
+        });
+
+        $connection->statement('CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL)');
+        $connection->statement('INSERT INTO users (name) VALUES (:name)', ['name' => 'Taylor']);
+
+        self::assertCount(2, $events);
+        self::assertSame('INSERT INTO users (name) VALUES (:name)', $events[1]->sql);
+        self::assertSame(['name' => 'Taylor'], $events[1]->bindings);
+        self::assertSame($connection, $events[1]->connection);
+        self::assertGreaterThanOrEqual(0.0, $events[1]->timeMs);
     }
 
     public function testConnectionCommitsTransactions(): void
