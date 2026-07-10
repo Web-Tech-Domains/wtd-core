@@ -1,0 +1,19 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+use WTD\Application\Application;
+
+/** @var Application $app */
+$app = require __DIR__ . '/bootstrap/app.php';
+
+$command = $argv[1] ?? 'about';
+
+if ($command === 'about') {
+    echo $app->name() . ' ' . $app->version() . PHP_EOL;
+    exit(0);
+}
+
+fwrite(STDERR, sprintf('Unknown command: %s%s', $command, PHP_EOL));
+exit(1);

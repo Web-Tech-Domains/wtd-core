@@ -10,18 +10,27 @@ A modern, lightweight, enterprise-ready PHP framework by Web Tech Domains.
 - Cloud-ready
 
 ## Initial Roadmap
-1. Kernel
-2. HTTP
-3. DI Container
-4. Router
-5. Database
-6. ORM
-7. Validation
-8. Authentication
-9. Queue
-10. Scheduler
-11. Cache
-12. Notifications
-13. Storage
-14. Testing
-15. Documentation
+1. Foundation: kernel, bootstrap, container, config, environment, CLI
+2. HTTP engine: request/response, middleware, routing
+3. Validation
+4. Database
+5. ORM
+6. Authentication
+7. Authorization
+8. Queue
+9. Scheduler
+10. Cache
+11. Notifications
+12. Storage
+13. Testing
+14. Documentation
+
+## Development
+
+```bash
+composer install
+composer test
+composer analyse
+composer cs:fix
+php core about
+```

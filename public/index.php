@@ -1,5 +1,10 @@
 <?php
 
-require __DIR__.'/../vendor/autoload.php';
+declare(strict_types=1);
 
-echo 'Welcome to WTD Core';
+use WTD\Application\Application;
+
+/** @var Application $app */
+$app = require dirname(__DIR__) . '/bootstrap/app.php';
+
+echo 'Welcome to ' . $app->name();

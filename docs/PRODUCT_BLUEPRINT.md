@@ -43,7 +43,32 @@ tests/
 - Conventional Commits
 
 ## Roadmap
-Alpha
-Beta
-1.0 LTS
-2.0 Enterprise
+### 0.1 Alpha
+- Application kernel
+- Bootstrap file
+- Service container
+- Configuration repository
+- Environment loader
+- CLI `core about` command
+- Initial PHPUnit, PHPStan, and PHP-CS-Fixer setup
+
+### 0.5 Beta
+- HTTP kernel
+- Routing
+- Middleware
+- Validation
+- Database foundation
+
+### 1.0 LTS
+- ORM
+- Authentication
+- Authorization
+- Queue
+- Scheduler
+- Documentation
+
+### 2.0 Enterprise
+- Marketplace
+- Multi-tenancy
+- AI package integrations
+- Enterprise monitoring and administration

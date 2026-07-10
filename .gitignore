@@ -1,5 +1,6 @@
 # Composer
 /vendor/
+composer.lock
 
 # Environment
 .env
@@ -35,6 +36,4 @@ Thumbs.db
 # Coverage
 coverage/
 build/
-
-# Composer lock (remove this line if this is an application instead of a framework)
-# composer.lock
+.php-cs-fixer.cache
