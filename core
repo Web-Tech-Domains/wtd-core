@@ -4,95 +4,21 @@
 declare(strict_types=1);
 
 use WTD\Application\Application;
-use WTD\Application\Diagnostics;
-use WTD\Application\HealthCheck;
-use WTD\Application\MaintenanceMode;
-use WTD\Application\MemoryMonitor;
+use WTD\Console\Input;
+use WTD\Console\Kernel;
+use WTD\Console\Output;
+use WTD\Console\UnknownCommandException;
 
 /** @var Application $app */
 $app = require __DIR__ . '/bootstrap/app.php';
 
-$command = $argv[1] ?? 'about';
+/** @var Kernel $kernel */
+$kernel = $app->container()->get(Kernel::class);
+$output = Output::standard();
 
-match ($command) {
-    'about' => about($app),
-    'env' => environment($app),
-    'health' => health($app),
-    'diagnostics' => diagnostics($app),
-    'down' => maintenance($app, true),
-    'up' => maintenance($app, false),
-    default => unknown($command),
-};
-
-/**
- * Print framework identity.
- */
-function about(Application $app): never
-{
-    echo $app->name() . ' ' . $app->version() . PHP_EOL;
-    exit(0);
-}
-
-/**
- * Print current application environment.
- */
-function environment(Application $app): never
-{
-    echo (string) $app->config()->get('app.env', 'production') . PHP_EOL;
-    exit(0);
-}
-
-/**
- * Print a JSON health report.
- */
-function health(Application $app): never
-{
-    /** @var HealthCheck $health */
-    $health = $app->container()->get(HealthCheck::class);
-    /** @var MemoryMonitor $memory */
-    $memory = $app->container()->get(MemoryMonitor::class);
-
-    echo json_encode([
-        ...$health->report(),
-        'memory' => [
-            'usage' => $memory->usage(),
-            'peak' => $memory->peak(),
-        ],
-    ], JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT) . PHP_EOL;
-    exit(0);
-}
-
-/**
- * Print a JSON diagnostics report.
- */
-function diagnostics(Application $app): never
-{
-    /** @var Diagnostics $diagnostics */
-    $diagnostics = $app->container()->get(Diagnostics::class);
-
-    echo json_encode($diagnostics->report(), JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT) . PHP_EOL;
-    exit(0);
-}
-
-/**
- * Toggle persistent maintenance mode.
- */
-function maintenance(Application $app, bool $enabled): never
-{
-    /** @var MaintenanceMode $maintenance */
-    $maintenance = $app->container()->get(MaintenanceMode::class);
-    $enabled ? $maintenance->enable() : $maintenance->disable();
-
-    echo $maintenance->enabled() ? 'Maintenance mode enabled' : 'Maintenance mode disabled';
-    echo PHP_EOL;
-    exit(0);
-}
-
-/**
- * Print an unknown command error.
- */
-function unknown(string $command): never
-{
-    fwrite(STDERR, sprintf('Unknown command: %s%s', $command, PHP_EOL));
+try {
+    exit($kernel->handle(Input::fromArgv($argv), $output));
+} catch (UnknownCommandException $exception) {
+    $output->error($exception->getMessage());
     exit(1);
 }

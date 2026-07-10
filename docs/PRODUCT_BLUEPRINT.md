@@ -59,7 +59,8 @@ tests/
 - Persistent maintenance mode state
 - Performance timer
 - Memory monitor
-- CLI `about`, `env`, `health`, `diagnostics`, `down`, and `up` commands
+- Console kernel and command registry
+- CLI `about`, `env`, `health`, `diagnostics`, `down`, `up`, and `list` commands
 - Initial PHPUnit, PHPStan, and PHP-CS-Fixer setup
 
 ### 0.5 Beta

@@ -7,6 +7,7 @@ use WTD\Application\CoreServiceProvider;
 use WTD\Config\Loader;
 use WTD\Config\Repository;
 use WTD\Container\Container;
+use WTD\Console\ConsoleServiceProvider;
 use WTD\Support\Env;
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
@@ -20,6 +21,7 @@ $config = new Repository();
 
 $app = new Application($basePath, $container, $config);
 $app->register(CoreServiceProvider::class);
+$app->register(ConsoleServiceProvider::class);
 $app->boot();
 
 return $app;
