@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 use WTD\Cookie\Cookie;
 use WTD\Http\Request;
 use WTD\Http\Response;
+use WTD\Validation\Validator;
 
 final class RequestResponseTest extends TestCase
 {
@@ -30,6 +31,31 @@ final class RequestResponseTest extends TestCase
         self::assertSame('Taylor', $request->input('name'));
         self::assertSame('dark', $request->cookie('theme'));
         self::assertSame('example.test', $request->host());
+    }
+
+    public function testRequestCanReturnAndValidateInput(): void
+    {
+        $request = new Request(
+            'POST',
+            '/users',
+            [],
+            ['source' => 'invite'],
+            ['name' => 'Taylor', 'email' => 'taylor@example.test'],
+        );
+
+        self::assertSame([
+            'source' => 'invite',
+            'name' => 'Taylor',
+            'email' => 'taylor@example.test',
+        ], $request->all());
+        self::assertSame(['name' => 'Taylor'], $request->only(['name']));
+        self::assertSame(
+            ['name' => 'Taylor', 'email' => 'taylor@example.test'],
+            $request->validate(new Validator(), [
+                'name' => 'required|string',
+                'email' => 'required|email',
+            ]),
+        );
     }
 
     public function testResponseCanRepresentJson(): void

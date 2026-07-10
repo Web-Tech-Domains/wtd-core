@@ -89,6 +89,79 @@ final class ValidatorTest extends TestCase
         self::assertSame(['name' => 'Taylor', 'nickname' => ''], $validated);
     }
 
+    public function testValidatorSupportsNestedFieldsAndCustomMessages(): void
+    {
+        $result = (new Validator())->make(
+            ['user' => ['email' => 'invalid']],
+            ['user.email' => 'required|email'],
+            ['user.email.email' => 'Use a valid user email.'],
+        );
+
+        self::assertSame(['Use a valid user email.'], $result->errors()['user.email']);
+    }
+
+    public function testValidatorSupportsConditionalRules(): void
+    {
+        $validator = new Validator();
+
+        $requiredIf = $validator->make(
+            ['type' => 'company'],
+            ['company_name' => 'required_if:type,company|string'],
+        );
+        $requiredUnless = $validator->make(
+            ['status' => 'published'],
+            ['published_at' => 'required_unless:status,draft|date'],
+        );
+
+        self::assertArrayHasKey('company_name', $requiredIf->errors());
+        self::assertArrayHasKey('published_at', $requiredUnless->errors());
+    }
+
+    public function testValidatorSupportsCommonRules(): void
+    {
+        $validated = (new Validator())->validate(
+            [
+                'website' => 'https://example.test',
+                'starts_at' => '2026-07-10',
+                'role' => 'admin',
+                'password' => 'secret',
+                'password_confirmation' => 'secret',
+                'terms' => '1',
+            ],
+            [
+                'website' => 'required|url',
+                'starts_at' => 'required|date',
+                'role' => 'required|not_in:guest,banned',
+                'password' => 'required|confirmed',
+                'terms' => 'required|boolean',
+            ],
+        );
+
+        self::assertSame('admin', $validated['role']);
+        self::assertSame('https://example.test', $validated['website']);
+    }
+
+    public function testSometimesSkipsMissingFields(): void
+    {
+        $result = (new Validator())->make([], ['nickname' => 'sometimes|required|string']);
+
+        self::assertTrue($result->passes());
+    }
+
+    public function testPresentAndFilledRulesRunForOptionalFields(): void
+    {
+        $result = (new Validator())->make(
+            ['name' => ''],
+            [
+                'token' => 'present',
+                'name' => 'filled',
+            ],
+        );
+
+        self::assertArrayHasKey('token', $result->errors());
+        self::assertArrayHasKey('name', $result->errors());
+    }
+
     public function testApplicationRegistersValidator(): void
     {
         /** @var non-empty-string $basePath */

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace WTD\Http;
 
+use WTD\Validation\Validator;
+
 /**
  * Represents an incoming HTTP request.
  */
@@ -100,6 +102,50 @@ final class Request
     public function input(string $key, mixed $default = null): mixed
     {
         return $this->body[$key] ?? $default;
+    }
+
+    /**
+     * Return merged query and body input.
+     *
+     * @return array<string, mixed>
+     */
+    public function all(): array
+    {
+        return array_merge($this->query, $this->body);
+    }
+
+    /**
+     * Return selected input values.
+     *
+     * @param list<string> $keys
+     *
+     * @return array<string, mixed>
+     */
+    public function only(array $keys): array
+    {
+        $input = $this->all();
+        $selected = [];
+
+        foreach ($keys as $key) {
+            if (array_key_exists($key, $input)) {
+                $selected[$key] = $input[$key];
+            }
+        }
+
+        return $selected;
+    }
+
+    /**
+     * Validate merged query and body input.
+     *
+     * @param array<string, string|list<string>> $rules
+     * @param array<string, string> $messages
+     *
+     * @return array<string, mixed>
+     */
+    public function validate(Validator $validator, array $rules, array $messages = []): array
+    {
+        return $validator->validate($this->all(), $rules, $messages);
     }
 
     /**

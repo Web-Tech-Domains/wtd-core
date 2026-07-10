@@ -61,11 +61,49 @@ final class ValidationResult
         $validated = [];
 
         foreach ($this->fields as $field) {
-            if (array_key_exists($field, $this->data)) {
-                $validated[$field] = $this->data[$field];
+            if ($this->exists($field)) {
+                $validated[$field] = $this->value($field);
             }
         }
 
         return $validated;
+    }
+
+    private function exists(string $field): bool
+    {
+        if (array_key_exists($field, $this->data)) {
+            return true;
+        }
+
+        $current = $this->data;
+
+        foreach (explode('.', $field) as $segment) {
+            if (!is_array($current) || !array_key_exists($segment, $current)) {
+                return false;
+            }
+
+            $current = $current[$segment];
+        }
+
+        return true;
+    }
+
+    private function value(string $field): mixed
+    {
+        if (array_key_exists($field, $this->data)) {
+            return $this->data[$field];
+        }
+
+        $current = $this->data;
+
+        foreach (explode('.', $field) as $segment) {
+            if (!is_array($current) || !array_key_exists($segment, $current)) {
+                return null;
+            }
+
+            $current = $current[$segment];
+        }
+
+        return $current;
     }
 }

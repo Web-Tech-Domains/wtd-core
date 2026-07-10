@@ -91,6 +91,13 @@ tests/
 - Validation foundation with pipe-style rules
 - PDO database foundation
 
+### 0.6 Validation
+- Request validation helpers
+- Nested input validation with dot notation
+- Conditional validation rules
+- Custom validation messages
+- Common scalar, comparison, confirmation, date, URL, and membership rules
+
 ### 1.0 LTS
 - ORM
 - Authentication
