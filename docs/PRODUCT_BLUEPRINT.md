@@ -93,6 +93,8 @@ tests/
 
 ### 0.6 Validation
 - Request validation helpers
+- Form request validation classes
+- Controller form request injection
 - Nested input validation with dot notation
 - Conditional validation rules
 - Custom validation messages

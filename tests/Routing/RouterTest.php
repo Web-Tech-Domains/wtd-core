@@ -17,6 +17,9 @@ use WTD\Middleware\Pipeline;
 use WTD\Routing\ControllerDispatcher;
 use WTD\Routing\Router;
 use WTD\Routing\UrlGenerator;
+use WTD\Validation\FormRequest;
+use WTD\Validation\ValidationException;
+use WTD\Validation\Validator;
 
 final class RouterTest extends TestCase
 {
@@ -181,6 +184,32 @@ final class RouterTest extends TestCase
         self::assertSame('yes', $response->headers()['X-Route-Middleware']);
     }
 
+    public function testRouterInjectsFormRequestsIntoControllers(): void
+    {
+        $router = $this->routerWithValidation();
+        $router->post('/users', [FormRequestController::class, 'store']);
+
+        $response = $router->dispatch(new Request('POST', '/users', body: [
+            'name' => 'Taylor',
+            'email' => 'taylor@example.test',
+        ]));
+
+        self::assertSame('{"name":"Taylor","email":"taylor@example.test"}', $response->content());
+    }
+
+    public function testRouterThrowsValidationExceptionForInvalidFormRequests(): void
+    {
+        $this->expectException(ValidationException::class);
+
+        $router = $this->routerWithValidation();
+        $router->post('/users', [FormRequestController::class, 'store']);
+
+        $router->dispatch(new Request('POST', '/users', body: [
+            'name' => 'Taylor',
+            'email' => 'invalid',
+        ]));
+    }
+
     private function router(): Router
     {
         $container = new Container();
@@ -199,6 +228,15 @@ final class RouterTest extends TestCase
             new MiddlewareResolver($container),
             new Pipeline(),
         );
+    }
+
+    private function routerWithValidation(): Router
+    {
+        $container = new Container();
+        $container->instance(Container::class, $container);
+        $container->singleton(Validator::class);
+
+        return new Router(new ControllerDispatcher($container));
     }
 }
 
@@ -232,5 +270,30 @@ final class RouteHeaderMiddleware implements Middleware
     public function handle(Request $request, Closure $next): Response
     {
         return $next($request)->withHeader('X-Route-Middleware', 'yes');
+    }
+}
+
+final class FormRequestController
+{
+    /**
+     * @return array<string, mixed>
+     */
+    public function store(StoreUserFormRequest $request): array
+    {
+        return $request->validated();
+    }
+}
+
+final class StoreUserFormRequest extends FormRequest
+{
+    /**
+     * @return array<string, string|list<string>>
+     */
+    public function rules(): array
+    {
+        return [
+            'name' => 'required|string',
+            'email' => 'required|email',
+        ];
     }
 }
