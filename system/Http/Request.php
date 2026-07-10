@@ -69,6 +69,16 @@ final class Request
     }
 
     /**
+     * Return the request host without port.
+     */
+    public function host(): string
+    {
+        $host = $this->header('host') ?? (string) ($this->server['HTTP_HOST'] ?? $this->server['SERVER_NAME'] ?? '');
+
+        return strtolower((string) preg_replace('/:\d+$/', '', $host));
+    }
+
+    /**
      * Return a request header value.
      */
     public function header(string $name, ?string $default = null): ?string

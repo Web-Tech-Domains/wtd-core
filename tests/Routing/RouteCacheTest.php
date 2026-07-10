@@ -22,15 +22,21 @@ final class RouteCacheTest extends TestCase
         $cache->clear();
 
         $router = $this->router();
-        $router->get('/cached/{id}', [CachedController::class, 'show'])->name('cached.show');
+        $router->domain('cache.example.test', function (Router $router): void {
+            $router->get('/cached/{id}', [CachedController::class, 'show'])->name('cached.show');
+        });
 
         $cache->write($router);
 
         $loaded = $this->router();
         $cache->load($loaded);
 
-        self::assertSame('Cached 7', $loaded->dispatch(new Request('GET', '/cached/7'))->content());
-        self::assertSame('/cached/{id}', $loaded->route('cached.show')?->path());
+        self::assertSame('Cached 7', $loaded->dispatch(new Request('GET', '/cached/7', ['host' => 'cache.example.test']))->content());
+        $route = $loaded->route('cached.show');
+
+        self::assertNotNull($route);
+        self::assertSame('/cached/{id}', $route->path());
+        self::assertSame('cache.example.test', $route->getDomain());
     }
 
     public function testRouteCacheRejectsClosureRoutes(): void

@@ -26,6 +26,7 @@ final class Route
         private readonly string $path,
         private readonly Closure|array|string $action,
         private ?string $name = null,
+        private ?string $domain = null,
     ) {
     }
 
@@ -64,6 +65,24 @@ final class Route
     }
 
     /**
+     * Set the route domain constraint.
+     */
+    public function domain(string $domain): self
+    {
+        $this->domain = strtolower($domain);
+
+        return $this;
+    }
+
+    /**
+     * Return the route domain constraint.
+     */
+    public function getDomain(): ?string
+    {
+        return $this->domain;
+    }
+
+    /**
      * Return the route action.
      *
      * @return Closure|class-string|array{0: class-string, 1: non-empty-string}
@@ -92,12 +111,34 @@ final class Route
     /**
      * Determine whether the route matches a request method and path.
      */
-    public function matches(string $method, string $path): bool
+    public function matches(Request $request): bool
     {
-        if ($this->method !== strtoupper($method)) {
+        $method = strtoupper($request->method());
+
+        if ($this->method !== $method && !($method === 'HEAD' && $this->method === 'GET')) {
             return false;
         }
 
+        return $this->matchesPathAndDomain($request);
+    }
+
+    /**
+     * Determine whether the route matches request path and domain, ignoring method.
+     */
+    public function matchesPathAndDomain(Request $request): bool
+    {
+        if ($this->domain !== null && $this->domain !== $request->host()) {
+            return false;
+        }
+
+        return $this->matchesPath($request);
+    }
+
+    /**
+     * Determine whether the route path matches the request.
+     */
+    private function matchesPath(Request $request): bool
+    {
         $parameterNames = [];
         $pattern = preg_replace_callback('/\{([A-Za-z_][A-Za-z0-9_]*)}/', static function (array $matches) use (&$parameterNames): string {
             $parameterNames[] = $matches[1];
@@ -109,7 +150,7 @@ final class Route
             return false;
         }
 
-        if (preg_match('#^' . $pattern . '$#', $this->normalize($path), $matches) !== 1) {
+        if (preg_match('#^' . $pattern . '$#', $this->normalize($request->path()), $matches) !== 1) {
             return false;
         }
 

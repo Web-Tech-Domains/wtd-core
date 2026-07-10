@@ -36,13 +36,15 @@ final class ExceptionRenderer
         }
 
         if ((bool) $this->config->get('app.debug', false)) {
-            return Response::json([
+            $response = Response::json([
                 'error' => $throwable->getMessage(),
                 'exception' => $throwable::class,
             ], $status);
+
+            return $this->withExceptionHeaders($response, $throwable);
         }
 
-        return Response::make($this->message($status), $status);
+        return $this->withExceptionHeaders(Response::make($this->message($status), $status), $throwable);
     }
 
     /**
@@ -52,7 +54,24 @@ final class ExceptionRenderer
     {
         return match ($status) {
             404 => 'Not Found',
+            405 => 'Method Not Allowed',
             default => 'Server Error',
         };
+    }
+
+    /**
+     * Attach exception headers to the response.
+     */
+    private function withExceptionHeaders(Response $response, Throwable $throwable): Response
+    {
+        if (!$throwable instanceof HttpException) {
+            return $response;
+        }
+
+        foreach ($throwable->headers() as $name => $value) {
+            $response->withHeader($name, $value);
+        }
+
+        return $response;
     }
 }

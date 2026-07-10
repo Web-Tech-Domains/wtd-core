@@ -6,6 +6,7 @@ namespace Tests\Routing;
 
 use PHPUnit\Framework\TestCase;
 use WTD\Container\Container;
+use WTD\Exception\MethodNotAllowedHttpException;
 use WTD\Exception\NotFoundHttpException;
 use WTD\Http\Request;
 use WTD\Http\Response;
@@ -43,6 +44,53 @@ final class RouterTest extends TestCase
         $this->expectException(NotFoundHttpException::class);
 
         $this->router()->dispatch(new Request('GET', '/missing'));
+    }
+
+    public function testRouterThrowsMethodNotAllowedForMatchingPath(): void
+    {
+        $router = $this->router();
+        $router->get('/submit', static fn (): string => 'GET');
+
+        try {
+            $router->dispatch(new Request('POST', '/submit'));
+            self::fail('Expected method not allowed exception.');
+        } catch (MethodNotAllowedHttpException $exception) {
+            self::assertSame(['GET', 'HEAD', 'OPTIONS'], $exception->allowedMethods());
+            self::assertSame('GET, HEAD, OPTIONS', $exception->headers()['Allow']);
+        }
+    }
+
+    public function testRouterSupportsAdditionalHttpMethods(): void
+    {
+        $router = $this->router();
+        $router->put('/resource', static fn (): string => 'PUT');
+        $router->patch('/resource', static fn (): string => 'PATCH');
+        $router->delete('/resource', static fn (): string => 'DELETE');
+
+        self::assertSame('PUT', $router->dispatch(new Request('PUT', '/resource'))->content());
+        self::assertSame('PATCH', $router->dispatch(new Request('PATCH', '/resource'))->content());
+        self::assertSame('DELETE', $router->dispatch(new Request('DELETE', '/resource'))->content());
+    }
+
+    public function testRouterSupportsImplicitHeadForGetRoutes(): void
+    {
+        $router = $this->router();
+        $router->get('/headable', static fn (): string => 'HEAD OK');
+
+        self::assertSame('HEAD OK', $router->dispatch(new Request('HEAD', '/headable'))->content());
+    }
+
+    public function testRouterAutomaticallyHandlesOptionsRequests(): void
+    {
+        $router = $this->router();
+        $router->get('/options', static fn (): string => 'GET');
+        $router->post('/options', static fn (): string => 'POST');
+
+        $response = $router->dispatch(new Request('OPTIONS', '/options'));
+
+        self::assertSame(204, $response->status());
+        self::assertSame('', $response->content());
+        self::assertSame('GET, HEAD, OPTIONS, POST', $response->headers()['Allow']);
     }
 
     public function testRouterSupportsGroupsAndNamedRoutes(): void
@@ -90,6 +138,31 @@ final class RouterTest extends TestCase
         $response = $router->dispatch(new Request('GET', '/invokable'));
 
         self::assertSame('Invokable', $response->content());
+    }
+
+    public function testRouterSupportsDomainRoutes(): void
+    {
+        $router = $this->router();
+        $router->domain('api.example.test', static function (Router $router): void {
+            $router->get('/status', static fn (): string => 'Domain OK');
+        });
+
+        $matched = $router->dispatch(new Request('GET', '/status', ['host' => 'api.example.test']));
+
+        self::assertSame('Domain OK', $matched->content());
+
+        $this->expectException(NotFoundHttpException::class);
+        $router->dispatch(new Request('GET', '/status', ['host' => 'www.example.test']));
+    }
+
+    public function testRouterSupportsApiVersionGroups(): void
+    {
+        $router = $this->router();
+        $router->version('1', static function (Router $router): void {
+            $router->get('/status', static fn (): string => 'v1');
+        });
+
+        self::assertSame('v1', $router->dispatch(new Request('GET', '/api/v1/status'))->content());
     }
 
     private function router(): Router

@@ -20,7 +20,7 @@ final class RequestResponseTest extends TestCase
             ['page' => 1],
             ['name' => 'Taylor'],
             ['theme' => 'dark'],
-            ['REQUEST_METHOD' => 'GET'],
+            ['REQUEST_METHOD' => 'GET', 'HTTP_HOST' => 'Example.test:8080'],
         );
 
         self::assertSame('GET', $request->method());
@@ -29,6 +29,7 @@ final class RequestResponseTest extends TestCase
         self::assertSame(1, $request->query('page'));
         self::assertSame('Taylor', $request->input('name'));
         self::assertSame('dark', $request->cookie('theme'));
+        self::assertSame('example.test', $request->host());
     }
 
     public function testResponseCanRepresentJson(): void
@@ -54,6 +55,13 @@ final class RequestResponseTest extends TestCase
         $response = Response::make('OK')->withCookie(new Cookie('theme', 'dark'));
 
         self::assertSame('theme', $response->cookies()[0]->name());
+    }
+
+    public function testResponseCanSetHeaders(): void
+    {
+        $response = Response::make('OK')->withHeader('X-Test', 'true');
+
+        self::assertSame('true', $response->headers()['X-Test']);
     }
 
     public function testResponseCanRepresentStream(): void

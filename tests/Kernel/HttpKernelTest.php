@@ -45,6 +45,21 @@ final class HttpKernelTest extends TestCase
         self::assertSame('Not Found', $response->content());
     }
 
+    public function testHttpKernelRendersMethodNotAllowedResponses(): void
+    {
+        $container = new Container();
+        $container->instance(Container::class, $container);
+        $router = new Router(new ControllerDispatcher($container));
+        $router->get('/submit', static fn (): string => 'OK');
+        $kernel = new HttpKernel($router, new Pipeline(), $this->renderer());
+
+        $response = $kernel->handle(new Request('POST', '/submit'));
+
+        self::assertSame(405, $response->status());
+        self::assertSame('Method Not Allowed', $response->content());
+        self::assertSame('GET, HEAD, OPTIONS', $response->headers()['Allow']);
+    }
+
     public function testHttpKernelRendersServerErrors(): void
     {
         $container = new Container();

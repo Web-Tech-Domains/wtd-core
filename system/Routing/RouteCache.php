@@ -49,6 +49,7 @@ final class RouteCache
                 'path' => $route->path(),
                 'action' => $action,
                 'name' => $route->getName(),
+                'domain' => $route->getDomain(),
             ];
         }
 
@@ -77,12 +78,13 @@ final class RouteCache
                 continue;
             }
 
-            /** @var array{method: string, path: string, action: class-string|array{0: class-string, 1: non-empty-string}, name?: string|null} $route */
+            /** @var array{method: string, path: string, action: class-string|array{0: class-string, 1: non-empty-string}, name?: string|null, domain?: string|null} $route */
             $router->addCached(
                 $route['method'],
                 $route['path'],
                 $route['action'],
                 $route['name'] ?? null,
+                $route['domain'] ?? null,
             );
         }
     }

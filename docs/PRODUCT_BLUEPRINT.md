@@ -68,10 +68,15 @@ tests/
 - HTTP kernel
 - Request and response objects
 - HTTP exception rendering
+- 404 and 405 HTTP error responses
+- Full HTTP method routing
+- Automatic OPTIONS responses
 - Routing
 - Route parameters
 - Route groups
 - Named routes
+- Domain routing
+- API versioning
 - URL generator
 - Route cache
 - Controllers

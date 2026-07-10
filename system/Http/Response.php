@@ -122,6 +122,16 @@ final class Response
     }
 
     /**
+     * Set a response header.
+     */
+    public function withHeader(string $name, string $value): self
+    {
+        $this->headers[$name] = $value;
+
+        return $this;
+    }
+
+    /**
      * Attach a cookie to the response.
      */
     public function withCookie(Cookie $cookie): self

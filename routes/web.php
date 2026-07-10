@@ -15,3 +15,7 @@ $router->get('/download', [HomeController::class, 'download'])->name('download')
 $router->group('/api', static function (Router $router): void {
     $router->get('/status', [HomeController::class, 'apiStatus'])->name('api.status');
 });
+
+$router->version('1', static function (Router $router): void {
+    $router->get('/status', [HomeController::class, 'apiStatus'])->name('api.v1.status');
+});
