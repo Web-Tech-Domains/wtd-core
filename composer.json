@@ -1,0 +1,15 @@
+{
+  "name": "webtechdomains/wtd-core",
+  "description": "WTD Core Framework",
+  "type": "project",
+  "license": "MIT",
+  "require": {
+    "php": "^8.3"
+  },
+  "autoload": {
+    "psr-4": {
+      "WTD\\": "system/",
+      "App\\": "app/"
+    }
+  }
+}
