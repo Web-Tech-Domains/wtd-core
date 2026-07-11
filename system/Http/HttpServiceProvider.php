@@ -53,10 +53,20 @@ final class HttpServiceProvider extends ServiceProvider
         );
         $this->container()->singleton(UrlGenerator::class);
         $this->container()->singleton(HttpKernel::class, function (): HttpKernel {
-            $middleware = $this->app->config()->get('http.middleware', []);
-            $middleware = is_array($middleware) ? array_values($middleware) : [];
+            $configured = $this->app->config()->get('http.middleware', []);
+            $middleware = [];
 
-            /** @var list<class-string<\WTD\Middleware\Middleware>> $middleware */
+            if (is_array($configured)) {
+                foreach ($configured as $candidate) {
+                    if (
+                        is_string($candidate)
+                        && is_a($candidate, \WTD\Middleware\Middleware::class, true)
+                    ) {
+                        $middleware[] = $candidate;
+                    }
+                }
+            }
+
             return new HttpKernel(
                 $this->container()->get(Router::class),
                 $this->container()->get(Pipeline::class),

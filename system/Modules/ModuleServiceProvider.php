@@ -32,7 +32,7 @@ final class ModuleServiceProvider extends ServiceProvider
             return $configured;
         }
 
-        return array_values(array_merge($configured, $this->discoverModules()));
+        return array_merge($configured, $this->discoverModules());
     }
 
     /**
