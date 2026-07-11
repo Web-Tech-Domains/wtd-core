@@ -1,4 +1,4 @@
-name: Repository Checks
+name: WTD Core Quality Gate
 
 on:
   push:
@@ -27,6 +27,7 @@ concurrency:
 
 jobs:
   php:
+    name: PHP Quality (PHP ${{ matrix.php-version }})
     if: github.event_name == 'push' || github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     strategy:
@@ -37,39 +38,58 @@ jobs:
           - "8.4"
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - uses: shivammathur/setup-php@v2
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-version }}
           coverage: none
           tools: composer:v2
 
-      - run: composer validate --strict
-      - run: composer install --no-interaction --prefer-dist --no-progress
-      - run: composer audit --no-interaction
-      - run: composer test
-      - run: composer analyse
-      - run: vendor/bin/php-cs-fixer fix --dry-run --diff --using-cache=no
+      - name: Validate Composer metadata
+        run: composer validate --strict
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Audit Composer dependencies
+        run: composer audit --no-interaction
+
+      - name: Run PHPUnit tests
+        run: composer test
+
+      - name: Run PHPStan analysis
+        run: composer analyse
+
+      - name: Check PHP code style
+        run: vendor/bin/php-cs-fixer fix --dry-run --diff --using-cache=no
 
   frontend:
+    name: Frontend Build
     if: github.event_name == 'push' || github.event_name == 'pull_request'
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: "22"
           cache: npm
 
-      - run: npm install
-      - run: npm run build
+      - name: Install npm dependencies
+        run: npm install
+
+      - name: Build frontend assets
+        run: npm run build
 
   codeql:
     if: github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'schedule'
-    name: CodeQL ${{ matrix.language }}
+    name: CodeQL Security Scan (${{ matrix.language }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -79,22 +99,27 @@ jobs:
           - javascript-typescript
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - uses: github/codeql-action/init@v3
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
 
-      - uses: github/codeql-action/analyze@v3
+      - name: Analyze with CodeQL
+        uses: github/codeql-action/analyze@v3
         with:
           category: "/language:${{ matrix.language }}"
 
   require-approver-review:
+    name: Approver Review
     if: github.event_name == 'pull_request_target' || github.event_name == 'pull_request_review'
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/github-script@v7
+      - name: Require approver team review
+        uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.WTD_APPROVER_TOKEN || github.token }}
           script: |
