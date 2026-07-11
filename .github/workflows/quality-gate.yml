@@ -2,8 +2,20 @@ name: WTD Core Quality Gate
 
 on:
   push:
+    branches:
+      - master
+      - main
+      - develop
   pull_request:
+    branches:
+      - master
+      - main
+      - develop
   pull_request_target:
+    branches:
+      - master
+      - main
+      - develop
     types:
       - opened
       - reopened
@@ -79,7 +91,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "22"
-          cache: npm
 
       - name: Install npm dependencies
         run: npm install
@@ -95,7 +106,6 @@ jobs:
       fail-fast: false
       matrix:
         language:
-          - php
           - javascript-typescript
 
     steps:

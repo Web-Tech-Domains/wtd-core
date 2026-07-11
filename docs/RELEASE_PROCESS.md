@@ -2,6 +2,20 @@
 
 WTD Core follows Semantic Versioning.
 
+Current version source:
+
+```text
+VERSION
+system/Application/Application.php
+CHANGELOG.md
+```
+
+Current release:
+
+```text
+0.1.0-alpha
+```
+
 ## Version Format
 
 ```text
@@ -35,6 +49,7 @@ Before tagging a release:
 Use signed or protected tags when possible:
 
 ```bash
+git checkout -b release/0.1.0-alpha
 git tag -a v0.1.0-alpha -m "Release v0.1.0-alpha"
 git push origin v0.1.0-alpha
 ```
