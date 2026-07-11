@@ -217,6 +217,12 @@ tests/
 - Mail templates
 - Mail attachments
 - Inline mail images
+- File cache store
+- Redis cache store
+- Memcached cache store
+- Cache tags
+- Atomic cache locks
+- Cache events
 - Documentation
 
 ### 2.0 Enterprise
