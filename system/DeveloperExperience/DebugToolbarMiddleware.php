@@ -70,7 +70,7 @@ final class DebugToolbarMiddleware implements Middleware
         $sections = $this->sections($request, $response, $profile);
 
         return sprintf(
-            '<style>%s</style><aside id="wtd-debug-toolbar" class="wtd-debug-toolbar" aria-label="WTD debug toolbar"><details><summary><span class="wtd-brand">WTD</span><span class="wtd-chip">%s</span><span class="wtd-route">%s</span><span class="wtd-status %s">%d</span><span>%.2f ms</span><span>%.2f MB</span><span>%d queries</span><span>%d headers</span></summary><div class="wtd-panel"><dl class="wtd-metrics"><div><dt>Method</dt><dd>%s</dd></div><div><dt>Path</dt><dd>%s</dd></div><div><dt>Status</dt><dd>%d</dd></div><div><dt>Memory peak</dt><dd>%.2f MB</dd></div><div><dt>Environment</dt><dd>%s</dd></div><div><dt>Debug</dt><dd>%s</dd></div></dl><div class="wtd-sections">%s<section class="wtd-section"><h2>Profiler Marks</h2>%s</section></div></div></details></aside>',
+            '<style>%s</style><aside id="wtd-debug-toolbar" class="wtd-debug-toolbar" aria-label="WTD debug toolbar"><details><summary><span class="wtd-brand">WTD</span><span class="wtd-chip">%s</span><span class="wtd-route">%s</span><span class="wtd-status %s">%d</span><span>%.2f ms</span><span>%.2f MB</span><span>%d queries</span><span>%d headers</span></summary><div class="wtd-panel"><div class="wtd-panel-head"><strong>Debug Toolbar</strong><span>%s / %s / PHP %s</span></div><div class="wtd-sections">%s<section class="wtd-section"><h2>Profiler Marks</h2>%s</section></div></div></details></aside>',
             $this->styles(),
             $method,
             $path,
@@ -80,12 +80,9 @@ final class DebugToolbarMiddleware implements Middleware
             $profile['memory_peak'] / 1024 / 1024,
             count($request->queryParams()),
             count($request->headers()),
-            $method,
-            $path,
-            $status,
-            $profile['memory_peak'] / 1024 / 1024,
             $this->escape((string) $this->config->get('app.env', 'development')),
             (bool) $this->config->get('app.debug', false) ? 'enabled' : 'disabled',
+            PHP_VERSION,
             $sections,
             $marks,
         );
@@ -173,7 +170,7 @@ final class DebugToolbarMiddleware implements Middleware
 
         foreach ($values as $label => $value) {
             $rows .= sprintf(
-                '<div><dt>%s</dt><dd>%s</dd></div>',
+                '<div class="wtd-row"><dt>%s</dt><dd>%s</dd></div>',
                 $this->escape($label),
                 $this->escape($value),
             );
@@ -223,7 +220,7 @@ final class DebugToolbarMiddleware implements Middleware
     private function styles(): string
     {
         return <<<'CSS'
-.wtd-debug-toolbar{position:fixed;right:16px;bottom:16px;z-index:2147483647;max-width:min(980px,calc(100vw - 32px));font:12px/1.45 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#e5e7eb}.wtd-debug-toolbar *{box-sizing:border-box}.wtd-debug-toolbar details{border:1px solid rgba(148,163,184,.34);border-radius:8px;background:#111827;box-shadow:0 18px 48px rgba(15,23,42,.24);overflow:hidden}.wtd-debug-toolbar summary{min-height:40px;display:flex;align-items:center;gap:8px;padding:7px 10px;cursor:pointer;list-style:none;overflow-x:auto}.wtd-debug-toolbar summary::-webkit-details-marker{display:none}.wtd-brand{display:inline-flex;align-items:center;justify-content:center;width:38px;height:26px;border-radius:6px;background:#2563eb;color:#fff;font-weight:900;letter-spacing:0}.wtd-chip,.wtd-status,.wtd-debug-toolbar summary span:not(.wtd-brand){display:inline-flex;align-items:center;min-height:26px;border-radius:6px;background:#1f2937;padding:0 8px;font-weight:800;white-space:nowrap}.wtd-route{max-width:260px;overflow:hidden;text-overflow:ellipsis}.wtd-status.success{background:#064e3b;color:#a7f3d0}.wtd-status.warning{background:#713f12;color:#fde68a}.wtd-status.danger{background:#7f1d1d;color:#fecaca}.wtd-panel{width:min(980px,calc(100vw - 32px));max-height:min(72vh,720px);overflow:auto;border-top:1px solid rgba(148,163,184,.22);background:#0f172a;padding:14px}.wtd-metrics,.wtd-section dl{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:0}.wtd-metrics{margin-bottom:14px}.wtd-panel dl div{min-width:0;border:1px solid rgba(148,163,184,.2);border-radius:8px;background:#111827;padding:10px}.wtd-panel dt{margin:0 0 5px;color:#94a3b8;font-weight:800}.wtd-panel dd{margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#f8fafc;font-weight:900}.wtd-sections{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.wtd-section{min-width:0;border:1px solid rgba(148,163,184,.16);border-radius:8px;background:#111827;padding:12px}.wtd-section h2{margin:0 0 10px;color:#cbd5e1;font-size:12px;text-transform:uppercase;letter-spacing:0}.wtd-section ol{max-height:190px;overflow:auto;margin:0;padding:0;list-style:none}.wtd-section li{display:flex;justify-content:space-between;gap:12px;border-top:1px solid rgba(148,163,184,.14);padding:7px 0}.wtd-section code{min-width:0;overflow:hidden;text-overflow:ellipsis;color:#bfdbfe}.wtd-section li span{max-width:62%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#e2e8f0}.wtd-empty{margin:0;color:#94a3b8}@media(max-width:820px){.wtd-debug-toolbar{right:8px;bottom:8px;left:8px;max-width:none}.wtd-panel{width:100%}.wtd-metrics,.wtd-section dl,.wtd-sections{grid-template-columns:1fr}.wtd-route{max-width:170px}}
+.wtd-debug-toolbar{position:fixed;right:14px;bottom:14px;z-index:2147483647;max-width:min(1040px,calc(100vw - 28px));font:12px/1.45 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#e5e7eb}.wtd-debug-toolbar *{box-sizing:border-box}.wtd-debug-toolbar details{border:1px solid rgba(148,163,184,.32);border-radius:8px;background:#0f172a;box-shadow:0 18px 48px rgba(15,23,42,.26);overflow:hidden}.wtd-debug-toolbar summary{min-height:38px;display:flex;align-items:center;gap:7px;padding:6px 10px;cursor:pointer;list-style:none;overflow-x:auto;border-bottom:1px solid transparent}.wtd-debug-toolbar details[open] summary{border-bottom-color:rgba(148,163,184,.18)}.wtd-debug-toolbar summary::-webkit-details-marker{display:none}.wtd-brand{display:inline-flex;align-items:center;justify-content:center;width:38px;height:24px;border-radius:6px;background:#2563eb;color:#fff;font-weight:900;letter-spacing:0}.wtd-chip,.wtd-status,.wtd-debug-toolbar summary span:not(.wtd-brand){display:inline-flex;align-items:center;min-height:24px;border-radius:6px;background:#1e293b;padding:0 8px;font-weight:800;white-space:nowrap}.wtd-route{max-width:260px;overflow:hidden;text-overflow:ellipsis}.wtd-status.success{background:#064e3b;color:#a7f3d0}.wtd-status.warning{background:#713f12;color:#fde68a}.wtd-status.danger{background:#7f1d1d;color:#fecaca}.wtd-panel{width:min(1040px,calc(100vw - 28px));max-height:min(68vh,680px);overflow:auto;background:#0f172a;padding:0}.wtd-panel-head{position:sticky;top:0;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 14px;border-bottom:1px solid rgba(148,163,184,.18);background:#111827}.wtd-panel-head strong{font-size:13px;color:#f8fafc}.wtd-panel-head span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#94a3b8;font-weight:800}.wtd-sections{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0}.wtd-section{min-width:0;border-right:1px solid rgba(148,163,184,.14);border-bottom:1px solid rgba(148,163,184,.14);background:#0f172a;padding:12px 14px}.wtd-section h2{margin:0 0 8px;color:#cbd5e1;font-size:11px;text-transform:uppercase;letter-spacing:0}.wtd-section dl,.wtd-section ol{margin:0;padding:0;list-style:none}.wtd-row,.wtd-section li{display:grid;grid-template-columns:minmax(96px,.38fr)minmax(0,1fr);gap:14px;align-items:start;border-top:1px solid rgba(148,163,184,.12);padding:7px 0}.wtd-row:first-child,.wtd-section li:first-child{border-top:0}.wtd-panel dt,.wtd-section code{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#94a3b8;font-weight:800}.wtd-panel dd,.wtd-section li span{min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#f8fafc;font-weight:800}.wtd-section code{color:#bfdbfe}.wtd-empty{margin:0;color:#94a3b8}@media(max-width:820px){.wtd-debug-toolbar{right:8px;bottom:8px;left:8px;max-width:none}.wtd-panel{width:100%}.wtd-sections{grid-template-columns:1fr}.wtd-section{border-right:0}.wtd-route{max-width:170px}.wtd-row,.wtd-section li{grid-template-columns:1fr;gap:3px}}@media(max-width:520px){.wtd-panel-head{align-items:flex-start;flex-direction:column;gap:4px}}
 CSS;
     }
 
@@ -235,6 +232,7 @@ CSS;
 
         return json_encode($value, JSON_THROW_ON_ERROR);
     }
+
     private function escape(string $value): string
     {
         return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
