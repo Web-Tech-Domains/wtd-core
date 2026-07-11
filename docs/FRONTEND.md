@@ -25,6 +25,18 @@ The framework itself does not require Node to run. Vite is only needed when deve
 Run the PHP app separately with the `public` directory as the document root:
 
 ```bash
+php core serve
+```
+
+To change the host or port:
+
+```bash
+php core serve --host=0.0.0.0 --port=8080
+```
+
+Composer also proxies to the same command:
+
+```bash
 composer serve
 ```
 
