@@ -30,7 +30,7 @@ on:
 
 permissions:
   contents: read
-  pull-requests: read
+  pull-requests: write
   security-events: write
 
 concurrency:
@@ -121,6 +121,44 @@ jobs:
         uses: github/codeql-action/analyze@v3
         with:
           category: "/language:${{ matrix.language }}"
+
+  request-approver-review:
+    name: Request Approver Review
+    if: github.event_name == 'pull_request_target'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Request approver team review
+        uses: actions/github-script@v9
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const team_slug = 'approvers';
+            const { owner, repo } = context.repo;
+            const pull_number = context.payload.pull_request.number;
+
+            if (context.payload.pull_request.draft) {
+              core.info('Pull request is draft; approver team request skipped.');
+              return;
+            }
+
+            try {
+              await github.rest.pulls.requestReviewers({
+                owner,
+                repo,
+                pull_number,
+                team_reviewers: [team_slug],
+              });
+
+              core.info(`Requested review from @${owner}/${team_slug}.`);
+            } catch (error) {
+              if ([403, 404, 422].includes(error.status)) {
+                core.warning(`Could not request @${owner}/${team_slug}: ${error.message}`);
+                return;
+              }
+
+              throw error;
+            }
 
   require-approver-review:
     name: Approver Review
