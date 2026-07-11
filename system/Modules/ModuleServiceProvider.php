@@ -26,12 +26,39 @@ final class ModuleServiceProvider extends ServiceProvider
     private function modules(): array
     {
         $modules = $this->app->config()->get('modules.enabled', []);
+        $configured = is_array($modules) ? array_values(array_filter($modules, 'is_array')) : [];
 
-        if (!is_array($modules)) {
+        if (!(bool) $this->app->config()->get('modules.auto_discover', true)) {
+            return $configured;
+        }
+
+        return array_values(array_merge($configured, $this->discoverModules()));
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    private function discoverModules(): array
+    {
+        $files = glob($this->app->basePath('modules/*/module.php'));
+
+        if ($files === false) {
             return [];
         }
 
-        return array_values(array_filter($modules, 'is_array'));
+        sort($files);
+        $modules = [];
+
+        foreach ($files as $file) {
+            $module = require $file;
+
+            if (is_array($module)) {
+                /** @var array<string, mixed> $module */
+                $modules[] = $module;
+            }
+        }
+
+        return $modules;
     }
 
     /**

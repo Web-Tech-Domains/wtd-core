@@ -64,4 +64,66 @@ PHP);
 
         self::assertSame('module-ok', $response->content());
     }
+
+    public function testModuleServiceProviderAutoDiscoversModuleManifests(): void
+    {
+        $basePath = dirname(__DIR__, 2);
+        self::assertNotSame('', $basePath);
+        /** @var non-empty-string $basePath */
+
+        $moduleRoot = $basePath . '/modules/AutoTest';
+        $routePath = $moduleRoot . '/Routes/web.php';
+
+        if (!is_dir(dirname($routePath))) {
+            mkdir(dirname($routePath), 0775, true);
+        }
+
+        file_put_contents($moduleRoot . '/module.php', <<<'PHP'
+<?php
+
+declare(strict_types=1);
+
+return [
+    'name' => 'AutoTest',
+    'routes' => 'modules/AutoTest/Routes/web.php',
+];
+PHP);
+        file_put_contents($routePath, <<<'PHP'
+<?php
+
+declare(strict_types=1);
+
+use WTD\Http\Response;
+use WTD\Routing\Router;
+
+/** @var Router $router */
+$router->get('/auto-test', static fn (): Response => Response::make('auto-ok'));
+PHP);
+
+        $container = new Container();
+        $container->singleton(Filesystem::class);
+
+        $app = new Application(
+            $basePath,
+            $container,
+            new Repository([
+                'modules.enabled' => [],
+                'modules.auto_discover' => true,
+            ]),
+        );
+        $app->register(HttpServiceProvider::class);
+        $app->register(ModuleServiceProvider::class);
+        $app->boot();
+
+        /** @var Router $router */
+        $router = $app->container()->get(Router::class);
+        $response = $router->dispatch(new Request('GET', '/auto-test'));
+
+        self::assertSame('auto-ok', $response->content());
+
+        @unlink($routePath);
+        @unlink($moduleRoot . '/module.php');
+        @rmdir($moduleRoot . '/Routes');
+        @rmdir($moduleRoot);
+    }
 }
