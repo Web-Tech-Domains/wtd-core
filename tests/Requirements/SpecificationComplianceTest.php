@@ -26,6 +26,9 @@ final class SpecificationComplianceTest extends TestCase
             'resources/js/vue.js',
             'resources/js/react.jsx',
             'resources/css/app.css',
+            'config/hooks.php',
+            'app/Hooks.php',
+            'docs/HOOKS.md',
             'docs/REQUIREMENTS_MATRIX.md',
         ] as $path) {
             self::assertFileExists($this->root($path));
@@ -39,6 +42,7 @@ final class SpecificationComplianceTest extends TestCase
             'system/Tenancy/TenancyServiceProvider.php',
             'system/AI/AIServiceProvider.php',
             'system/Monitoring/MonitoringServiceProvider.php',
+            'system/Hooks/HookServiceProvider.php',
         ] as $path) {
             self::assertFileExists($this->root($path));
         }

@@ -9,6 +9,7 @@ use WTD\Application\Application;
 use WTD\Config\Repository;
 use WTD\Container\Container;
 use WTD\Filesystem\Filesystem;
+use WTD\Hooks\HookManager;
 use WTD\View\AssetManager;
 use WTD\View\ViewRenderer;
 
@@ -122,6 +123,34 @@ final class HelpersTest extends TestCase
             @rmdir($basePath . '/tests/tmp/helper-assets/public/build');
             @rmdir($basePath . '/tests/tmp/helper-assets/public');
             @rmdir($basePath . '/tests/tmp/helper-assets');
+        }
+    }
+
+    public function testHookHelpersProxyToHookManager(): void
+    {
+        require_once dirname(__DIR__, 2) . '/system/Support/helpers.php';
+
+        $basePath = dirname(__DIR__, 2);
+        $container = new Container();
+        $hooks = new HookManager();
+        $app = new Application($basePath, $container, new Repository());
+        $container->instance(HookManager::class, $hooks);
+        $GLOBALS['wtd_app'] = $app;
+        $calls = [];
+
+        try {
+            add_action('helper.action', static function (string $value) use (&$calls): void {
+                $calls[] = $value;
+            });
+            add_filter('helper.filter', static fn (string $value): string => $value . '-filtered');
+
+            do_action('helper.action', 'called');
+
+            self::assertSame($hooks, app_hooks());
+            self::assertSame(['called'], $calls);
+            self::assertSame('value-filtered', apply_filters('helper.filter', 'value'));
+        } finally {
+            unset($GLOBALS['wtd_app']);
         }
     }
 }
