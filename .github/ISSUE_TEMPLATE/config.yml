@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Security vulnerability
-    url: https://github.com/webtechdomains/wtd-core/security/policy
-    about: Report vulnerabilities privately.
-  - name: Commercial support
+  - name: Security Vulnerability
+    url: https://github.com/Web-Tech-Domains/wtd-core/security/policy
+    about: Report vulnerabilities privately through the security policy.
+  - name: Commercial Support
     url: https://webtechdomains.in
-    about: Contact Web Tech Domains for implementation or enterprise support.
+    about: Contact Web Tech Domains for enterprise implementation or support.

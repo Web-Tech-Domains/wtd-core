@@ -23,7 +23,7 @@ This matrix maps the architecture specification to implemented project assets.
 | PHPStan | `phpstan.neon`, `composer analyse` |
 | PHP-CS-Fixer | `.php-cs-fixer.dist.php` |
 | Rector | `rector.php` |
-| GitHub Actions | `.github/workflows/ci.yml` |
+| GitHub Actions | `.github/workflows/quality-gate.yml` |
 
 ## Standards
 

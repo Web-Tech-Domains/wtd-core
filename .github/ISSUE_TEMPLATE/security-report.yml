@@ -1,0 +1,24 @@
+name: Security Report
+description: Read the private vulnerability reporting process.
+title: "security: private report required"
+labels:
+  - security
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not disclose vulnerabilities in a public issue.
+
+        Please follow the private reporting process in `SECURITY.md`.
+
+        Send security reports to:
+
+        `info@webtechdomains.in`
+
+  - type: checkboxes
+    id: acknowledgement
+    attributes:
+      label: Acknowledgement
+      options:
+        - label: I understand that vulnerabilities should be reported privately, not in this public issue tracker.
+          required: true

@@ -2,6 +2,8 @@
 
 A modern, lightweight, enterprise-ready PHP framework by Web Tech Domains.
 
+Current version: `0.1.0-alpha`
+
 ## Vision
 - Lightweight
 - Secure
@@ -16,6 +18,9 @@ Practical guides are available from [docs/README.md](docs/README.md).
 
 - License: [MIT](LICENSE)
 - Contributing guide: [CONTRIBUTING.md](CONTRIBUTING.md)
+- Git workflow: [docs/GIT_WORKFLOW.md](docs/GIT_WORKFLOW.md)
+- Governance: [docs/GOVERNANCE.md](docs/GOVERNANCE.md)
+- Release process: [docs/RELEASE_PROCESS.md](docs/RELEASE_PROCESS.md)
 - Code of conduct: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
 - Security policy: [SECURITY.md](SECURITY.md)
 - Support policy: [SUPPORT.md](SUPPORT.md)

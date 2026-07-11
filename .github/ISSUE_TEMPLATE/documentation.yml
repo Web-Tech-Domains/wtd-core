@@ -1,25 +1,40 @@
-name: Documentation issue
+name: Documentation
 description: Report unclear, missing, or incorrect documentation.
 title: "docs: "
 labels:
   - documentation
 body:
-  - type: textarea
+  - type: input
     id: location
     attributes:
       label: Location
       description: Which file, section, or page needs work?
+      placeholder: "docs/GETTING_STARTED.md"
     validations:
       required: true
+
   - type: textarea
     id: issue
     attributes:
       label: Issue
-      description: What is confusing, missing, or incorrect?
+      description: What is confusing, missing, outdated, or incorrect?
     validations:
       required: true
+
   - type: textarea
-    id: suggestion
+    id: suggested-change
     attributes:
-      label: Suggested change
-      description: Optional wording or structure suggestion.
+      label: Suggested Change
+      description: Optional wording, example, or structure suggestion.
+
+  - type: dropdown
+    id: audience
+    attributes:
+      label: Audience
+      options:
+        - New user
+        - Application developer
+        - Package/module developer
+        - Framework contributor
+        - Operations/security team
+        - Other
