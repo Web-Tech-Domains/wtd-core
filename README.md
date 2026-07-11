@@ -34,6 +34,8 @@ Practical guides are available from [docs/README.md](docs/README.md).
 composer install
 npm install
 copy .env.example .env
+php core serve
+php core serve --host=0.0.0.0 --port=8080
 composer serve
 php -S 127.0.0.1:8000 -t public public/index.php
 npm run dev
@@ -78,6 +80,18 @@ php core diagnostics
 ## Local Server
 
 Use the `public` directory as the document root. For a quick local server:
+
+```bash
+php core serve
+```
+
+That is equivalent to Laravel's `php artisan serve`. To change the host or port:
+
+```bash
+php core serve --host=0.0.0.0 --port=8080
+```
+
+Composer also proxies to the same command:
 
 ```bash
 composer serve

@@ -80,6 +80,7 @@ final class KernelTest extends TestCase
         self::assertArrayHasKey('route:clear', $kernel->commands());
         self::assertArrayHasKey('schedule:run', $kernel->commands());
         self::assertArrayHasKey('db:seed', $kernel->commands());
+        self::assertArrayHasKey('serve', $kernel->commands());
         self::assertArrayHasKey('test', $kernel->commands());
     }
 
@@ -211,6 +212,12 @@ final class KernelTest extends TestCase
         self::assertSame(0, $kernel->handle(new Input(['cache:clear']), $output));
         self::assertSame(0, $kernel->handle(new Input(['test']), $output));
         self::assertSame(0, $kernel->handle(new Input(['deploy']), $output));
+        self::assertSame(0, $kernel->handle(new Input([
+            'serve',
+            '--host=0.0.0.0',
+            '--port=8080',
+            '--no-run',
+        ]), $output));
 
         rewind($stdout);
         $contents = (string) stream_get_contents($stdout);
@@ -218,6 +225,8 @@ final class KernelTest extends TestCase
         self::assertStringContainsString('Application cache cleared', $contents);
         self::assertStringContainsString('composer test', $contents);
         self::assertStringContainsString('"deployable"', $contents);
+        self::assertStringContainsString('WTD Core development server: http://0.0.0.0:8080', $contents);
+        self::assertStringContainsString('-S', $contents);
     }
 
     public function testMigrationCommandCanTargetNamedDatabaseConnection(): void
