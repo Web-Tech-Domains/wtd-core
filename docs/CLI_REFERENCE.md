@@ -31,6 +31,9 @@ php core help <command>
 | `make:controller` | Generate an application controller. |
 | `make:model` | Generate an application model. |
 | `make:resource` | Generate an API resource controller and route snippet. |
+| `marketplace:install` | Install a local marketplace package. |
+| `marketplace:list` | List local marketplace packages. |
+| `marketplace:publish` | Publish package configuration files. |
 | `migrate` | Run pending database migrations. |
 | `migrate:rollback` | Roll back the latest database migration batch. |
 | `optimize` | Build framework optimization caches. |
@@ -52,6 +55,9 @@ php core app:new demo
 php core api:docs
 php core ide:helper
 php core benchmark / --iterations=100
+php core marketplace:list
+php core marketplace:install vendor/package
+php core marketplace:publish vendor/package
 php core migrate
 php core db:seed
 php core queue:work

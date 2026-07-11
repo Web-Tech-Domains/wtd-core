@@ -257,7 +257,11 @@ tests/
 - HTML error pages
 
 ### 2.0 Enterprise
-- Marketplace
+- Marketplace package manifests
+- Local package discovery
+- Package installation metadata
+- Package config publishing
+- Installed provider auto-registration
 - Multi-tenancy
 - AI package integrations
 - Enterprise monitoring and administration

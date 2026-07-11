@@ -12,5 +12,6 @@ This directory contains the practical framework documentation for WTD Core.
 - [Security](SECURITY.md)
 - [Operations](OPERATIONS.md)
 - [Developer Experience](DEVELOPER_EXPERIENCE.md)
+- [Marketplace](MARKETPLACE.md)
 - [Product Blueprint](PRODUCT_BLUEPRINT.md)
 - [Software Architecture Specification](SOFTWARE_ARCHITECTURE_SPECIFICATION.md)

@@ -14,6 +14,7 @@ use WTD\Database\DatabaseServiceProvider;
 use WTD\DeveloperExperience\DeveloperExperienceServiceProvider;
 use WTD\Filesystem\Filesystem;
 use WTD\Http\HttpServiceProvider;
+use WTD\Marketplace\MarketplaceServiceProvider;
 use WTD\Support\Env;
 use WTD\Validation\ValidationServiceProvider;
 
@@ -40,6 +41,7 @@ $app->register(HttpServiceProvider::class);
 $app->register(ValidationServiceProvider::class);
 $app->register(DatabaseServiceProvider::class);
 $app->register(DeveloperExperienceServiceProvider::class);
+$app->register(MarketplaceServiceProvider::class);
 
 $providers = $config->get('app.providers', []);
 if (is_array($providers)) {
