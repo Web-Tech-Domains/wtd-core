@@ -6,6 +6,9 @@ This directory contains the practical framework documentation for WTD Core.
 
 - [Getting Started](GETTING_STARTED.md)
 - [Architecture](ARCHITECTURE.md)
+- [Git Workflow](GIT_WORKFLOW.md)
+- [Governance](GOVERNANCE.md)
+- [Release Process](RELEASE_PROCESS.md)
 - [CLI Reference](CLI_REFERENCE.md)
 - [HTTP, Routing, and Middleware](HTTP.md)
 - [Frontend Assets](FRONTEND.md)

@@ -1,0 +1,44 @@
+name: Feature Request
+description: Suggest a focused framework improvement.
+title: "feat: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What developer, product, or framework problem should this solve?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: Describe the API, behavior, command, or workflow you want.
+    validations:
+      required: true
+
+  - type: textarea
+    id: examples
+    attributes:
+      label: Example Usage
+      description: Show how developers would use this feature.
+      render: php
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: What other approaches did you consider?
+
+  - type: checkboxes
+    id: impact
+    attributes:
+      label: Impact
+      options:
+        - label: This may require documentation changes.
+        - label: This may require tests.
+        - label: This may affect backward compatibility.
+        - label: This may affect security-sensitive behavior.

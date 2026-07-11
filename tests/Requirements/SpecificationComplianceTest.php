@@ -17,7 +17,7 @@ final class SpecificationComplianceTest extends TestCase
             'docker/nginx/default.conf',
             'docker/apache/vhost.conf',
             'docker/php-fpm/wtd.ini',
-            '.github/workflows/ci.yml',
+            '.github/workflows/quality-gate.yml',
             'rector.php',
             'package.json',
             'vite.config.js',

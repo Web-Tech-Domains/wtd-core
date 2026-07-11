@@ -61,6 +61,12 @@ test: cover env fallback behavior
 
 Common types: `feat`, `fix`, `docs`, `test`, `refactor`, `chore`, `ci`, `perf`, `security`.
 
+You can enable the repository commit template:
+
+```bash
+git config commit.template .gitmessage
+```
+
 ## Pull Requests
 
 Every pull request should:
@@ -72,7 +78,17 @@ Every pull request should:
 - Pass CI.
 - Be approved by a member of `@Web-Tech-Domains/approvers`.
 
-The repository uses `.github/CODEOWNERS` to request reviews from the approvers team for every path. Maintainers should enable branch protection with "Require review from Code Owners" so this is enforced before merge.
+The repository uses `.github/CODEOWNERS` to request reviews from the approvers team for every path. The `Approver Review` workflow checks that at least one active member of `@Web-Tech-Domains/approvers` approved the pull request.
+
+Maintainers should enable branch protection with:
+
+- Require review from Code Owners.
+- Require at least 1 approval.
+- Require the status check `WTD Core Quality Gate / Approver Review`.
+
+If the approvers team is private, configure the `WTD_APPROVER_TOKEN` secret so the workflow can read team membership.
+
+Do not merge with failing CI, unresolved conversations, or missing Code Owner approval.
 
 ## Security
 
