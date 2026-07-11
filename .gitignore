@@ -5,6 +5,11 @@ composer.lock
 # Environment
 .env
 .env.*
+!.env.example
+
+# Local databases
+/database/*.sqlite
+/database/*.sqlite-*
 
 # Logs
 /storage/logs/*

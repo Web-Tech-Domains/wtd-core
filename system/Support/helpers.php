@@ -21,6 +21,31 @@ if (!function_exists('app')) {
     }
 }
 
+if (!function_exists('env')) {
+    function env(string $key, mixed $default = null): mixed
+    {
+        $value = $_ENV[$key] ?? $_SERVER[$key] ?? getenv($key);
+
+        if ($value === false) {
+            return $default;
+        }
+
+        if (!is_string($value)) {
+            return $value;
+        }
+
+        $normalized = strtolower(trim($value));
+
+        return match ($normalized) {
+            'true', '(true)' => true,
+            'false', '(false)' => false,
+            'empty', '(empty)' => '',
+            'null', '(null)' => null,
+            default => $value,
+        };
+    }
+}
+
 if (!function_exists('base_path')) {
     function base_path(string $path = ''): string
     {

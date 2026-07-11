@@ -24,6 +24,34 @@ final class HelpersTest extends TestCase
         self::assertSame(dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'storage', storage_path());
     }
 
+    public function testEnvHelperCastsCommonValues(): void
+    {
+        require_once dirname(__DIR__, 2) . '/system/Support/helpers.php';
+
+        $_ENV['WTD_TEST_TRUE'] = 'true';
+        $_ENV['WTD_TEST_FALSE'] = 'false';
+        $_ENV['WTD_TEST_EMPTY'] = 'empty';
+        $_ENV['WTD_TEST_NULL'] = 'null';
+        $_ENV['WTD_TEST_TEXT'] = 'wtd';
+
+        try {
+            self::assertTrue(env('WTD_TEST_TRUE'));
+            self::assertFalse(env('WTD_TEST_FALSE'));
+            self::assertSame('', env('WTD_TEST_EMPTY'));
+            self::assertNull(env('WTD_TEST_NULL'));
+            self::assertSame('wtd', env('WTD_TEST_TEXT'));
+            self::assertSame('fallback', env('WTD_TEST_MISSING', 'fallback'));
+        } finally {
+            unset(
+                $_ENV['WTD_TEST_TRUE'],
+                $_ENV['WTD_TEST_FALSE'],
+                $_ENV['WTD_TEST_EMPTY'],
+                $_ENV['WTD_TEST_NULL'],
+                $_ENV['WTD_TEST_TEXT'],
+            );
+        }
+    }
+
     public function testViewHelpersRenderNormalAndModuleViews(): void
     {
         require_once dirname(__DIR__, 2) . '/system/Support/helpers.php';

@@ -3,10 +3,9 @@
 declare(strict_types=1);
 
 return [
-    'enabled' => ($_ENV['APP_ENV'] ?? 'production') !== 'production',
-    'debug_toolbar' => ($_ENV['WTD_DEBUG_TOOLBAR'] ?? 'false') === 'true',
-    'api_docs' => ($_ENV['WTD_API_DOCS'] ?? 'false') === 'true',
+    'enabled' => env('APP_ENV', 'production') !== 'production',
+    'debug_toolbar' => env('WTD_DEBUG_TOOLBAR', false),
+    'api_docs' => env('WTD_API_DOCS', false),
     'error_pages' => true,
     'benchmark_iterations' => 100,
 ];
-
