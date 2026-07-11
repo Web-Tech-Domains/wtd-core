@@ -4,6 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="{{ description }}">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="/site.webmanifest">
     <title>{{ name }} | Web Tech Domains</title>
     <style>
         :root {
@@ -28,6 +30,7 @@
         .topbar { border-bottom: 1px solid var(--line); background: rgba(255, 255, 255, .9); position: sticky; top: 0; z-index: 5; backdrop-filter: blur(16px); }
         .nav { min-height: 72px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
         .brand { display: flex; align-items: center; gap: 12px; font-weight: 800; color: var(--navy); }
+        .brand-logo { width: 42px; height: 42px; display: block; }
         .mark { width: 38px; height: 38px; border-radius: 8px; display: grid; place-items: center; color: #fff; background: linear-gradient(135deg, var(--blue), var(--cyan)); box-shadow: 0 12px 30px rgba(37, 99, 235, .22); }
         .navlinks { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: flex-end; }
         .navlinks a { min-height: 38px; display: inline-flex; align-items: center; padding: 0 14px; border: 1px solid transparent; border-radius: 8px; color: var(--muted); font-weight: 700; font-size: 14px; }
@@ -115,7 +118,7 @@
     <header class="topbar">
         <div class="wrap nav">
             <a class="brand" href="/">
-                <span class="mark">W</span>
+                <img class="brand-logo" src="/favicon.svg" alt="WTD Core">
                 <span>Web Tech Domains / {{ name }}</span>
             </a>
             <nav class="navlinks" aria-label="Primary navigation">

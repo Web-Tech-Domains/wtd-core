@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 240" role="img" aria-labelledby="title desc">
+  <title id="title">WTD Core Logo</title>
+  <desc id="desc">A modern WTD Core framework logo with a secure modular mark and wordmark.</desc>
+  <defs>
+    <linearGradient id="markGradient" x1="80" x2="220" y1="40" y2="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#00A8E8"/>
+      <stop offset="0.52" stop-color="#1B75BB"/>
+      <stop offset="1" stop-color="#0B1F3A"/>
+    </linearGradient>
+    <linearGradient id="accentGradient" x1="126" x2="170" y1="78" y2="166" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#7CE7C8"/>
+      <stop offset="1" stop-color="#35B779"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="240" rx="28" fill="#F7FAFC"/>
+  <g transform="translate(54 34)">
+    <path d="M96 4 164 42v78c0 31-17 59-44 74l-24 14-24-14c-27-15-44-43-44-74V42L96 4Z" fill="url(#markGradient)"/>
+    <path d="M96 29 140 54v62c0 22-12 42-31 53l-13 8-13-8c-19-11-31-31-31-53V54l44-25Z" fill="#fff" opacity=".12"/>
+    <path d="M68 73h20l11 53 16-53h17l-25 86H90L78 108 66 159H49L24 73h18l16 53 10-53Z" fill="#fff"/>
+    <path d="M134 73h58v18h-20v68h-18V91h-20V73Z" fill="#fff"/>
+    <path d="M111 73h17l-25 86H86l-9-38 9-34 10 39 15-53Z" fill="url(#accentGradient)"/>
+  </g>
+  <g fill="#0B1F3A" transform="translate(260 70)">
+    <text x="0" y="55" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="58" font-weight="800" letter-spacing="0">WTD Core</text>
+    <text x="2" y="96" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="22" font-weight="500" letter-spacing="0" fill="#35536F">Secure modular PHP framework for client-grade products</text>
+    <g transform="translate(2 126)" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="700">
+      <rect x="0" y="0" width="84" height="30" rx="6" fill="#E5F6FD"/>
+      <text x="14" y="20" fill="#0B6FA4">PSR</text>
+      <rect x="98" y="0" width="118" height="30" rx="6" fill="#EAF8F2"/>
+      <text x="112" y="20" fill="#147A4E">Security</text>
+      <rect x="230" y="0" width="118" height="30" rx="6" fill="#EEF2F8"/>
+      <text x="244" y="20" fill="#27425F">Modular</text>
+    </g>
+  </g>
+</svg>

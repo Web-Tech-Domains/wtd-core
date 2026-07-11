@@ -1,5 +1,7 @@
 # WTD Core
 
+![WTD Core logo](resources/branding/logo.svg)
+
 A modern, lightweight, enterprise-ready PHP framework by Web Tech Domains.
 
 Current version: `0.1.0-alpha`

@@ -73,6 +73,7 @@ final class StorageTest extends TestCase
 
         $app = new Application($basePath, new Container(), new Repository([
             'filesystems.default' => 's3',
+            'filesystems.disks.s3.url' => 'https://cdn.example.test',
             'app.key' => 'secret',
         ]));
         $app->register(StorageServiceProvider::class);
@@ -80,5 +81,6 @@ final class StorageTest extends TestCase
         self::assertInstanceOf(StorageManager::class, $app->container()->get(StorageManager::class));
         self::assertInstanceOf(StorageDisk::class, $app->container()->get(StorageDisk::class));
         self::assertInstanceOf(S3Disk::class, $app->container()->get(StorageDisk::class));
+        self::assertSame('https://cdn.example.test/docs/readme.txt', $app->container()->get(StorageDisk::class)->url('docs/readme.txt'));
     }
 }

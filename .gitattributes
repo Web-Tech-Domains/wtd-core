@@ -12,6 +12,7 @@
 *.yaml text
 *.js text
 *.css text
+*.svg text
 
 *.png binary
 *.jpg binary

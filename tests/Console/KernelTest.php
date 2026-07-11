@@ -174,6 +174,10 @@ final class KernelTest extends TestCase
             (string) file_get_contents($moduleRoot . '/Resources/views/pages/index.php'),
         );
         self::assertStringContainsString(
+            '/favicon.svg',
+            (string) file_get_contents($moduleRoot . '/Resources/views/pages/index.php'),
+        );
+        self::assertStringContainsString(
             'class="module-shell"',
             (string) file_get_contents($moduleRoot . '/Resources/views/layouts/app.php'),
         );

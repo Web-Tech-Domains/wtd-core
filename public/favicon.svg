@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">WTD Core</title>
+  <defs>
+    <linearGradient id="g" x1="8" x2="56" y1="4" y2="60" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#00A8E8"/>
+      <stop offset=".55" stop-color="#1B75BB"/>
+      <stop offset="1" stop-color="#0B1F3A"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#g)"/>
+  <path d="M16 18h7l4 20 6-20h6l6 20 4-20h7L49 48h-7l-6-19-6 19h-7L16 18Z" fill="#fff"/>
+  <path d="M35 18h6l-9 30h-6l3-10 3 6 6-26Z" fill="#7CE7C8"/>
+</svg>

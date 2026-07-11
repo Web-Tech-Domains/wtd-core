@@ -12,6 +12,14 @@ Describe what changed and why.
 - [ ] Repository quality workflow / tooling
 - [ ] Security
 
+## Reviewers
+
+Required reviewer team:
+
+```text
+@Web-Tech-Domains/approvers
+```
+
 ## Checklist
 
 - [ ] I kept the change focused and reviewable.
