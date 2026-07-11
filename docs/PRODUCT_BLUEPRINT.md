@@ -208,6 +208,15 @@ tests/
 - Firebase notifications
 - Database notifications
 - Webhook notifications
+- SMTP mail transport
+- SES mail transport
+- Mailgun mail transport
+- Postmark mail transport
+- SendGrid mail transport
+- Markdown mail rendering
+- Mail templates
+- Mail attachments
+- Inline mail images
 - Documentation
 
 ### 2.0 Enterprise
