@@ -29,7 +29,7 @@
   ],
   "scripts": {
     "test": "phpunit",
-    "analyse": "phpstan analyse --configuration=phpstan.neon",
+    "analyse": "phpstan analyse --configuration=phpstan.neon --memory-limit=512M",
     "cs:fix": "php-cs-fixer fix"
   }
 }

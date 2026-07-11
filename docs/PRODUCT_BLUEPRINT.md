@@ -151,8 +151,34 @@ tests/
 - ORM UUID primary key support
 - ORM casting, accessors, and mutators
 - ORM repository abstraction
-- Authentication
-- Authorization
+- Session authentication
+- JWT service
+- OAuth state protection
+- API tokens
+- Password reset tokens
+- Email verification tokens
+- Remember-me tokens
+- Magic link tokens
+- MFA TOTP service
+- Device management
+- RBAC authorization
+- Role permissions
+- Policies
+- Gates
+- ACL
+- Role cache
+- CSRF protection
+- XSS escaping
+- SQL identifier validation and parameterized query coverage
+- Encryption
+- Hashing
+- Rate limiter
+- CORS headers
+- Trusted proxy client IP resolution
+- Signed URLs
+- Security headers
+- Audit logging
+- Secrets manager
 - Queue
 - Scheduler
 - Documentation

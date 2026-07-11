@@ -69,6 +69,14 @@ final class SessionStore
     }
 
     /**
+     * Remove a session value.
+     */
+    public function forget(string $key): void
+    {
+        unset($this->data[$key]);
+    }
+
+    /**
      * Save the active session.
      */
     public function save(): void
