@@ -10,6 +10,8 @@ Every pull request must be approved by a member of:
 @Web-Tech-Domains/approvers
 ```
 
+Approvals from users outside that team do not satisfy the project review policy.
+
 The repository declares this in `.github/CODEOWNERS`:
 
 ```text
@@ -21,12 +23,23 @@ The repository declares this in `.github/CODEOWNERS`:
 Repository administrators should protect the default branch and enable:
 
 - Require a pull request before merging.
-- Require approvals.
+- Require at least 1 approval.
 - Require review from Code Owners.
 - Require status checks to pass.
+- Require the status check `Repository Checks / require-approver-review`.
 - Require branches to be up to date before merging.
 - Restrict force pushes.
 - Restrict deletions.
+
+The `Repository Checks / require-approver-review` job validates that at least one active member of `@Web-Tech-Domains/approvers` has approved the pull request. The job does not check out or execute pull request code.
+
+If the team is private or GitHub does not allow the default workflow token to read team membership, add a repository or organization secret named:
+
+```text
+WTD_APPROVER_TOKEN
+```
+
+The token should have permission to read organization team membership.
 
 ## Local Branches
 

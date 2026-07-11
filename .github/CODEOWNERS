@@ -1,8 +1,11 @@
-# Every pull request must be reviewed by a member of:
+# Every pull request must be reviewed by at least one member of:
 # https://github.com/orgs/Web-Tech-Domains/teams/approvers
+#
+# Only approvals from this team satisfy the project review policy.
 #
 # Enforcement requires GitHub branch protection with:
 # - Require a pull request before merging
 # - Require review from Code Owners
+# - Require status check: Repository Checks / require-approver-review
 
 * @Web-Tech-Domains/approvers
