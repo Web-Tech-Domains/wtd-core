@@ -156,6 +156,18 @@ final class Response
      */
     public function send(): void
     {
+        $hooksAvailable = isset($GLOBALS['wtd_app']);
+
+        if ($hooksAvailable && $this->isRedirect()) {
+            \do_action('app.before_redirect', $this);
+            \do_action('app_hook_before_redirect', [
+                'response' => $this,
+                'status' => $this->status,
+                'headers' => $this->headers,
+                'location' => $this->headers['Location'] ?? null,
+            ]);
+        }
+
         http_response_code($this->status);
 
         foreach ($this->headers as $name => $value) {
@@ -166,6 +178,11 @@ final class Response
             header('Set-Cookie: ' . $cookie->toHeader(), false);
         }
 
-        echo $this->content();
+        echo $hooksAvailable ? \apply_filters('response.content', $this->content(), $this) : $this->content();
+    }
+
+    private function isRedirect(): bool
+    {
+        return $this->status >= 300 && $this->status < 400 && isset($this->headers['Location']);
     }
 }

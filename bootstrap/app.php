@@ -15,6 +15,7 @@ use WTD\Console\ConsoleServiceProvider;
 use WTD\Database\DatabaseServiceProvider;
 use WTD\DeveloperExperience\DeveloperExperienceServiceProvider;
 use WTD\Filesystem\Filesystem;
+use WTD\Hooks\HookServiceProvider;
 use WTD\Http\HttpServiceProvider;
 use WTD\Marketplace\MarketplaceServiceProvider;
 use WTD\Monitoring\MonitoringServiceProvider;
@@ -48,6 +49,7 @@ $GLOBALS['wtd_app'] = $app;
 $app->register(CoreServiceProvider::class);
 $app->register(ConsoleServiceProvider::class);
 $app->register(CliServiceProvider::class);
+$app->register(HookServiceProvider::class);
 $app->register(HttpServiceProvider::class);
 $app->register(ValidationServiceProvider::class);
 $app->register(DatabaseServiceProvider::class);
@@ -68,5 +70,6 @@ if (is_array($providers)) {
 }
 
 $app->boot();
+do_action('app.booted', $app);
 
 return $app;

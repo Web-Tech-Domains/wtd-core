@@ -316,6 +316,7 @@ abstract class Model
 
             if ($affected) {
                 $this->fireModelEvent('deleted');
+                $this->fireDataHook('data.deleted');
             }
 
             return $affected;
@@ -329,6 +330,7 @@ abstract class Model
         if ($affected > 0) {
             $this->exists = false;
             $this->fireModelEvent('deleted');
+            $this->fireDataHook('data.deleted');
         }
 
         return $affected > 0;
@@ -514,6 +516,7 @@ abstract class Model
             $this->original = $this->attributes;
             $this->fireModelEvent('created');
             $this->runCallbacks($this->afterInsert);
+            $this->fireDataHook('data.inserted');
             $this->fireModelEvent('saved');
         }
 
@@ -555,6 +558,7 @@ abstract class Model
             $this->original = $this->attributes;
             $this->fireModelEvent('updated');
             $this->runCallbacks($this->afterUpdate);
+            $this->fireDataHook('data.updated');
             $this->fireModelEvent('saved');
         }
 
@@ -598,6 +602,22 @@ abstract class Model
                 $observer->{$event}($this);
             }
         }
+    }
+
+    private function fireDataHook(string $hook): void
+    {
+        if (!isset($GLOBALS['wtd_app'])) {
+            return;
+        }
+
+        \do_action($hook, [
+            'model' => $this,
+            'table' => $this->tableName(),
+            'table_without_prefix' => $this->tableName(),
+            'primary_key' => $this->primaryKey,
+            'id' => $this->getKey(),
+            'attributes' => $this->attributes(),
+        ]);
     }
 
     private function studly(string $value): string
