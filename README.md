@@ -16,6 +16,7 @@ Practical guides are available from [docs/README.md](docs/README.md).
 
 - License: [MIT](LICENSE)
 - Contributing guide: [CONTRIBUTING.md](CONTRIBUTING.md)
+- Git workflow: [docs/GIT_WORKFLOW.md](docs/GIT_WORKFLOW.md)
 - Code of conduct: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
 - Security policy: [SECURITY.md](SECURITY.md)
 - Support policy: [SUPPORT.md](SUPPORT.md)
