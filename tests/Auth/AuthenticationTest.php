@@ -35,7 +35,7 @@ final class AuthenticationTest extends TestCase
             'password' => $hasher->make('secret'),
         ]], $hasher);
         $session = new SessionStore(new Filesystem(), dirname(__DIR__) . '/tmp/auth-sessions');
-        $session->start('auth');
+        $session->start('auth-session-1234');
         $guard = new SessionGuard($provider, $session);
 
         self::assertTrue($guard->attempt(['email' => 'user@example.test', 'password' => 'secret'], remember: true));

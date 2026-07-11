@@ -45,7 +45,9 @@ This matrix maps the architecture specification to implemented project assets.
 | Area | Status |
 | --- | --- |
 | Foundation, HTTP, DI, validation, database, ORM | Implemented and tested |
+| ORM timestamps, guarded fields, lifecycle callbacks, migrations, seeders | Implemented and tested |
 | Auth, authorization, security | Implemented and tested |
+| Hardened sessions, secure cookies, CSRF, signed URLs, rate limiting | Implemented and tested |
 | Secure cookies and default security headers | Implemented and tested |
 | Queue, scheduler, events | Implemented and tested |
 | Notifications, mail, cache, storage | Implemented and tested |

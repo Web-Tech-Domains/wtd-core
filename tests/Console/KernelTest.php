@@ -65,7 +65,9 @@ final class KernelTest extends TestCase
         self::assertArrayHasKey('list', $kernel->commands());
         self::assertArrayHasKey('make:command', $kernel->commands());
         self::assertArrayHasKey('make:controller', $kernel->commands());
+        self::assertArrayHasKey('make:migration', $kernel->commands());
         self::assertArrayHasKey('make:model', $kernel->commands());
+        self::assertArrayHasKey('make:seeder', $kernel->commands());
         self::assertArrayHasKey('migrate', $kernel->commands());
         self::assertArrayHasKey('migrate:rollback', $kernel->commands());
         self::assertArrayHasKey('optimize', $kernel->commands());
@@ -100,9 +102,29 @@ final class KernelTest extends TestCase
         self::assertSame(0, $kernel->handle(new Input([
             'make:model',
             'Post',
+            '--table=posts',
             '--path=tests/tmp/cli/Post.php',
         ]), $output));
         self::assertFileExists(dirname(__DIR__) . '/tmp/cli/Post.php');
+        self::assertStringContainsString(
+            'protected bool $useTimestamps = true;',
+            (string) file_get_contents(dirname(__DIR__) . '/tmp/cli/Post.php'),
+        );
+
+        self::assertSame(0, $kernel->handle(new Input([
+            'make:migration',
+            'create_posts_table',
+            '--table=posts',
+            '--path=tests/tmp/cli/create_posts_table.php',
+        ]), $output));
+        self::assertFileExists(dirname(__DIR__) . '/tmp/cli/create_posts_table.php');
+
+        self::assertSame(0, $kernel->handle(new Input([
+            'make:seeder',
+            'PostSeeder',
+            '--path=tests/tmp/cli/PostSeeder.php',
+        ]), $output));
+        self::assertFileExists(dirname(__DIR__) . '/tmp/cli/PostSeeder.php');
 
         self::assertSame(0, $kernel->handle(new Input([
             'make:command',

@@ -17,7 +17,9 @@ use WTD\Console\Commands\HelpCommand;
 use WTD\Console\Commands\ListCommand;
 use WTD\Console\Commands\MakeCommandCommand;
 use WTD\Console\Commands\MakeControllerCommand;
+use WTD\Console\Commands\MakeMigrationCommand;
 use WTD\Console\Commands\MakeModelCommand;
+use WTD\Console\Commands\MakeSeederCommand;
 use WTD\Console\Commands\MigrateCommand;
 use WTD\Console\Commands\MigrateRollbackCommand;
 use WTD\Console\Commands\OptimizeClearCommand;
@@ -75,7 +77,9 @@ final class ConsoleServiceProvider extends ServiceProvider
             HealthCommand::class,
             MakeCommandCommand::class,
             MakeControllerCommand::class,
+            MakeMigrationCommand::class,
             MakeModelCommand::class,
+            MakeSeederCommand::class,
             MigrateCommand::class,
             MigrateRollbackCommand::class,
             OptimizeCommand::class,

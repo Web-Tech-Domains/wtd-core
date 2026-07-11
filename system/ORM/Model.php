@@ -40,6 +40,43 @@ abstract class Model
 
     protected bool $usesUuids = false;
 
+    protected bool $useTimestamps = false;
+
+    protected string $createdAt = 'created_at';
+
+    protected string $updatedAt = 'updated_at';
+
+    protected string $deletedAt = 'deleted_at';
+
+    protected bool $protectFields = false;
+
+    /**
+     * @var list<string>
+     */
+    protected array $allowedFields = [];
+
+    protected bool $allowCallbacks = true;
+
+    /**
+     * @var list<string>
+     */
+    protected array $beforeInsert = [];
+
+    /**
+     * @var list<string>
+     */
+    protected array $afterInsert = [];
+
+    /**
+     * @var list<string>
+     */
+    protected array $beforeUpdate = [];
+
+    /**
+     * @var list<string>
+     */
+    protected array $afterUpdate = [];
+
     /**
      * @var array<string, string>
      */
@@ -332,7 +369,7 @@ abstract class Model
 
     protected function deletedAtColumn(): string
     {
-        return 'deleted_at';
+        return $this->deletedAt;
     }
 
     /**
@@ -441,13 +478,16 @@ abstract class Model
 
     private function performInsert(): bool
     {
+        $this->runCallbacks($this->beforeInsert);
         $this->fireModelEvent('creating');
 
         if ($this->usesUuids && !array_key_exists($this->primaryKey, $this->attributes)) {
             $this->attributes[$this->primaryKey] = $this->newUuid();
         }
 
-        $affected = static::connection()->table($this->tableName())->insert($this->attributes);
+        $this->updateTimestamps(insert: true);
+
+        $affected = static::connection()->table($this->tableName())->insert($this->databaseAttributes());
 
         if ($affected > 0) {
             if (!array_key_exists($this->primaryKey, $this->attributes)) {
@@ -457,6 +497,7 @@ abstract class Model
             $this->exists = true;
             $this->original = $this->attributes;
             $this->fireModelEvent('created');
+            $this->runCallbacks($this->afterInsert);
             $this->fireModelEvent('saved');
         }
 
@@ -482,9 +523,11 @@ abstract class Model
 
     private function performUpdate(): bool
     {
+        $this->runCallbacks($this->beforeUpdate);
         $this->fireModelEvent('updating');
+        $this->updateTimestamps(insert: false);
         $key = $this->attributes[$this->primaryKey] ?? null;
-        $values = $this->attributes;
+        $values = $this->databaseAttributes();
         unset($values[$this->primaryKey]);
 
         $affected = static::connection()
@@ -495,6 +538,7 @@ abstract class Model
         if ($affected > 0) {
             $this->original = $this->attributes;
             $this->fireModelEvent('updated');
+            $this->runCallbacks($this->afterUpdate);
             $this->fireModelEvent('saved');
         }
 
@@ -543,5 +587,57 @@ abstract class Model
     private function studly(string $value): string
     {
         return str_replace(' ', '', ucwords(str_replace(['-', '_'], ' ', $value)));
+    }
+
+    /**
+     * Return attributes that are allowed to be written to the database.
+     *
+     * @return array<string, mixed>
+     */
+    private function databaseAttributes(): array
+    {
+        if (!$this->protectFields) {
+            return $this->attributes;
+        }
+
+        $allowed = array_flip(array_merge($this->allowedFields, [
+            $this->primaryKey,
+            $this->createdAt,
+            $this->updatedAt,
+            $this->deletedAt,
+        ]));
+
+        return array_intersect_key($this->attributes, $allowed);
+    }
+
+    private function updateTimestamps(bool $insert): void
+    {
+        if (!$this->useTimestamps) {
+            return;
+        }
+
+        $now = date('Y-m-d H:i:s');
+
+        if ($insert && !array_key_exists($this->createdAt, $this->attributes)) {
+            $this->attributes[$this->createdAt] = $now;
+        }
+
+        $this->attributes[$this->updatedAt] = $now;
+    }
+
+    /**
+     * @param list<string> $callbacks
+     */
+    private function runCallbacks(array $callbacks): void
+    {
+        if (!$this->allowCallbacks) {
+            return;
+        }
+
+        foreach ($callbacks as $callback) {
+            if (method_exists($this, $callback)) {
+                $this->{$callback}();
+            }
+        }
     }
 }

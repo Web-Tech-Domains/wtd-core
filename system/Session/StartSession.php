@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace WTD\Session;
 
 use Closure;
+use InvalidArgumentException;
 use WTD\Cookie\Cookie;
 use WTD\Http\Request;
 use WTD\Http\Response;
@@ -28,7 +29,11 @@ final class StartSession implements Middleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $this->session->start($request->cookie($this->cookieName));
+        try {
+            $this->session->start($request->cookie($this->cookieName));
+        } catch (InvalidArgumentException) {
+            $this->session->start();
+        }
 
         $response = $next($request);
         $this->session->save();

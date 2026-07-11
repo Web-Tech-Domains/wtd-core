@@ -34,7 +34,7 @@ final class SecurityTest extends TestCase
     public function testCsrfMiddlewareRejectsInvalidTokensAndAllowsValidTokens(): void
     {
         $session = new SessionStore(new Filesystem(), dirname(__DIR__) . '/tmp/security-sessions');
-        $session->start('csrf');
+        $session->start('csrf-session-1234');
         $manager = new CsrfTokenManager($session);
         $middleware = new VerifyCsrfToken($manager);
         $token = $manager->token();

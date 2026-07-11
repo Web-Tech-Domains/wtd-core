@@ -123,6 +123,40 @@ final class ModelTest extends TestCase
         self::assertSame($events, $observer->events());
     }
 
+    public function testModelTimestampsCallbacksAndFieldProtection(): void
+    {
+        TimestampedUser::setConnection($this->connection);
+        $schema = new Schema($this->connection);
+        $schema->create('timestamped_users', static function (Blueprint $table): void {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
+        });
+
+        $user = new TimestampedUser(['name' => 'Taylor', 'admin' => true]);
+
+        self::assertTrue($user->save());
+
+        $row = $this->connection->table('timestamped_users')->first();
+
+        self::assertNotNull($row);
+        self::assertSame('before-Taylor', $row['name']);
+        self::assertArrayHasKey('created_at', $row);
+        self::assertArrayHasKey('updated_at', $row);
+        self::assertArrayNotHasKey('admin', $row);
+        self::assertSame(['beforeInsert', 'afterInsert'], $user->callbacks);
+
+        $user->setAttribute('name', 'Updated');
+
+        self::assertTrue($user->save());
+
+        $updated = $this->connection->table('timestamped_users')->where('id', 1)->first();
+
+        self::assertNotNull($updated);
+        self::assertSame('before-Updated', $updated['name']);
+        self::assertSame(['beforeInsert', 'afterInsert', 'beforeUpdate', 'afterUpdate'], $user->callbacks);
+    }
+
     private function makeConnection(): Connection
     {
         return (new DatabaseManager(new Repository([
@@ -162,6 +196,67 @@ final class CastUser extends Model
     public function setNameAttribute(mixed $value): string
     {
         return strtolower((string) $value);
+    }
+}
+
+final class TimestampedUser extends Model
+{
+    protected ?string $table = 'timestamped_users';
+
+    protected bool $useTimestamps = true;
+
+    protected bool $protectFields = true;
+
+    /**
+     * @var list<string>
+     */
+    protected array $allowedFields = ['name'];
+
+    /**
+     * @var list<string>
+     */
+    protected array $beforeInsert = ['beforeInsertHook'];
+
+    /**
+     * @var list<string>
+     */
+    protected array $afterInsert = ['afterInsertHook'];
+
+    /**
+     * @var list<string>
+     */
+    protected array $beforeUpdate = ['beforeUpdateHook'];
+
+    /**
+     * @var list<string>
+     */
+    protected array $afterUpdate = ['afterUpdateHook'];
+
+    /**
+     * @var list<string>
+     */
+    public array $callbacks = [];
+
+    protected function beforeInsertHook(): void
+    {
+        $this->callbacks[] = 'beforeInsert';
+        $this->setAttribute('name', 'before-' . $this->getAttribute('name'));
+    }
+
+    protected function afterInsertHook(): void
+    {
+        $this->callbacks[] = 'afterInsert';
+    }
+
+    protected function beforeUpdateHook(): void
+    {
+        $this->callbacks[] = 'beforeUpdate';
+        $this->setAttribute('name', 'before-' . $this->getAttribute('name'));
+    }
+
+    protected function afterUpdateHook(): void
+    {
+        $this->callbacks[] = 'afterUpdate';
     }
 }
 

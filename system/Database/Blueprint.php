@@ -90,6 +90,16 @@ final class Blueprint
     }
 
     /**
+     * Add a nullable deleted_at column for soft deletes.
+     */
+    public function softDeletes(string $name = 'deleted_at'): self
+    {
+        $this->columns[] = sprintf('%s DATETIME NULL', $this->quote($name));
+
+        return $this;
+    }
+
+    /**
      * Return the table name.
      */
     public function table(): string

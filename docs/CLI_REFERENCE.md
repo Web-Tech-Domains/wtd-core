@@ -30,8 +30,10 @@ php core help <command>
 | `list` | List available commands. |
 | `make:command` | Generate an application console command. |
 | `make:controller` | Generate an application controller. |
+| `make:migration` | Generate a database migration. |
 | `make:model` | Generate an application model. |
 | `make:resource` | Generate an API resource controller and route snippet. |
+| `make:seeder` | Generate a database seeder. |
 | `marketplace:install` | Install a local marketplace package. |
 | `marketplace:list` | List local marketplace packages. |
 | `marketplace:publish` | Publish package configuration files. |
@@ -53,6 +55,8 @@ php core help <command>
 ```bash
 php core make:controller HomeController
 php core make:model User
+php core make:migration create_users_table --table=users
+php core make:seeder UserSeeder
 php core make:resource Post --model=Post
 php core app:new demo
 php core api:docs
