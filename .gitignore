@@ -65,3 +65,4 @@ build/
 /.phpstan.cache/
 /.rector.cache/
 /.cache/
+.gitmessage
