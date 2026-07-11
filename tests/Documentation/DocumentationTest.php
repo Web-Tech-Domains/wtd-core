@@ -86,6 +86,7 @@ final class DocumentationTest extends TestCase
             'DATABASE_ORM.md',
             'SECURITY.md',
             'OPERATIONS.md',
+            'DEVELOPER_EXPERIENCE.md',
             'PRODUCT_BLUEPRINT.md',
             'SOFTWARE_ARCHITECTURE_SPECIFICATION.md',
         ];

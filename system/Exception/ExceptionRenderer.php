@@ -6,6 +6,7 @@ namespace WTD\Exception;
 
 use Throwable;
 use WTD\Config\Repository;
+use WTD\DeveloperExperience\ErrorPageRenderer;
 use WTD\Http\Response;
 use WTD\Logging\Logger;
 use WTD\Validation\ValidationException;
@@ -18,6 +19,7 @@ final class ExceptionRenderer
     public function __construct(
         private readonly Repository $config,
         private readonly Logger $logger,
+        private readonly ?ErrorPageRenderer $errorPages = null,
     ) {
     }
 
@@ -43,7 +45,16 @@ final class ExceptionRenderer
             ]);
         }
 
-        if ((bool) $this->config->get('app.debug', false)) {
+        $debug = (bool) $this->config->get('app.debug', false);
+
+        if ((bool) $this->config->get('developer.error_pages', false) && $this->errorPages !== null) {
+            return $this->withExceptionHeaders(
+                Response::make($this->errorPages->render($throwable, $status, $debug), $status),
+                $throwable,
+            );
+        }
+
+        if ($debug) {
             $response = Response::json([
                 'error' => $throwable->getMessage(),
                 'exception' => $throwable::class,

@@ -246,6 +246,15 @@ tests/
 - Security guide
 - Operations guide
 - Documentation regression tests
+- Developer experience configuration
+- Debug toolbar
+- Profiler
+- API documentation UI
+- OpenAPI generator
+- API resource code generator
+- Benchmark CLI tool
+- IDE helper generator
+- HTML error pages
 
 ### 2.0 Enterprise
 - Marketplace

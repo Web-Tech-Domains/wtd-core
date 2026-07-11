@@ -11,6 +11,7 @@ use WTD\Config\Repository;
 use WTD\Container\Container;
 use WTD\Console\ConsoleServiceProvider;
 use WTD\Database\DatabaseServiceProvider;
+use WTD\DeveloperExperience\DeveloperExperienceServiceProvider;
 use WTD\Filesystem\Filesystem;
 use WTD\Http\HttpServiceProvider;
 use WTD\Support\Env;
@@ -38,6 +39,7 @@ $app->register(ConsoleServiceProvider::class);
 $app->register(HttpServiceProvider::class);
 $app->register(ValidationServiceProvider::class);
 $app->register(DatabaseServiceProvider::class);
+$app->register(DeveloperExperienceServiceProvider::class);
 
 $providers = $config->get('app.providers', []);
 if (is_array($providers)) {
