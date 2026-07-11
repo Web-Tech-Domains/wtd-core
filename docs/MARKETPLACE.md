@@ -6,6 +6,14 @@ WTD Core includes a local package marketplace foundation for enterprise package 
 
 Packages live under `packages/` by default and expose a `wtd-package.php` manifest:
 
+```text
+packages/
+  vendor-package/
+    wtd-package.php
+    src/
+    config/
+```
+
 ```php
 <?php
 
@@ -46,4 +54,3 @@ return [
     'auto_register' => true,
 ];
 ```
-
