@@ -43,10 +43,14 @@ pnpm-debug.log*
 # IDE
 .idea/
 .vscode/
+*.swp
+*.swo
+*.bak
 
 # OS
 .DS_Store
 Thumbs.db
+desktop.ini
 
 # PHPUnit
 .phpunit.result.cache
@@ -56,3 +60,8 @@ Thumbs.db
 coverage/
 build/
 .php-cs-fixer.cache
+
+# Tool caches
+/.phpstan.cache/
+/.rector.cache/
+/.cache/

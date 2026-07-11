@@ -47,3 +47,9 @@ feat: add module auto-discovery
 fix: handle missing env as development
 docs: document code owner review
 ```
+
+To use the repository commit template locally:
+
+```bash
+git config commit.template .gitmessage
+```
