@@ -35,6 +35,9 @@ composer install
 composer test
 composer analyse
 composer cs:fix
+npm install
+npm run dev
+npm run build
 php core about
 php core list
 php core help

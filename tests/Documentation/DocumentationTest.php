@@ -83,6 +83,7 @@ final class DocumentationTest extends TestCase
             'ARCHITECTURE.md',
             'CLI_REFERENCE.md',
             'HTTP.md',
+            'FRONTEND.md',
             'DATABASE_ORM.md',
             'SECURITY.md',
             'OPERATIONS.md',

@@ -19,6 +19,12 @@ final class SpecificationComplianceTest extends TestCase
             'docker/php-fpm/wtd.ini',
             '.github/workflows/ci.yml',
             'rector.php',
+            'package.json',
+            'vite.config.js',
+            'resources/js/app.js',
+            'resources/js/vue.js',
+            'resources/js/react.jsx',
+            'resources/css/app.css',
             'docs/REQUIREMENTS_MATRIX.md',
         ] as $path) {
             self::assertFileExists($this->root($path));

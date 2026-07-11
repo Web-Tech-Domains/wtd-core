@@ -8,6 +8,7 @@ This directory contains the practical framework documentation for WTD Core.
 - [Architecture](ARCHITECTURE.md)
 - [CLI Reference](CLI_REFERENCE.md)
 - [HTTP, Routing, and Middleware](HTTP.md)
+- [Frontend Assets](FRONTEND.md)
 - [Database and ORM](DATABASE_ORM.md)
 - [Security](SECURITY.md)
 - [Operations](OPERATIONS.md)

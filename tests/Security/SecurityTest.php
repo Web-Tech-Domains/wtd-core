@@ -19,6 +19,7 @@ use WTD\Security\CsrfTokenManager;
 use WTD\Security\Encryption;
 use WTD\Security\RateLimiter;
 use WTD\Security\SecurityHeaders;
+use WTD\Security\SecurityHeadersMiddleware;
 use WTD\Security\SecurityServiceProvider;
 use WTD\Security\SecretsManager;
 use WTD\Security\SignedUrl;
@@ -99,6 +100,10 @@ final class SecurityTest extends TestCase
 
         self::assertSame('https://example.test', $headers['Access-Control-Allow-Origin']);
         self::assertSame('SAMEORIGIN', $headers['X-Frame-Options']);
+        self::assertSame('nosniff', $headers['X-Content-Type-Options']);
+        self::assertArrayHasKey('Strict-Transport-Security', $headers);
+        self::assertArrayHasKey('Permissions-Policy', $headers);
+        self::assertStringContainsString("object-src 'none'", $headers['Content-Security-Policy']);
 
         $signed = new SignedUrl('secret');
         $url = $signed->sign('/download?id=1', time() + 60);
@@ -114,6 +119,17 @@ final class SecurityTest extends TestCase
         $secrets = new SecretsManager(['API_KEY' => 'abcdef']);
         self::assertSame('abcdef', $secrets->get('API_KEY'));
         self::assertSame('ab**ef', $secrets->mask('abcdef'));
+    }
+
+    public function testSecurityHeadersMiddlewareAppliesHeadersToResponses(): void
+    {
+        $response = (new SecurityHeadersMiddleware(new SecurityHeaders()))->handle(
+            new Request('GET', '/'),
+            static fn (): Response => Response::make('OK'),
+        );
+
+        self::assertSame('SAMEORIGIN', $response->headers()['X-Frame-Options']);
+        self::assertArrayHasKey('Content-Security-Policy', $response->headers());
     }
 
     public function testSecurityServiceProviderRegistersServices(): void

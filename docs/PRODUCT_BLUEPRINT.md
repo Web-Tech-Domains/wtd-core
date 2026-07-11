@@ -257,6 +257,9 @@ tests/
 - HTML error pages
 - CLI runtime wrapper
 - View renderer
+- Vite asset manager
+- Vue-ready frontend entry
+- React-ready frontend entry
 - WebSocket handshake, frames, and channels
 
 ### 2.0 Enterprise

@@ -16,6 +16,7 @@ This matrix maps the architecture specification to implemented project assets.
 | Apache | `docker/apache/vhost.conf`, `public/.htaccess` |
 | PHP-FPM | `Dockerfile`, `docker/php-fpm/wtd.ini` |
 | OpenAPI | Developer experience OpenAPI generator |
+| Vite, Vue, React frontend tooling | `package.json`, `vite.config.js`, `resources/js`, `resources/css` |
 | JWT | Authentication JWT service |
 | OAuth2 | OAuth state protection foundation |
 | PHPUnit | `phpunit.xml.dist`, tests |
@@ -48,5 +49,6 @@ This matrix maps the architecture specification to implemented project assets.
 | Queue, scheduler, events | Implemented and tested |
 | Notifications, mail, cache, storage | Implemented and tested |
 | CLI runtime, views, WebSocket foundations | Implemented and tested |
+| Vite frontend assets with Vue and React-ready entries | Implemented and tested |
 | CLI, documentation, developer experience | Implemented and tested |
 | Marketplace, multi-tenancy, AI integrations, monitoring/admin | Implemented and tested |

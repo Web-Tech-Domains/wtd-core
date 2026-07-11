@@ -31,6 +31,8 @@ Authorization components include:
 
 Security utilities include CSRF protection, XSS escaping, SQL identifier validation, encryption, password hashing, rate limiting, CORS handling, trusted proxy client IP resolution, signed URLs, security headers, audit logging, and secrets management.
 
+Default HTTP middleware applies security headers including frame protection, MIME sniffing protection, HSTS, Permissions Policy, Cross-Origin-Opener-Policy, and a restrictive Content Security Policy.
+
 ## Operational Guidance
 
 - Keep `app.debug` disabled in production.
@@ -38,4 +40,3 @@ Security utilities include CSRF protection, XSS escaping, SQL identifier validat
 - Rotate encryption keys and secrets through deployment automation.
 - Use rate limiting on authentication and public write endpoints.
 - Cache authorization roles only with a clear invalidation path.
-
