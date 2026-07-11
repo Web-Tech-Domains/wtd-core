@@ -87,6 +87,11 @@ final class Repository
             $path = $prefix . '.' . $key;
 
             if (is_array($value)) {
+                if (array_is_list($value)) {
+                    $flattened[$path] = $value;
+                    continue;
+                }
+
                 $flattened += $this->flatten($value, $path);
                 continue;
             }

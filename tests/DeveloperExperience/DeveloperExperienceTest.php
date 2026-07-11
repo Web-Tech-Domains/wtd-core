@@ -76,7 +76,47 @@ final class DeveloperExperienceTest extends TestCase
         $response = $kernel->handle(new Request('GET', '/toolbar'));
 
         self::assertStringContainsString('wtd-debug-toolbar', $response->content());
+        self::assertStringContainsString('aria-label="WTD debug toolbar"', $response->content());
+        self::assertStringContainsString('<details>', $response->content());
+        self::assertStringContainsString('Profiler Marks', $response->content());
+        self::assertStringContainsString('request.start', $response->content());
         self::assertArrayHasKey('X-WTD-Profile-Time', $response->headers());
+    }
+
+    public function testBootstrappedApplicationRegistersDebugToolbarMiddleware(): void
+    {
+        $oldToolbarEnv = $_ENV['WTD_DEBUG_TOOLBAR'] ?? null;
+        $oldToolbarServer = $_SERVER['WTD_DEBUG_TOOLBAR'] ?? null;
+        $oldToolbarProcess = getenv('WTD_DEBUG_TOOLBAR');
+        $oldAppEnv = $_ENV['APP_ENV'] ?? null;
+        $oldAppServer = $_SERVER['APP_ENV'] ?? null;
+        $oldAppProcess = getenv('APP_ENV');
+
+        $_ENV['WTD_DEBUG_TOOLBAR'] = 'true';
+        $_SERVER['WTD_DEBUG_TOOLBAR'] = 'true';
+        putenv('WTD_DEBUG_TOOLBAR=true');
+        $_ENV['APP_ENV'] = 'local';
+        $_SERVER['APP_ENV'] = 'local';
+        putenv('APP_ENV=local');
+
+        try {
+            $app = require dirname(__DIR__, 2) . '/bootstrap/app.php';
+
+            self::assertTrue((bool) $app->config()->get('developer.enabled'));
+            self::assertTrue((bool) $app->config()->get('developer.debug_toolbar'));
+
+            /** @var HttpKernel $kernel */
+            $kernel = $app->container()->get(HttpKernel::class);
+            $response = $kernel->handle(new Request('GET', '/'));
+
+            self::assertStringContainsString('wtd-debug-toolbar', $response->content());
+            self::assertArrayHasKey('X-WTD-Profile-Time', $response->headers());
+        } finally {
+            restore_error_handler();
+            restore_exception_handler();
+            $this->restoreEnv('WTD_DEBUG_TOOLBAR', $oldToolbarEnv, $oldToolbarServer, $oldToolbarProcess);
+            $this->restoreEnv('APP_ENV', $oldAppEnv, $oldAppServer, $oldAppProcess);
+        }
     }
 
     public function testOpenApiAndApiDocumentationRoutesCanBeExposed(): void
@@ -256,5 +296,27 @@ final class DeveloperExperienceTest extends TestCase
         }
 
         rmdir($directory);
+    }
+
+    private function restoreEnv(string $key, ?string $envValue, ?string $serverValue, string|false $processValue): void
+    {
+        if ($envValue === null) {
+            unset($_ENV[$key]);
+        } else {
+            $_ENV[$key] = $envValue;
+        }
+
+        if ($serverValue === null) {
+            unset($_SERVER[$key]);
+        } else {
+            $_SERVER[$key] = $serverValue;
+        }
+
+        if ($processValue === false) {
+            putenv($key);
+            return;
+        }
+
+        putenv($key . '=' . $processValue);
     }
 }

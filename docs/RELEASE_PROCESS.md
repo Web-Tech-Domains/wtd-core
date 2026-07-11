@@ -2,12 +2,10 @@
 
 WTD Core follows Semantic Versioning.
 
-Current version source:
+Current version source of truth:
 
 ```text
 VERSION
-system/Application/Application.php
-CHANGELOG.md
 ```
 
 Current release:
@@ -29,6 +27,20 @@ Examples:
 0.1.1
 1.0.0
 ```
+
+Use the plain Semantic Version in `VERSION`, package metadata, runtime metadata, and docs. Use the `v` prefix only for Git tags.
+
+```text
+VERSION file: 0.1.0-alpha
+Git tag:      v0.1.0-alpha
+```
+
+The following files must match `VERSION` before release:
+
+- `system/Application/Application.php`
+- `package.json`
+- `README.md`
+- `CHANGELOG.md`
 
 ## Release Checklist
 
