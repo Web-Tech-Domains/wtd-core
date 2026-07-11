@@ -164,8 +164,25 @@ final class KernelTest extends TestCase
         self::assertFileExists($moduleRoot . '/Database/Seeders/BillingSeeder.php');
         self::assertFileExists($moduleRoot . '/Resources/views/layouts/app.php');
         self::assertFileExists($moduleRoot . '/Resources/views/pages/index.php');
-        self::assertFileExists($moduleRoot . '/Resources/views/partials/.gitkeep');
-        self::assertFileExists($moduleRoot . '/Resources/views/components/.gitkeep');
+        self::assertStringContainsString(
+            'This generated module includes routing, controller dispatch, middleware, model, migration, seeder, tests, and a polished view foundation',
+            (string) file_get_contents($moduleRoot . '/Resources/views/pages/index.php'),
+        );
+        self::assertStringContainsString(
+            'Module status',
+            (string) file_get_contents($moduleRoot . '/Resources/views/pages/index.php'),
+        );
+        self::assertStringContainsString(
+            'class="module-shell"',
+            (string) file_get_contents($moduleRoot . '/Resources/views/layouts/app.php'),
+        );
+        self::assertFileExists($moduleRoot . '/Resources/views/partials/header.php');
+        self::assertFileExists($moduleRoot . '/Resources/views/partials/footer.php');
+        self::assertFileExists($moduleRoot . '/Resources/views/components/feature-card.php');
+        self::assertStringContainsString(
+            '{{ title }}',
+            (string) file_get_contents($moduleRoot . '/Resources/views/components/feature-card.php'),
+        );
         self::assertFileExists($moduleRoot . '/Tests/BillingModuleTest.php');
 
         self::assertSame(0, $kernel->handle(new Input([
