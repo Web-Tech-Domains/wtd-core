@@ -25,10 +25,16 @@ use WTD\Scheduler\SchedulerServiceProvider;
 
 final class MarketplaceTest extends TestCase
 {
+    private bool $registeredHandlers = false;
+
     protected function tearDown(): void
     {
         $this->removeDirectory(dirname(__DIR__) . '/tmp/marketplace');
-        restore_exception_handler();
+
+        if ($this->registeredHandlers) {
+            restore_error_handler();
+            restore_exception_handler();
+        }
     }
 
     public function testMarketplaceDiscoversAndInstallsLocalPackages(): void
@@ -80,6 +86,7 @@ final class MarketplaceTest extends TestCase
         $app->register(SchedulerServiceProvider::class);
         $app->register(ConsoleServiceProvider::class);
         $app->register(MarketplaceServiceProvider::class);
+        $this->registeredHandlers = true;
         $app->boot();
 
         /** @var Kernel $kernel */

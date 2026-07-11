@@ -64,20 +64,16 @@ final class ErrorHandler
             return;
         }
 
-        $type = $error['type'] ?? null;
+        $type = $error['type'];
 
-        if (!is_int($type) || !in_array($type, [E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_PARSE], true)) {
+        if (!in_array($type, [E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_PARSE], true)) {
             return;
         }
 
-        $message = is_string($error['message'] ?? null) ? $error['message'] : 'Fatal PHP error';
-        $file = is_string($error['file'] ?? null) ? $error['file'] : '';
-        $line = is_int($error['line'] ?? null) ? $error['line'] : 0;
-
-        $this->logger->error($message, [
+        $this->logger->error($error['message'], [
             'exception' => 'FatalError',
-            'file' => $file,
-            'line' => $line,
+            'file' => $error['file'],
+            'line' => $error['line'],
         ]);
     }
 }

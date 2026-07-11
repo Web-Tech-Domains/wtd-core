@@ -45,4 +45,54 @@ final class RepositoryTest extends TestCase
 
         self::assertSame('Loaded', $config->get('app.name'));
     }
+
+    public function testDefaultEnvironmentIsDevelopmentWhenEnvFileIsMissing(): void
+    {
+        $oldAppEnv = $_ENV['APP_ENV'] ?? null;
+        $oldServerEnv = $_SERVER['APP_ENV'] ?? null;
+        $oldAppDebug = $_ENV['APP_DEBUG'] ?? null;
+        $oldServerDebug = $_SERVER['APP_DEBUG'] ?? null;
+        $oldProcessEnv = getenv('APP_ENV');
+        $oldProcessDebug = getenv('APP_DEBUG');
+
+        unset($_ENV['APP_ENV'], $_SERVER['APP_ENV'], $_ENV['APP_DEBUG'], $_SERVER['APP_DEBUG']);
+        putenv('APP_ENV');
+        putenv('APP_DEBUG');
+
+        try {
+            /** @var array<string, mixed> $app */
+            $app = require dirname(__DIR__, 2) . '/config/app.php';
+            /** @var array<string, mixed> $developer */
+            $developer = require dirname(__DIR__, 2) . '/config/developer.php';
+
+            self::assertSame('development', $app['env']);
+            self::assertTrue($app['debug']);
+            self::assertTrue($developer['enabled']);
+        } finally {
+            $this->restoreEnv('APP_ENV', $oldAppEnv, $oldServerEnv, $oldProcessEnv);
+            $this->restoreEnv('APP_DEBUG', $oldAppDebug, $oldServerDebug, $oldProcessDebug);
+        }
+    }
+
+    private function restoreEnv(string $key, ?string $envValue, ?string $serverValue, string|false $processValue): void
+    {
+        if ($envValue === null) {
+            unset($_ENV[$key]);
+        } else {
+            $_ENV[$key] = $envValue;
+        }
+
+        if ($serverValue === null) {
+            unset($_SERVER[$key]);
+        } else {
+            $_SERVER[$key] = $serverValue;
+        }
+
+        if ($processValue === false) {
+            putenv($key);
+            return;
+        }
+
+        putenv($key . '=' . $processValue);
+    }
 }

@@ -29,9 +29,14 @@ use WTD\Tenancy\TenantResolver;
 
 final class EnterpriseTest extends TestCase
 {
+    private bool $registeredHandlers = false;
+
     protected function tearDown(): void
     {
-        restore_exception_handler();
+        if ($this->registeredHandlers) {
+            restore_error_handler();
+            restore_exception_handler();
+        }
     }
 
     public function testTenancyResolvesConfiguredTenantFromRequest(): void
@@ -78,6 +83,7 @@ final class EnterpriseTest extends TestCase
         /** @var MetricsRegistry $metrics */
         $metrics = $app->container()->get(MetricsRegistry::class);
         $metrics->increment('requests');
+        $this->registeredHandlers = true;
         $app->boot();
 
         /** @var SystemMonitor $monitor */
@@ -100,6 +106,7 @@ final class EnterpriseTest extends TestCase
         $app->register(TenancyServiceProvider::class);
         $app->register(AIServiceProvider::class);
         $app->register(MonitoringServiceProvider::class);
+        $this->registeredHandlers = true;
         $app->boot();
 
         /** @var Kernel $kernel */

@@ -32,9 +32,15 @@ use WTD\Scheduler\SchedulerServiceProvider;
 
 final class DeveloperExperienceTest extends TestCase
 {
+    private bool $registeredHandlers = false;
+
     protected function tearDown(): void
     {
-        restore_exception_handler();
+        if ($this->registeredHandlers) {
+            restore_error_handler();
+            restore_exception_handler();
+        }
+
         $this->removeDirectory(dirname(__DIR__) . '/tmp/dx');
     }
 
@@ -206,6 +212,7 @@ final class DeveloperExperienceTest extends TestCase
         $app->register(CoreServiceProvider::class);
         $app->register(HttpServiceProvider::class);
         $app->register(DeveloperExperienceServiceProvider::class);
+        $this->registeredHandlers = true;
     }
 
     private function registerFullApp(Application $app): void
@@ -216,6 +223,7 @@ final class DeveloperExperienceTest extends TestCase
         $app->register(DatabaseServiceProvider::class);
         $app->register(SchedulerServiceProvider::class);
         $app->register(DeveloperExperienceServiceProvider::class);
+        $this->registeredHandlers = true;
     }
 
     /**
