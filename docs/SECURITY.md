@@ -33,6 +33,8 @@ Security utilities include CSRF protection, XSS escaping, SQL identifier validat
 
 Default HTTP middleware applies security headers including frame protection, MIME sniffing protection, HSTS, Permissions Policy, Cross-Origin-Opener-Policy, and a restrictive Content Security Policy.
 
+Cookie headers validate names and header attribute values to prevent response splitting. `HttpOnly` is enabled by default, and `SameSite=None` cookies must also be marked `Secure`.
+
 ## Operational Guidance
 
 - Keep `app.debug` disabled in production.

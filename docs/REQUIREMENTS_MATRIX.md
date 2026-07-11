@@ -46,6 +46,7 @@ This matrix maps the architecture specification to implemented project assets.
 | --- | --- |
 | Foundation, HTTP, DI, validation, database, ORM | Implemented and tested |
 | Auth, authorization, security | Implemented and tested |
+| Secure cookies and default security headers | Implemented and tested |
 | Queue, scheduler, events | Implemented and tested |
 | Notifications, mail, cache, storage | Implemented and tested |
 | CLI runtime, views, WebSocket foundations | Implemented and tested |
