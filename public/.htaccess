@@ -1,10 +1,20 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
+    Options -Indexes
+    ServerSignature Off
+
     RewriteRule (^|/)\. - [F]
+    RewriteRule ^(?:app|bootstrap|config|database|docs|packages|resources|routes|storage|system|tests|vendor)(?:/|$) - [F,L]
+    RewriteRule ^(?:composer\.(?:json|lock)|package(?:-lock)?\.json|phpunit\.xml(?:\.dist)?|phpstan\.neon|rector\.php|Dockerfile|docker-compose\.yml)$ - [F,L]
 
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
 
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>

@@ -31,9 +31,10 @@ final class MakeModelCommand implements Command
     public function handle(Input $input, Output $output): int
     {
         $name = $input->argument(0, 'Model');
-        $class = $this->className((string) $name);
+        $resource = $this->resourceName((string) $name);
+        $class = $this->className($resource);
         $tableOption = $input->option('table');
-        $table = is_string($tableOption) ? $this->tableName($tableOption) : $this->tableName($class) . 's';
+        $table = is_string($tableOption) ? $this->tableName($tableOption) : $this->pluralTable($resource);
         $path = $this->app->basePath($this->path($input, 'app/Models/' . $class . '.php'));
 
         $this->files->put($path, <<<PHP
@@ -73,7 +74,7 @@ PHP);
         return is_string($path) ? $path : $default;
     }
 
-    private function className(string $name): string
+    private function resourceName(string $name): string
     {
         $base = preg_replace('/[^A-Za-z0-9_]+/', '', basename(str_replace('\\', '/', $name))) ?? '';
 
@@ -81,7 +82,21 @@ PHP);
             return 'Model';
         }
 
+        if (str_ends_with(strtolower($base), 'ies')) {
+            $base = substr($base, 0, -3) . 'y';
+        } elseif (str_ends_with(strtolower($base), 's') && !str_ends_with(strtolower($base), 'ss')) {
+            $base = substr($base, 0, -1);
+        }
+
         return ctype_digit($base[0]) ? 'Model' . $base : $base;
+    }
+
+    private function className(string $name): string
+    {
+        $name = str_replace('_', ' ', $name);
+        $name = str_replace(' ', '', ucwords($name));
+
+        return $name === '' ? 'Model' : $name;
     }
 
     private function tableName(string $value): string
@@ -91,5 +106,16 @@ PHP);
         $table = trim($table, '_');
 
         return $table === '' ? 'models' : $table;
+    }
+
+    private function pluralTable(string $resource): string
+    {
+        $table = $this->tableName($resource);
+
+        if (str_ends_with($table, 'y')) {
+            return substr($table, 0, -1) . 'ies';
+        }
+
+        return str_ends_with($table, 's') ? $table : $table . 's';
     }
 }

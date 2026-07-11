@@ -65,6 +65,7 @@ final class KernelTest extends TestCase
         self::assertArrayHasKey('list', $kernel->commands());
         self::assertArrayHasKey('make:command', $kernel->commands());
         self::assertArrayHasKey('make:controller', $kernel->commands());
+        self::assertArrayHasKey('make:middleware', $kernel->commands());
         self::assertArrayHasKey('make:migration', $kernel->commands());
         self::assertArrayHasKey('make:model', $kernel->commands());
         self::assertArrayHasKey('make:seeder', $kernel->commands());
@@ -94,21 +95,39 @@ final class KernelTest extends TestCase
 
         self::assertSame(0, $kernel->handle(new Input([
             'make:controller',
-            'AdminController',
-            '--path=tests/tmp/cli/AdminController.php',
+            'users',
+            '--path=tests/tmp/cli/UserController.php',
         ]), $output));
-        self::assertFileExists(dirname(__DIR__) . '/tmp/cli/AdminController.php');
+        self::assertFileExists(dirname(__DIR__) . '/tmp/cli/UserController.php');
+        self::assertStringContainsString(
+            'final class UserController',
+            (string) file_get_contents(dirname(__DIR__) . '/tmp/cli/UserController.php'),
+        );
 
         self::assertSame(0, $kernel->handle(new Input([
             'make:model',
-            'Post',
-            '--table=posts',
-            '--path=tests/tmp/cli/Post.php',
+            'users',
+            '--path=tests/tmp/cli/User.php',
         ]), $output));
-        self::assertFileExists(dirname(__DIR__) . '/tmp/cli/Post.php');
+        self::assertFileExists(dirname(__DIR__) . '/tmp/cli/User.php');
         self::assertStringContainsString(
-            'protected bool $useTimestamps = true;',
-            (string) file_get_contents(dirname(__DIR__) . '/tmp/cli/Post.php'),
+            'final class User extends Model',
+            (string) file_get_contents(dirname(__DIR__) . '/tmp/cli/User.php'),
+        );
+        self::assertStringContainsString(
+            "protected ?string \$table = 'users';",
+            (string) file_get_contents(dirname(__DIR__) . '/tmp/cli/User.php'),
+        );
+
+        self::assertSame(0, $kernel->handle(new Input([
+            'make:middleware',
+            'auth',
+            '--path=tests/tmp/cli/Auth.php',
+        ]), $output));
+        self::assertFileExists(dirname(__DIR__) . '/tmp/cli/Auth.php');
+        self::assertStringContainsString(
+            'implements Middleware',
+            (string) file_get_contents(dirname(__DIR__) . '/tmp/cli/Auth.php'),
         );
 
         self::assertSame(0, $kernel->handle(new Input([

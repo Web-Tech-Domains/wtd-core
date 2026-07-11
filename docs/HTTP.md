@@ -51,3 +51,6 @@ The framework supports text responses, JSON responses, redirects, streamed respo
 
 Middleware implements `WTD\Middleware\Middleware` and can be assigned globally or per route through configuration and route definitions. The middleware pipeline resolves middleware through the container, so constructor dependencies are supported.
 
+```bash
+php core make:middleware Authenticate
+```

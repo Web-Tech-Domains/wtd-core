@@ -17,6 +17,7 @@ use WTD\Console\Commands\HelpCommand;
 use WTD\Console\Commands\ListCommand;
 use WTD\Console\Commands\MakeCommandCommand;
 use WTD\Console\Commands\MakeControllerCommand;
+use WTD\Console\Commands\MakeMiddlewareCommand;
 use WTD\Console\Commands\MakeMigrationCommand;
 use WTD\Console\Commands\MakeModelCommand;
 use WTD\Console\Commands\MakeSeederCommand;
@@ -77,6 +78,7 @@ final class ConsoleServiceProvider extends ServiceProvider
             HealthCommand::class,
             MakeCommandCommand::class,
             MakeControllerCommand::class,
+            MakeMiddlewareCommand::class,
             MakeMigrationCommand::class,
             MakeModelCommand::class,
             MakeSeederCommand::class,

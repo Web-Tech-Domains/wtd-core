@@ -110,12 +110,18 @@ final class DatabaseManager
 
         return match ($driver) {
             'sqlite' => 'sqlite:' . $this->stringValue($configuration['database'] ?? ':memory:'),
-            'mysql' => sprintf(
+            'mysql', 'mariadb' => sprintf(
                 'mysql:host=%s;port=%s;dbname=%s;charset=%s',
                 $this->stringValue($configuration['host'] ?? '127.0.0.1'),
                 $this->stringValue($configuration['port'] ?? '3306'),
                 $this->stringValue($configuration['database'] ?? ''),
                 $this->stringValue($configuration['charset'] ?? 'utf8mb4'),
+            ),
+            'pgsql', 'postgres', 'postgresql' => sprintf(
+                'pgsql:host=%s;port=%s;dbname=%s',
+                $this->stringValue($configuration['host'] ?? '127.0.0.1'),
+                $this->stringValue($configuration['port'] ?? '5432'),
+                $this->stringValue($configuration['database'] ?? ''),
             ),
             default => throw new InvalidArgumentException(sprintf('Database driver [%s] is not supported.', $driver)),
         };

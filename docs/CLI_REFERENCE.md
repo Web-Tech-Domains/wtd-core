@@ -30,6 +30,7 @@ php core help <command>
 | `list` | List available commands. |
 | `make:command` | Generate an application console command. |
 | `make:controller` | Generate an application controller. |
+| `make:middleware` | Generate an application middleware. |
 | `make:migration` | Generate a database migration. |
 | `make:model` | Generate an application model. |
 | `make:resource` | Generate an API resource controller and route snippet. |
@@ -54,6 +55,7 @@ php core help <command>
 
 ```bash
 php core make:controller HomeController
+php core make:middleware Authenticate
 php core make:model User
 php core make:migration create_users_table --table=users
 php core make:seeder UserSeeder

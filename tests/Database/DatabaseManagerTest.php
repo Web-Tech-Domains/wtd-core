@@ -94,6 +94,30 @@ final class DatabaseManagerTest extends TestCase
         (new DatabaseManager($this->config()))->connection('missing');
     }
 
+    public function testDatabaseManagerBuildsSupportedDriverDsns(): void
+    {
+        $manager = new DatabaseManager($this->config());
+        $method = new \ReflectionMethod(DatabaseManager::class, 'dsn');
+
+        self::assertSame('sqlite::memory:', $method->invoke($manager, [
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+        ]));
+        self::assertSame('mysql:host=127.0.0.1;port=3306;dbname=wtd;charset=utf8mb4', $method->invoke($manager, [
+            'driver' => 'mariadb',
+            'host' => '127.0.0.1',
+            'port' => '3306',
+            'database' => 'wtd',
+            'charset' => 'utf8mb4',
+        ]));
+        self::assertSame('pgsql:host=127.0.0.1;port=5432;dbname=wtd', $method->invoke($manager, [
+            'driver' => 'postgresql',
+            'host' => '127.0.0.1',
+            'port' => '5432',
+            'database' => 'wtd',
+        ]));
+    }
+
     public function testDatabaseServiceProviderRegistersServices(): void
     {
         /** @var non-empty-string $basePath */

@@ -18,6 +18,7 @@ The CLI flow is similar: `core` bootstraps the application, resolves the console
 - PSR-11-compatible container behavior
 - PSR-3-compatible logging
 - Service-provider based module registration
+- Configurable application modules through `config/modules.php`
 - Small contracts for commands, middleware, mail, notifications, queues, storage, and events
 - Framework modules that can be used independently where possible
 
@@ -36,3 +37,7 @@ The CLI flow is similar: `core` bootstraps the application, resolves the console
 - `CLI`: executable console runtime wrapper
 - `View`: file-based template rendering
 - `WebSocket`: handshake, frame, and channel foundations
+
+## Application Modules
+
+Application modules can be enabled in `config/modules.php`. A module may declare service providers and a route file, allowing first-party modules and third-party packages to attach services, middleware, routes, and integrations without changing the framework core.

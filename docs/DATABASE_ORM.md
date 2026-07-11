@@ -4,7 +4,7 @@ Database features live in `system/Database`; ORM features live in `system/ORM`.
 
 ## Connections
 
-Configure database connections in `config/database.php`. Supported targets include SQLite, MySQL, MariaDB, and PostgreSQL through PDO.
+Configure database connections in `config/database.php`. Supported targets include SQLite, MySQL, MariaDB, and PostgreSQL through PDO. Driver names `pgsql`, `postgres`, and `postgresql` are accepted for PostgreSQL, while `mysql` and `mariadb` share the PDO MySQL transport.
 
 ## Query Builder
 

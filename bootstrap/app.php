@@ -18,6 +18,7 @@ use WTD\Filesystem\Filesystem;
 use WTD\Http\HttpServiceProvider;
 use WTD\Marketplace\MarketplaceServiceProvider;
 use WTD\Monitoring\MonitoringServiceProvider;
+use WTD\Modules\ModuleServiceProvider;
 use WTD\Security\SecurityServiceProvider;
 use WTD\Support\Env;
 use WTD\Tenancy\TenancyServiceProvider;
@@ -26,6 +27,7 @@ use WTD\View\ViewServiceProvider;
 use WTD\WebSocket\WebSocketServiceProvider;
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
+require_once dirname(__DIR__) . '/system/Support/helpers.php';
 
 $basePath = dirname(__DIR__);
 Env::load($basePath . DIRECTORY_SEPARATOR . '.env');
@@ -42,6 +44,7 @@ if ($configCache->exists()) {
 }
 
 $app = new Application($basePath, $container, $config);
+$GLOBALS['wtd_app'] = $app;
 $app->register(CoreServiceProvider::class);
 $app->register(ConsoleServiceProvider::class);
 $app->register(CliServiceProvider::class);
@@ -53,6 +56,7 @@ $app->register(ViewServiceProvider::class);
 $app->register(WebSocketServiceProvider::class);
 $app->register(DeveloperExperienceServiceProvider::class);
 $app->register(MarketplaceServiceProvider::class);
+$app->register(ModuleServiceProvider::class);
 $app->register(TenancyServiceProvider::class);
 $app->register(AIServiceProvider::class);
 $app->register(MonitoringServiceProvider::class);

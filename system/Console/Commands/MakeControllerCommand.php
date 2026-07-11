@@ -31,7 +31,7 @@ final class MakeControllerCommand implements Command
     public function handle(Input $input, Output $output): int
     {
         $name = $input->argument(0, 'HomeController');
-        $class = $this->className((string) $name);
+        $class = $this->controllerClass((string) $name);
         $path = $this->app->basePath($this->path($input, 'app/Http/Controllers/' . $class . '.php'));
 
         $this->files->put($path, <<<PHP
@@ -65,10 +65,27 @@ PHP);
         return is_string($path) ? $path : $default;
     }
 
-    private function className(string $name): string
+    private function controllerClass(string $name): string
     {
-        $base = basename(str_replace('\\', '/', $name));
+        $base = preg_replace('/[^A-Za-z0-9_]+/', '', basename(str_replace('\\', '/', $name))) ?? '';
 
-        return $base === '' ? 'HomeController' : $base;
+        if ($base === '') {
+            return 'HomeController';
+        }
+
+        if (!str_ends_with(strtolower($base), 'controller')) {
+            if (str_ends_with(strtolower($base), 'ies')) {
+                $base = substr($base, 0, -3) . 'y';
+            } elseif (str_ends_with(strtolower($base), 's') && !str_ends_with(strtolower($base), 'ss')) {
+                $base = substr($base, 0, -1);
+            }
+
+            $base .= 'Controller';
+        }
+
+        $base = str_replace('_', ' ', $base);
+        $base = str_replace(' ', '', ucwords($base));
+
+        return ctype_digit($base[0]) ? 'Controller' . $base : $base;
     }
 }
