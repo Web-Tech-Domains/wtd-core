@@ -237,7 +237,15 @@ tests/
 - CLI cache management
 - CLI testing helper
 - CLI deployment helper
-- Documentation
+- Documentation index
+- Getting started guide
+- Architecture guide
+- CLI reference
+- HTTP and routing guide
+- Database and ORM guide
+- Security guide
+- Operations guide
+- Documentation regression tests
 
 ### 2.0 Enterprise
 - Marketplace
