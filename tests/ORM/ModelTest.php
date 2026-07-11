@@ -11,6 +11,9 @@ use WTD\Database\Blueprint;
 use WTD\Database\Connection;
 use WTD\Database\DatabaseManager;
 use WTD\Database\Schema;
+use WTD\Application\Application;
+use WTD\Container\Container;
+use WTD\Hooks\HookManager;
 use WTD\ORM\Model;
 
 final class ModelTest extends TestCase
@@ -181,6 +184,43 @@ final class ModelTest extends TestCase
 
         self::assertTrue($user->save());
         self::assertSame([['name' => 'Report']], $manager->connection('reporting')->table('named_users')->select('name')->get());
+    }
+
+    public function testModelFiresCompatibilityDataHooks(): void
+    {
+        require_once dirname(__DIR__, 2) . '/system/Support/helpers.php';
+
+        $container = new Container();
+        $app = new Application(dirname(__DIR__, 2), $container, new Repository());
+        $container->instance(HookManager::class, new HookManager());
+        $GLOBALS['wtd_app'] = $app;
+        $events = [];
+
+        try {
+            register_data_insert_hook(static function (array $data) use (&$events): void {
+                $events[] = 'insert:' . $data['table_without_prefix'] . ':' . $data['attributes']['name'];
+            });
+            register_data_update_hook(static function (array $data) use (&$events): void {
+                $events[] = 'update:' . $data['table_without_prefix'] . ':' . $data['attributes']['name'];
+            });
+            register_data_delete_hook(static function (array $data) use (&$events): void {
+                $events[] = 'delete:' . $data['table_without_prefix'] . ':' . $data['id'];
+            });
+
+            $user = new OrmUser(['name' => 'Taylor', 'active' => 1]);
+            $user->save();
+            $user->setAttribute('name', 'Updated');
+            $user->save();
+            $user->delete();
+
+            self::assertSame([
+                'insert:users:Taylor',
+                'update:users:Updated',
+                'delete:users:1',
+            ], $events);
+        } finally {
+            unset($GLOBALS['wtd_app']);
+        }
     }
 
     private function makeConnection(): Connection

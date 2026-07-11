@@ -154,3 +154,24 @@ if (!function_exists('apply_filters')) {
         return app_hooks()->applyFilters($hook, $value, ...$payload);
     }
 }
+
+if (!function_exists('register_data_insert_hook')) {
+    function register_data_insert_hook(callable $callback, int $priority = 10): void
+    {
+        add_action('data.inserted', $callback, $priority);
+    }
+}
+
+if (!function_exists('register_data_update_hook')) {
+    function register_data_update_hook(callable $callback, int $priority = 10): void
+    {
+        add_action('data.updated', $callback, $priority);
+    }
+}
+
+if (!function_exists('register_data_delete_hook')) {
+    function register_data_delete_hook(callable $callback, int $priority = 10): void
+    {
+        add_action('data.deleted', $callback, $priority);
+    }
+}

@@ -160,6 +160,12 @@ final class Response
 
         if ($hooksAvailable && $this->isRedirect()) {
             \do_action('app.before_redirect', $this);
+            \do_action('app_hook_before_redirect', [
+                'response' => $this,
+                'status' => $this->status,
+                'headers' => $this->headers,
+                'location' => $this->headers['Location'] ?? null,
+            ]);
         }
 
         http_response_code($this->status);

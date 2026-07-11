@@ -10,6 +10,7 @@ use WTD\Config\Repository;
 use WTD\Container\Container;
 use WTD\Hooks\HookManager;
 use WTD\Hooks\HookServiceProvider;
+use WTD\Http\Response;
 
 final class HookManagerTest extends TestCase
 {
@@ -86,6 +87,35 @@ PHP);
             self::assertTrue($config->get('hooks.test_loaded', false));
         } finally {
             @unlink($hookFile);
+        }
+    }
+
+    public function testLegacyRedirectHookNameReceivesRedirectPayload(): void
+    {
+        require_once dirname(__DIR__, 2) . '/system/Support/helpers.php';
+
+        $basePath = dirname(__DIR__, 2);
+        $container = new Container();
+        $app = new Application($basePath, $container, new Repository());
+        $container->instance(HookManager::class, new HookManager());
+        $GLOBALS['wtd_app'] = $app;
+        $payload = null;
+
+        try {
+            app_hooks()->add_action('app_hook_before_redirect', static function (array $data) use (&$payload): void {
+                $payload = $data;
+            });
+
+            ob_start();
+            Response::redirect('/dashboard')->send();
+            ob_end_clean();
+
+            self::assertIsArray($payload);
+            self::assertSame(302, $payload['status']);
+            self::assertSame('/dashboard', $payload['location']);
+            self::assertInstanceOf(Response::class, $payload['response']);
+        } finally {
+            unset($GLOBALS['wtd_app']);
         }
     }
 }
