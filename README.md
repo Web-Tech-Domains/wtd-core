@@ -32,11 +32,14 @@ Practical guides are available from [docs/README.md](docs/README.md).
 
 ```bash
 composer install
+npm install
+copy .env.example .env
+composer serve
+php -S 127.0.0.1:8000 -t public public/index.php
+npm run dev
 composer test
 composer analyse
 composer cs:fix
-npm install
-npm run dev
 npm run build
 php core about
 php core list
@@ -71,6 +74,53 @@ php core optimize:clear
 php core health
 php core diagnostics
 ```
+
+## Local Server
+
+Use the `public` directory as the document root. For a quick local server:
+
+```bash
+composer serve
+```
+
+Or run PHP directly:
+
+```bash
+php -S 127.0.0.1:8000 -t public public/index.php
+```
+
+Open `http://127.0.0.1:8000`. Do not serve the project root in production; only `public/` should be web-accessible.
+
+## Frontend Assets
+
+Install Node dependencies and start Vite when developing CSS, JavaScript, Vue, or React files:
+
+```bash
+npm install
+npm run dev
+```
+
+Build production assets into `public/build`:
+
+```bash
+npm run build
+```
+
+Link asset files through the Vite helper from controller data:
+
+```php
+return Response::make($this->views->render('home', [
+    'assetTags' => vite('resources/js/app.js'),
+]));
+```
+
+Then render those trusted tags with the raw placeholder syntax:
+
+```html
+{!! assetTags !!}
+```
+
+Normal placeholders like `{{ name }}` stay escaped for security.
 
 ## Current Phase
 

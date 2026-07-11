@@ -61,6 +61,11 @@ final class ViewRenderer
         }
 
         $template = $this->files->get($path);
+        $template = preg_replace_callback('/{!!\s*([A-Za-z_][A-Za-z0-9_.]*)\s*!!}/', static function (array $matches) use ($data): string {
+            $value = self::value($data, $matches[1]);
+
+            return is_scalar($value) ? (string) $value : '';
+        }, $template) ?? $template;
 
         return preg_replace_callback('/{{\s*([A-Za-z_][A-Za-z0-9_.]*)\s*}}/', static function (array $matches) use ($data): string {
             $value = self::value($data, $matches[1]);

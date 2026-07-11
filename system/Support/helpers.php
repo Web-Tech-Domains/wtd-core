@@ -5,6 +5,7 @@ declare(strict_types=1);
 use WTD\Application\Application;
 use WTD\Database\Connection;
 use WTD\Database\DatabaseManager;
+use WTD\View\AssetManager;
 use WTD\View\ViewRenderer;
 
 if (!function_exists('app')) {
@@ -95,6 +96,16 @@ if (!function_exists('view')) {
     function view(string $view, array $data = []): string
     {
         return app(ViewRenderer::class)->render($view, $data);
+    }
+}
+
+if (!function_exists('vite')) {
+    /**
+     * @param string|list<string> $entries
+     */
+    function vite(string|array $entries): string
+    {
+        return app(AssetManager::class)->tags(is_string($entries) ? [$entries] : $entries);
     }
 }
 

@@ -47,6 +47,28 @@ final class ViewTest extends TestCase
         ]));
     }
 
+    public function testViewRendererCanRenderTrustedRawTemplateData(): void
+    {
+        $basePath = dirname(__DIR__, 2);
+        self::assertNotSame('', $basePath);
+        /** @var non-empty-string $basePath */
+
+        $files = new Filesystem();
+        $files->put($basePath . '/tests/tmp/views/greeting.php', '{!! tags !!} {{ tags }}');
+        $renderer = new ViewRenderer(
+            new Application($basePath, new Container(), new Repository()),
+            new Repository([
+                'view.path' => 'tests/tmp/views',
+                'view.extension' => '.php',
+            ]),
+            $files,
+        );
+
+        self::assertSame('<script></script> &lt;script&gt;&lt;/script&gt;', $renderer->render('greeting', [
+            'tags' => '<script></script>',
+        ]));
+    }
+
     public function testViewRendererRendersModuleViews(): void
     {
         $basePath = dirname(__DIR__, 2);
