@@ -231,6 +231,12 @@ tests/
 - FTP storage disk
 - SFTP storage disk
 - Storage signed URLs
+- CLI generators (`make:*`)
+- CLI project creation
+- CLI queue worker command
+- CLI cache management
+- CLI testing helper
+- CLI deployment helper
 - Documentation
 
 ### 2.0 Enterprise
