@@ -83,6 +83,21 @@ final class DeveloperExperienceTest extends TestCase
         self::assertArrayHasKey('X-WTD-Profile-Time', $response->headers());
     }
 
+    public function testBootstrappedApplicationRegistersDebugToolbarMiddleware(): void
+    {
+        $app = require dirname(__DIR__, 2) . '/bootstrap/app.php';
+
+        self::assertTrue((bool) $app->config()->get('developer.enabled'));
+        self::assertTrue((bool) $app->config()->get('developer.debug_toolbar'));
+
+        /** @var HttpKernel $kernel */
+        $kernel = $app->container()->get(HttpKernel::class);
+        $response = $kernel->handle(new Request('GET', '/'));
+
+        self::assertStringContainsString('wtd-debug-toolbar', $response->content());
+        self::assertArrayHasKey('X-WTD-Profile-Time', $response->headers());
+    }
+
     public function testOpenApiAndApiDocumentationRoutesCanBeExposed(): void
     {
         $app = $this->application([
