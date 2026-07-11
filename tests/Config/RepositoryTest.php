@@ -31,6 +31,20 @@ final class RepositoryTest extends TestCase
         self::assertSame('file', $config->get('app.services.cache'));
     }
 
+    public function testListValuesCanBeMergedWithNamespace(): void
+    {
+        $config = new Repository();
+        $middleware = [
+            'Tests\\Middleware\\FirstMiddleware',
+            'Tests\\Middleware\\SecondMiddleware',
+        ];
+
+        $config->merge('http', ['middleware' => $middleware]);
+
+        self::assertSame($middleware, $config->get('http.middleware'));
+        self::assertSame('fallback', $config->get('http.middleware.0', 'fallback'));
+    }
+
     public function testLoaderImportsConfigDirectory(): void
     {
         $path = dirname(__DIR__) . '/tmp/config';
