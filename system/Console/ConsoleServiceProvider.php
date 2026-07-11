@@ -32,6 +32,7 @@ use WTD\Console\Commands\RouteCacheCommand;
 use WTD\Console\Commands\RouteClearCommand;
 use WTD\Console\Commands\ScheduleRunCommand;
 use WTD\Console\Commands\SeedCommand;
+use WTD\Console\Commands\ServeCommand;
 use WTD\Console\Commands\TestCommand;
 use WTD\Console\Commands\UpCommand;
 use WTD\Support\ServiceProvider;
@@ -94,6 +95,7 @@ final class ConsoleServiceProvider extends ServiceProvider
             RouteClearCommand::class,
             ScheduleRunCommand::class,
             SeedCommand::class,
+            ServeCommand::class,
             TestCommand::class,
             UpCommand::class,
         ];
