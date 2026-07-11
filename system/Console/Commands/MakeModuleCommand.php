@@ -65,7 +65,10 @@ final class MakeModuleCommand implements Command
             'Models/' . $module . '.php' => $this->model($namespace, $module, $table),
             'Database/Migrations/2026_01_01_000000_create_' . $table . '_table.php' => $this->migration($table),
             'Database/Seeders/' . $module . 'Seeder.php' => $this->seeder($module, $table),
-            'Resources/views/index.php' => "<h1>{$module}</h1>\n",
+            'Resources/views/layouts/app.php' => $this->viewLayout($module),
+            'Resources/views/pages/index.php' => $this->viewIndex($module),
+            'Resources/views/partials/.gitkeep' => '',
+            'Resources/views/components/.gitkeep' => '',
             'Tests/' . $module . 'ModuleTest.php' => $this->test($module, $slug),
         ];
     }
@@ -151,9 +154,40 @@ final class {$module}Controller
      */
     public function index(Request \$request, array \$parameters): Response
     {
-        return Response::make('{$module} module');
+        \$view = dirname(__DIR__, 2) . '/Resources/views/pages/index.php';
+
+        return Response::make(is_file(\$view) ? (string) file_get_contents(\$view) : '{$module} module');
     }
 }
+
+PHP;
+    }
+
+    private function viewLayout(string $module): string
+    {
+        return <<<PHP
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{$module}</title>
+</head>
+<body>
+    {{ content }}
+</body>
+</html>
+
+PHP;
+    }
+
+    private function viewIndex(string $module): string
+    {
+        return <<<PHP
+<section>
+    <h1>{$module}</h1>
+    <p>{$module} module is ready.</p>
+</section>
 
 PHP;
     }

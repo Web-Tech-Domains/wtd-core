@@ -154,7 +154,10 @@ final class KernelTest extends TestCase
         self::assertFileExists($moduleRoot . '/Models/Billing.php');
         self::assertFileExists($moduleRoot . '/Database/Migrations/2026_01_01_000000_create_billings_table.php');
         self::assertFileExists($moduleRoot . '/Database/Seeders/BillingSeeder.php');
-        self::assertFileExists($moduleRoot . '/Resources/views/index.php');
+        self::assertFileExists($moduleRoot . '/Resources/views/layouts/app.php');
+        self::assertFileExists($moduleRoot . '/Resources/views/pages/index.php');
+        self::assertFileExists($moduleRoot . '/Resources/views/partials/.gitkeep');
+        self::assertFileExists($moduleRoot . '/Resources/views/components/.gitkeep');
         self::assertFileExists($moduleRoot . '/Tests/BillingModuleTest.php');
 
         self::assertSame(0, $kernel->handle(new Input([

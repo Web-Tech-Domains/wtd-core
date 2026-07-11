@@ -48,4 +48,4 @@ Create a complete module skeleton with:
 php core make:module Billing
 ```
 
-Generated modules include `Config`, `Database/Migrations`, `Database/Seeders`, `Http/Controllers`, `Http/Middleware`, `Models`, `Providers`, `Resources/views`, `Routes`, and `Tests`.
+Generated modules include `Config`, `Database/Migrations`, `Database/Seeders`, `Http/Controllers`, `Http/Middleware`, `Models`, `Providers`, `Resources/views/layouts`, `Resources/views/pages`, `Resources/views/partials`, `Resources/views/components`, `Routes`, and `Tests`.
