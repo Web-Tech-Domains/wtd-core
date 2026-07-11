@@ -1,0 +1,8 @@
+# Every pull request must be reviewed by a member of:
+# https://github.com/orgs/Web-Tech-Domains/teams/approvers
+#
+# Enforcement requires GitHub branch protection with:
+# - Require a pull request before merging
+# - Require review from Code Owners
+
+* @Web-Tech-Domains/approvers
