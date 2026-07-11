@@ -1,0 +1,15 @@
+{
+  "name": "WTD Core",
+  "short_name": "WTD Core",
+  "description": "Secure modular PHP framework by Web Tech Domains.",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "theme_color": "#0B1F3A",
+  "background_color": "#F7FAFC",
+  "display": "standalone"
+}
