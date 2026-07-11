@@ -20,6 +20,7 @@ use WTD\Console\Commands\MakeControllerCommand;
 use WTD\Console\Commands\MakeMiddlewareCommand;
 use WTD\Console\Commands\MakeMigrationCommand;
 use WTD\Console\Commands\MakeModelCommand;
+use WTD\Console\Commands\MakeModuleCommand;
 use WTD\Console\Commands\MakeSeederCommand;
 use WTD\Console\Commands\MigrateCommand;
 use WTD\Console\Commands\MigrateRollbackCommand;
@@ -81,6 +82,7 @@ final class ConsoleServiceProvider extends ServiceProvider
             MakeMiddlewareCommand::class,
             MakeMigrationCommand::class,
             MakeModelCommand::class,
+            MakeModuleCommand::class,
             MakeSeederCommand::class,
             MigrateCommand::class,
             MigrateRollbackCommand::class,

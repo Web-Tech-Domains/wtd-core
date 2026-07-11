@@ -69,6 +69,7 @@ final class KernelTest extends TestCase
         self::assertArrayHasKey('make:middleware', $kernel->commands());
         self::assertArrayHasKey('make:migration', $kernel->commands());
         self::assertArrayHasKey('make:model', $kernel->commands());
+        self::assertArrayHasKey('make:module', $kernel->commands());
         self::assertArrayHasKey('make:seeder', $kernel->commands());
         self::assertArrayHasKey('migrate', $kernel->commands());
         self::assertArrayHasKey('migrate:rollback', $kernel->commands());
@@ -138,6 +139,23 @@ final class KernelTest extends TestCase
             '--path=tests/tmp/cli/create_posts_table.php',
         ]), $output));
         self::assertFileExists(dirname(__DIR__) . '/tmp/cli/create_posts_table.php');
+
+        self::assertSame(0, $kernel->handle(new Input([
+            'make:module',
+            'Billing',
+            '--path=tests/tmp/cli/modules/Billing',
+        ]), $output));
+        $moduleRoot = dirname(__DIR__) . '/tmp/cli/modules/Billing';
+        self::assertFileExists($moduleRoot . '/module.php');
+        self::assertFileExists($moduleRoot . '/Providers/BillingServiceProvider.php');
+        self::assertFileExists($moduleRoot . '/Routes/web.php');
+        self::assertFileExists($moduleRoot . '/Http/Controllers/BillingController.php');
+        self::assertFileExists($moduleRoot . '/Http/Middleware/BillingMiddleware.php');
+        self::assertFileExists($moduleRoot . '/Models/Billing.php');
+        self::assertFileExists($moduleRoot . '/Database/Migrations/2026_01_01_000000_create_billings_table.php');
+        self::assertFileExists($moduleRoot . '/Database/Seeders/BillingSeeder.php');
+        self::assertFileExists($moduleRoot . '/Resources/views/index.php');
+        self::assertFileExists($moduleRoot . '/Tests/BillingModuleTest.php');
 
         self::assertSame(0, $kernel->handle(new Input([
             'make:seeder',

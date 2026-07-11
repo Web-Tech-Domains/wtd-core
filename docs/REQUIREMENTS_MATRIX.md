@@ -52,7 +52,7 @@ This matrix maps the architecture specification to implemented project assets.
 | Queue, scheduler, events | Implemented and tested |
 | Notifications, mail, cache, storage | Implemented and tested |
 | CLI runtime, views, WebSocket foundations | Implemented and tested |
-| Modules, helpers, middleware generator, Apache hardening | Implemented and tested |
+| Modules, helpers, middleware generator, full module generator, Apache hardening | Implemented and tested |
 | Vite frontend assets with Vue and React-ready entries | Implemented and tested |
 | CLI, documentation, developer experience | Implemented and tested |
 | Marketplace, multi-tenancy, AI integrations, monitoring/admin | Implemented and tested |

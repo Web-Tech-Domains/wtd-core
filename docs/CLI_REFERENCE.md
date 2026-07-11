@@ -33,6 +33,7 @@ php core help <command>
 | `make:middleware` | Generate an application middleware. |
 | `make:migration` | Generate a database migration. |
 | `make:model` | Generate an application model. |
+| `make:module` | Generate a complete application module structure. |
 | `make:resource` | Generate an API resource controller and route snippet. |
 | `make:seeder` | Generate a database seeder. |
 | `marketplace:install` | Install a local marketplace package. |
@@ -57,6 +58,7 @@ php core help <command>
 php core make:controller HomeController
 php core make:middleware Authenticate
 php core make:model User
+php core make:module Billing
 php core make:migration create_users_table --table=users
 php core make:seeder UserSeeder
 php core make:resource Post --model=Post

@@ -41,3 +41,11 @@ The CLI flow is similar: `core` bootstraps the application, resolves the console
 ## Application Modules
 
 Application modules can be enabled in `config/modules.php`. A module may declare service providers and a route file, allowing first-party modules and third-party packages to attach services, middleware, routes, and integrations without changing the framework core.
+
+Create a complete module skeleton with:
+
+```bash
+php core make:module Billing
+```
+
+Generated modules include `Config`, `Database/Migrations`, `Database/Seeders`, `Http/Controllers`, `Http/Middleware`, `Models`, `Providers`, `Resources/views`, `Routes`, and `Tests`.
