@@ -5,6 +5,7 @@ declare(strict_types=1);
 use WTD\Application\Application;
 use WTD\Database\Connection;
 use WTD\Database\DatabaseManager;
+use WTD\View\ViewRenderer;
 
 if (!function_exists('app')) {
     function app(?string $abstract = null): mixed
@@ -59,5 +60,25 @@ if (!function_exists('db')) {
     function db(?string $connection = null): Connection
     {
         return app(DatabaseManager::class)->connection($connection);
+    }
+}
+
+if (!function_exists('view')) {
+    /**
+     * @param array<string, mixed> $data
+     */
+    function view(string $view, array $data = []): string
+    {
+        return app(ViewRenderer::class)->render($view, $data);
+    }
+}
+
+if (!function_exists('module_view')) {
+    /**
+     * @param array<string, mixed> $data
+     */
+    function module_view(string $module, string $view, array $data = []): string
+    {
+        return app(ViewRenderer::class)->renderModule($module, $view, $data);
     }
 }

@@ -33,15 +33,22 @@ Controllers are regular classes under `app/Http/Controllers`.
 namespace App\Http\Controllers;
 
 use WTD\Http\Response;
+use WTD\View\ViewRenderer;
 
 final class HomeController
 {
+    public function __construct(private readonly ViewRenderer $views)
+    {
+    }
+
     public function __invoke(): Response
     {
-        return Response::make('Welcome to WTD Core');
+        return Response::make($this->views->render('home'));
     }
 }
 ```
+
+Application views live in `resources/views` and can be rendered with `ViewRenderer::render()` or the `view()` helper. Module views live under `modules/<Module>/Resources/views` and can be rendered with `ViewRenderer::renderModule()` or the `module_view()` helper.
 
 ## Responses
 
