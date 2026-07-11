@@ -98,7 +98,15 @@ final class DatabaseManager
         $connections = $this->config->get('database.connections', []);
 
         if (is_array($connections) && $connections !== []) {
-            return array_values(array_filter(array_keys($connections), 'is_string'));
+            $names = [];
+
+            foreach (array_keys($connections) as $name) {
+                if (is_string($name)) {
+                    $names[] = $name;
+                }
+            }
+
+            return $names;
         }
 
         $names = [];
@@ -109,7 +117,29 @@ final class DatabaseManager
             }
         }
 
-        return array_values(array_unique($names));
+        return $this->uniqueStrings($names);
+    }
+
+    /**
+     * @param list<string> $values
+     *
+     * @return list<string>
+     */
+    private function uniqueStrings(array $values): array
+    {
+        $seen = [];
+        $unique = [];
+
+        foreach ($values as $value) {
+            if (isset($seen[$value])) {
+                continue;
+            }
+
+            $seen[$value] = true;
+            $unique[] = $value;
+        }
+
+        return $unique;
     }
 
     private function makeConnection(string $name): Connection
@@ -195,6 +225,8 @@ final class DatabaseManager
 
     private function stringValue(mixed $value): string
     {
-        return is_scalar($value) ? (string) $value : '';
+        return is_int($value) || is_float($value) || is_string($value) || is_bool($value)
+            ? (string) $value
+            : '';
     }
 }

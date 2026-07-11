@@ -25,10 +25,8 @@ final class MiddlewareResolverTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        /** @var list<class-string<Middleware>> $middleware */
-        $middleware = [InvalidMiddleware::class];
-
-        (new MiddlewareResolver(new Container()))->resolve($middleware);
+        /** @phpstan-ignore-next-line Intentionally verifies runtime rejection of a non-middleware class. */
+        (new MiddlewareResolver(new Container()))->resolve([InvalidMiddleware::class]);
     }
 }
 

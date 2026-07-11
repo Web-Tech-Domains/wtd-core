@@ -104,7 +104,7 @@ final class DocumentationTest extends TestCase
         $files = glob($this->docsPath('*.md'));
         self::assertIsArray($files);
 
-        return array_values($files);
+        return $files;
     }
 
     private function docsPath(string $file): string

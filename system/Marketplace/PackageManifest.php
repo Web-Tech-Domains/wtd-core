@@ -91,7 +91,7 @@ final class PackageManifest
         $mapped = [];
 
         foreach ($values as $source => $target) {
-            if (!is_scalar($source) || !is_scalar($target)) {
+            if (!is_scalar($target)) {
                 continue;
             }
 

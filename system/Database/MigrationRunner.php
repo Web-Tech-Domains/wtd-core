@@ -99,7 +99,7 @@ final class MigrationRunner
 
         sort($files);
 
-        return array_values($files);
+        return $files;
     }
 
     private function migration(string $name): Migration

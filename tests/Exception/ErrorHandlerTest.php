@@ -44,6 +44,6 @@ final class ErrorHandlerTest extends TestCase
 
         $handler->handleShutdown();
 
-        self::assertTrue(true);
+        self::assertFileDoesNotExist(dirname(__DIR__) . '/tmp/logs/shutdown.log');
     }
 }

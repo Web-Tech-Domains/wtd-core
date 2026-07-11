@@ -40,7 +40,7 @@ This is declared in `.github/CODEOWNERS`. Repository administrators must enable 
 
 Maintainers should:
 
-- Keep CI required and passing.
+- Keep repository quality workflow checks required and passing.
 - Review security reports privately.
 - Keep dependencies updated.
 - Avoid merging unrelated changes together.

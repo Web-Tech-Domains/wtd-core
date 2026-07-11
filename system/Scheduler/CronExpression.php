@@ -23,7 +23,7 @@ final class CronExpression
             throw new InvalidArgumentException('Cron expression must contain five fields.');
         }
 
-        $this->parts = array_values($parts);
+        $this->parts = $parts;
     }
 
     public function isDue(?DateTimeImmutable $time = null, string $timezone = 'UTC'): bool

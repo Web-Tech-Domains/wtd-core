@@ -36,7 +36,7 @@ final class Route
         private ?string $domain = null,
         array $middleware = [],
     ) {
-        $this->middleware = array_values($middleware);
+        $this->middleware = $middleware;
     }
 
     /**

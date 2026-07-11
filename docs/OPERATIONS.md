@@ -65,7 +65,7 @@ Storage support includes local, S3, Cloudflare R2, Azure, Google Cloud, FTP, and
 php core deploy
 ```
 
-The deployment helper reports readiness checks as JSON so CI or release automation can consume it.
+The deployment helper reports readiness checks as JSON so repository quality workflows or release automation can consume it.
 
 ## Web Server Routing
 

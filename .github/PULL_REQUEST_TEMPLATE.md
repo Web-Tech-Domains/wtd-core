@@ -9,7 +9,7 @@ Describe what changed and why.
 - [ ] Documentation
 - [ ] Refactor
 - [ ] Test
-- [ ] CI / tooling
+- [ ] Repository quality workflow / tooling
 - [ ] Security
 
 ## Checklist
