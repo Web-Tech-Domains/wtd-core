@@ -33,4 +33,6 @@ The CLI flow is similar: `core` bootstraps the application, resolves the console
 - `Queue`, `Scheduler`, `Events`: background work and event-driven workflows
 - `Notification`, `Mail`: delivery abstractions
 - `Cache`, `Storage`, `Filesystem`: infrastructure utilities
-
+- `CLI`: executable console runtime wrapper
+- `View`: file-based template rendering
+- `WebSocket`: handshake, frame, and channel foundations

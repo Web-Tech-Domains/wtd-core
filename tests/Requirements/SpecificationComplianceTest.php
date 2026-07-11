@@ -37,6 +37,17 @@ final class SpecificationComplianceTest extends TestCase
         }
     }
 
+    public function testScaffoldedFrameworkFoldersContainRealModules(): void
+    {
+        foreach ([
+            'system/CLI/CliApplication.php',
+            'system/View/ViewRenderer.php',
+            'system/WebSocket/WebSocketHandshake.php',
+        ] as $path) {
+            self::assertFileExists($this->root($path));
+        }
+    }
+
     private function root(string $path): string
     {
         return dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $path);

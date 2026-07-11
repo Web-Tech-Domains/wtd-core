@@ -4,21 +4,12 @@
 declare(strict_types=1);
 
 use WTD\Application\Application;
-use WTD\Console\Input;
-use WTD\Console\Kernel;
+use WTD\CLI\CliApplication;
 use WTD\Console\Output;
-use WTD\Console\UnknownCommandException;
 
 /** @var Application $app */
 $app = require __DIR__ . '/bootstrap/app.php';
 
-/** @var Kernel $kernel */
-$kernel = $app->container()->get(Kernel::class);
-$output = Output::standard();
-
-try {
-    exit($kernel->handle(Input::fromArgv($argv), $output));
-} catch (UnknownCommandException $exception) {
-    $output->error($exception->getMessage());
-    exit(1);
-}
+/** @var CliApplication $cli */
+$cli = $app->container()->get(CliApplication::class);
+exit($cli->run($argv, Output::standard()));

@@ -47,5 +47,6 @@ This matrix maps the architecture specification to implemented project assets.
 | Auth, authorization, security | Implemented and tested |
 | Queue, scheduler, events | Implemented and tested |
 | Notifications, mail, cache, storage | Implemented and tested |
+| CLI runtime, views, WebSocket foundations | Implemented and tested |
 | CLI, documentation, developer experience | Implemented and tested |
 | Marketplace, multi-tenancy, AI integrations, monitoring/admin | Implemented and tested |

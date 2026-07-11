@@ -6,6 +6,7 @@ use WTD\Application\Application;
 use WTD\Application\CoreServiceProvider;
 use WTD\Application\ProviderBootstrapper;
 use WTD\AI\AIServiceProvider;
+use WTD\CLI\CliServiceProvider;
 use WTD\Config\Cache;
 use WTD\Config\Loader;
 use WTD\Config\Repository;
@@ -20,6 +21,8 @@ use WTD\Monitoring\MonitoringServiceProvider;
 use WTD\Support\Env;
 use WTD\Tenancy\TenancyServiceProvider;
 use WTD\Validation\ValidationServiceProvider;
+use WTD\View\ViewServiceProvider;
+use WTD\WebSocket\WebSocketServiceProvider;
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
@@ -40,9 +43,12 @@ if ($configCache->exists()) {
 $app = new Application($basePath, $container, $config);
 $app->register(CoreServiceProvider::class);
 $app->register(ConsoleServiceProvider::class);
+$app->register(CliServiceProvider::class);
 $app->register(HttpServiceProvider::class);
 $app->register(ValidationServiceProvider::class);
 $app->register(DatabaseServiceProvider::class);
+$app->register(ViewServiceProvider::class);
+$app->register(WebSocketServiceProvider::class);
 $app->register(DeveloperExperienceServiceProvider::class);
 $app->register(MarketplaceServiceProvider::class);
 $app->register(TenancyServiceProvider::class);

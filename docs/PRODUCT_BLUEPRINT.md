@@ -255,6 +255,9 @@ tests/
 - Benchmark CLI tool
 - IDE helper generator
 - HTML error pages
+- CLI runtime wrapper
+- View renderer
+- WebSocket handshake, frames, and channels
 
 ### 2.0 Enterprise
 - Marketplace package manifests
