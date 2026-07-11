@@ -244,7 +244,7 @@ final class Router
             }
         }
 
-        return array_unique($methods);
+        return $this->uniqueStrings($methods);
     }
 
     /**
@@ -267,6 +267,28 @@ final class Router
         sort($methods);
 
         return $methods;
+    }
+
+    /**
+     * @param list<string> $values
+     *
+     * @return list<string>
+     */
+    private function uniqueStrings(array $values): array
+    {
+        $seen = [];
+        $unique = [];
+
+        foreach ($values as $value) {
+            if (isset($seen[$value])) {
+                continue;
+            }
+
+            $seen[$value] = true;
+            $unique[] = $value;
+        }
+
+        return $unique;
     }
 
     /**

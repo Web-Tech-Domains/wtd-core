@@ -132,7 +132,7 @@ final class Container implements ContainerInterface
             $this->tags[$tag][] = $abstract;
         }
 
-        $this->tags[$tag] = array_unique($this->tags[$tag] ?? []);
+        $this->tags[$tag] = $this->uniqueStrings($this->tags[$tag] ?? []);
     }
 
     /**
@@ -143,6 +143,28 @@ final class Container implements ContainerInterface
     public function tagged(string $tag): array
     {
         return array_map(fn (string $abstract): mixed => $this->get($abstract), $this->tags[$tag] ?? []);
+    }
+
+    /**
+     * @param list<string> $values
+     *
+     * @return list<string>
+     */
+    private function uniqueStrings(array $values): array
+    {
+        $seen = [];
+        $unique = [];
+
+        foreach ($values as $value) {
+            if (isset($seen[$value])) {
+                continue;
+            }
+
+            $seen[$value] = true;
+            $unique[] = $value;
+        }
+
+        return $unique;
     }
 
     /**

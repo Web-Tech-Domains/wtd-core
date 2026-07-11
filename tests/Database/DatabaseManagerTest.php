@@ -72,7 +72,7 @@ final class DatabaseManagerTest extends TestCase
     {
         $connection = (new DatabaseManager($this->config()))->connection();
         $connection->statement('CREATE TABLE events (name TEXT NOT NULL)');
-        $thrown = false;
+        $thrown = null;
 
         try {
             $connection->transaction(function (Connection $connection): void {
@@ -80,11 +80,11 @@ final class DatabaseManagerTest extends TestCase
                 throw new RuntimeException('Stop');
             });
         } catch (RuntimeException $exception) {
-            $thrown = true;
-            self::assertSame('Stop', $exception->getMessage());
+            $thrown = $exception;
         }
 
-        self::assertTrue($thrown);
+        self::assertInstanceOf(RuntimeException::class, $thrown);
+        self::assertSame('Stop', $thrown->getMessage());
         self::assertSame([], $connection->select('SELECT name FROM events'));
     }
 
@@ -135,9 +135,9 @@ final class DatabaseManagerTest extends TestCase
         ]));
         $manager->extend('array', static fn (array $configuration): Connection => new Connection(new PDO('sqlite::memory:')));
 
+        self::assertSame(['custom', 'reporting'], $manager->connectionNames());
         self::assertTrue($manager->hasConnection('custom'));
         self::assertFalse($manager->hasConnection('missing'));
-        self::assertSame(['custom', 'reporting'], $manager->connectionNames());
         self::assertInstanceOf(Connection::class, $manager->connection('custom'));
     }
 

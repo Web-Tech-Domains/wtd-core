@@ -55,7 +55,7 @@ final class MarketplaceRegistry
         $directory = $this->app->basePath($this->packagesPath());
         $files = glob($directory . DIRECTORY_SEPARATOR . '*' . DIRECTORY_SEPARATOR . 'wtd-package.php');
 
-        return is_array($files) ? array_values($files) : [];
+        return is_array($files) ? $files : [];
     }
 
     private function packagesPath(): string

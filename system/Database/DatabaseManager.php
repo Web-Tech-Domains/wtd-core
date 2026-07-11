@@ -98,7 +98,15 @@ final class DatabaseManager
         $connections = $this->config->get('database.connections', []);
 
         if (is_array($connections) && $connections !== []) {
-            return array_filter(array_keys($connections), 'is_string');
+            $names = [];
+
+            foreach (array_keys($connections) as $name) {
+                if (is_string($name)) {
+                    $names[] = $name;
+                }
+            }
+
+            return $names;
         }
 
         $names = [];
@@ -109,7 +117,29 @@ final class DatabaseManager
             }
         }
 
-        return array_unique($names);
+        return $this->uniqueStrings($names);
+    }
+
+    /**
+     * @param list<string> $values
+     *
+     * @return list<string>
+     */
+    private function uniqueStrings(array $values): array
+    {
+        $seen = [];
+        $unique = [];
+
+        foreach ($values as $value) {
+            if (isset($seen[$value])) {
+                continue;
+            }
+
+            $seen[$value] = true;
+            $unique[] = $value;
+        }
+
+        return $unique;
     }
 
     private function makeConnection(string $name): Connection
