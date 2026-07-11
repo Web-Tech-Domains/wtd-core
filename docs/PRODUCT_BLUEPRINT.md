@@ -194,6 +194,12 @@ tests/
 - Scheduler background execution flag
 - Scheduler maintenance-mode filtering
 - CLI `schedule:run` command
+- Event dispatcher
+- Event listeners
+- Event subscribers
+- Event broadcasting
+- Queued events and listeners
+- Event discovery
 - Documentation
 
 ### 2.0 Enterprise
