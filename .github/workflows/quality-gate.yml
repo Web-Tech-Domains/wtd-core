@@ -34,8 +34,8 @@ permissions:
   security-events: write
 
 concurrency:
-  group: repository-checks-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: repository-checks-${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name != 'pull_request_review' }}
 
 jobs:
   php:
