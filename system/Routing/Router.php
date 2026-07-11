@@ -244,7 +244,7 @@ final class Router
             }
         }
 
-        return array_values(array_unique($methods));
+        return array_unique($methods);
     }
 
     /**
@@ -266,7 +266,7 @@ final class Router
 
         sort($methods);
 
-        return array_values($methods);
+        return $methods;
     }
 
     /**

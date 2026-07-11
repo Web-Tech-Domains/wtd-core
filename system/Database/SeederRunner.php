@@ -62,7 +62,7 @@ final class SeederRunner
 
         sort($files);
 
-        return array_values(array_map(static fn (string $file): string => basename($file, '.php'), $files));
+        return array_map(static fn (string $file): string => basename($file, '.php'), $files);
     }
 
     private function seeder(string $name): Seeder
