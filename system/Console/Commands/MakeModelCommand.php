@@ -50,6 +50,8 @@ final class {$class} extends Model
 {
     protected ?string \$table = '{$table}';
 
+    protected ?string \$connectionName = null;
+
     protected bool \$useTimestamps = true;
 
     protected bool \$protectFields = true;

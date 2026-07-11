@@ -8,7 +8,7 @@ This matrix maps the architecture specification to implemented project assets.
 | --- | --- |
 | PHP 8.3+ | `composer.json`, CI PHP 8.3 |
 | Composer | `composer.json` |
-| MySQL, MariaDB, PostgreSQL, SQLite | PDO database manager and connection config |
+| MySQL, MariaDB, PostgreSQL, SQLite, SQL Server | PDO database manager, named connections, and provider extension |
 | Redis | Cache and queue drivers |
 | RabbitMQ | Queue driver and Docker Compose service |
 | Docker | `Dockerfile`, `docker-compose.yml` |

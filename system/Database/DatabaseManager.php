@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace WTD\Database;
 
 use InvalidArgumentException;
+use Closure;
 use PDO;
 use WTD\Config\Repository;
 
@@ -17,6 +18,11 @@ final class DatabaseManager
      * @var array<string, Connection>
      */
     private array $connections = [];
+
+    /**
+     * @var array<string, Closure(array<string, mixed>): Connection>
+     */
+    private array $providers = [];
 
     public function __construct(private readonly Repository $config)
     {
@@ -58,9 +64,63 @@ final class DatabaseManager
         unset($this->connections[$name ?? $this->defaultConnection()]);
     }
 
+    /**
+     * Register a custom connection provider for a database driver.
+     *
+     * @param Closure(array<string, mixed>): Connection $provider
+     */
+    public function extend(string $driver, Closure $provider): void
+    {
+        $this->providers[strtolower($driver)] = $provider;
+    }
+
+    /**
+     * Determine whether a named connection is configured.
+     */
+    public function hasConnection(string $name): bool
+    {
+        try {
+            $this->connectionConfiguration($name);
+
+            return true;
+        } catch (InvalidArgumentException) {
+            return false;
+        }
+    }
+
+    /**
+     * Return configured connection names.
+     *
+     * @return list<string>
+     */
+    public function connectionNames(): array
+    {
+        $connections = $this->config->get('database.connections', []);
+
+        if (is_array($connections) && $connections !== []) {
+            return array_values(array_filter(array_keys($connections), 'is_string'));
+        }
+
+        $names = [];
+
+        foreach ($this->config->all() as $key => $value) {
+            if (preg_match('/^database\.connections\.([^.]+)\./', (string) $key, $matches) === 1) {
+                $names[] = $matches[1];
+            }
+        }
+
+        return array_values(array_unique($names));
+    }
+
     private function makeConnection(string $name): Connection
     {
         $configuration = $this->connectionConfiguration($name);
+
+        $driver = strtolower($this->stringValue($configuration['driver'] ?? null));
+        if (isset($this->providers[$driver])) {
+            return ($this->providers[$driver])($configuration);
+        }
+
         $pdo = new PDO(
             $this->dsn($configuration),
             $this->stringValue($configuration['username'] ?? null),
@@ -106,7 +166,7 @@ final class DatabaseManager
      */
     private function dsn(array $configuration): string
     {
-        $driver = $this->stringValue($configuration['driver'] ?? null);
+        $driver = strtolower($this->stringValue($configuration['driver'] ?? null));
 
         return match ($driver) {
             'sqlite' => 'sqlite:' . $this->stringValue($configuration['database'] ?? ':memory:'),
@@ -121,6 +181,12 @@ final class DatabaseManager
                 'pgsql:host=%s;port=%s;dbname=%s',
                 $this->stringValue($configuration['host'] ?? '127.0.0.1'),
                 $this->stringValue($configuration['port'] ?? '5432'),
+                $this->stringValue($configuration['database'] ?? ''),
+            ),
+            'sqlsrv' => sprintf(
+                'sqlsrv:Server=%s,%s;Database=%s',
+                $this->stringValue($configuration['host'] ?? '127.0.0.1'),
+                $this->stringValue($configuration['port'] ?? '1433'),
                 $this->stringValue($configuration['database'] ?? ''),
             ),
             default => throw new InvalidArgumentException(sprintf('Database driver [%s] is not supported.', $driver)),

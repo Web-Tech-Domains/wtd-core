@@ -21,7 +21,7 @@ final class ErrorPageRenderer
 
         return '<!doctype html><html lang="en"><head><meta charset="utf-8"><title>'
             . $this->escape($title)
-            . '</title><style>body{margin:0;font-family:system-ui,sans-serif;background:#f8fafc;color:#111827}.wrap{max-width:920px;margin:10vh auto;padding:0 24px}h1{font-size:32px;margin:0 0 12px}p{font-size:16px;color:#4b5563}pre{overflow:auto;background:#111827;color:#f9fafb;padding:16px;border-radius:6px}</style></head><body><main class="wrap"><h1>'
+            . '</title><meta name="viewport" content="width=device-width, initial-scale=1"><style>body{margin:0;font-family:system-ui,sans-serif;background:#f8fafc;color:#111827}.wrap{max-width:920px;margin:10vh auto;padding:0 24px}h1{font-size:32px;margin:0 0 12px}p{font-size:16px;color:#4b5563}pre{overflow:auto;background:#111827;color:#f9fafb;padding:16px;border-radius:6px}</style></head><body><main class="wrap"><h1>'
             . $this->escape($title)
             . '</h1><p>'
             . $this->escape($message)

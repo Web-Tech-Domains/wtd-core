@@ -45,7 +45,7 @@ final class Request
 
         return new self(
             strtoupper((string) ($server['REQUEST_METHOD'] ?? 'GET')),
-            parse_url((string) ($server['REQUEST_URI'] ?? '/'), PHP_URL_PATH) ?: '/',
+            self::normalizeCapturedPath($server),
             self::headersFromServer($server),
             $query,
             $body,
@@ -185,5 +185,22 @@ final class Request
         }
 
         return $headers;
+    }
+
+    /**
+     * Normalize the captured URI to the route path.
+     *
+     * @param array<string, mixed> $server
+     */
+    private static function normalizeCapturedPath(array $server): string
+    {
+        $path = parse_url((string) ($server['REQUEST_URI'] ?? '/'), PHP_URL_PATH) ?: '/';
+        $scriptDirectory = str_replace('\\', '/', dirname((string) ($server['SCRIPT_NAME'] ?? '')));
+
+        if ($scriptDirectory !== '' && $scriptDirectory !== '/' && str_starts_with($path . '/', rtrim($scriptDirectory, '/') . '/')) {
+            $path = substr($path, strlen(rtrim($scriptDirectory, '/'))) ?: '/';
+        }
+
+        return $path;
     }
 }

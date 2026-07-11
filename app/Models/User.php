@@ -10,6 +10,8 @@ final class User extends Model
 {
     protected ?string $table = 'users';
 
+    protected ?string $connectionName = null;
+
     protected bool $useTimestamps = true;
 
     protected bool $protectFields = true;

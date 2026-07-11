@@ -58,6 +58,34 @@ final class RequestResponseTest extends TestCase
         );
     }
 
+    public function testCapturedRequestStripsFrontControllerDirectory(): void
+    {
+        $originalServer = $_SERVER;
+        $originalGet = $_GET;
+        $originalPost = $_POST;
+        $originalCookie = $_COOKIE;
+
+        $_SERVER = [
+            'REQUEST_METHOD' => 'GET',
+            'REQUEST_URI' => '/public/',
+            'SCRIPT_NAME' => '/public/index.php',
+        ];
+        $_GET = [];
+        $_POST = [];
+        $_COOKIE = [];
+
+        try {
+            $request = Request::capture();
+        } finally {
+            $_SERVER = $originalServer;
+            $_GET = $originalGet;
+            $_POST = $originalPost;
+            $_COOKIE = $originalCookie;
+        }
+
+        self::assertSame('/', $request->path());
+    }
+
     public function testResponseCanRepresentJson(): void
     {
         $response = Response::json(['status' => 'ok'], 201);

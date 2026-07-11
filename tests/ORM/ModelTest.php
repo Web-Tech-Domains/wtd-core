@@ -19,6 +19,7 @@ final class ModelTest extends TestCase
 
     protected function setUp(): void
     {
+        Model::setDatabaseManager(null);
         $this->connection = $this->makeConnection();
         OrmUser::setConnection($this->connection);
         OrmUser::flushModelEvents();
@@ -157,6 +158,31 @@ final class ModelTest extends TestCase
         self::assertSame(['beforeInsert', 'afterInsert', 'beforeUpdate', 'afterUpdate'], $user->callbacks);
     }
 
+    public function testModelCanUseNamedDatabaseManagerConnection(): void
+    {
+        OrmUser::setConnection(null);
+        NamedConnectionUser::setConnection(null);
+        $manager = new DatabaseManager(new Repository([
+            'database.default' => 'primary',
+            'database.connections.primary.driver' => 'sqlite',
+            'database.connections.primary.database' => ':memory:',
+            'database.connections.reporting.driver' => 'sqlite',
+            'database.connections.reporting.database' => ':memory:',
+        ]));
+        Model::setDatabaseManager($manager);
+
+        $schema = new Schema($manager->connection('reporting'));
+        $schema->create('named_users', static function (Blueprint $table): void {
+            $table->id();
+            $table->string('name');
+        });
+
+        $user = new NamedConnectionUser(['name' => 'Report']);
+
+        self::assertTrue($user->save());
+        self::assertSame([['name' => 'Report']], $manager->connection('reporting')->table('named_users')->select('name')->get());
+    }
+
     private function makeConnection(): Connection
     {
         return (new DatabaseManager(new Repository([
@@ -258,6 +284,13 @@ final class TimestampedUser extends Model
     {
         $this->callbacks[] = 'afterUpdate';
     }
+}
+
+final class NamedConnectionUser extends Model
+{
+    protected ?string $connectionName = 'reporting';
+
+    protected ?string $table = 'named_users';
 }
 
 final class UserObserver

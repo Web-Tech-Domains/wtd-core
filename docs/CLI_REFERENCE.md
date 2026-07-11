@@ -71,7 +71,9 @@ php core tenant:list
 php core ai:providers
 php core monitor:report
 php core migrate
+php core migrate --database=reporting
 php core db:seed
+php core db:seed UserSeeder --database=reporting
 php core queue:work
 php core schedule:run
 php core cache:clear

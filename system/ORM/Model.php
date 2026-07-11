@@ -6,6 +6,7 @@ namespace WTD\ORM;
 
 use RuntimeException;
 use WTD\Database\Connection;
+use WTD\Database\DatabaseManager;
 use WTD\ORM\Relations\BelongsTo;
 use WTD\ORM\Relations\BelongsToMany;
 use WTD\ORM\Relations\HasMany;
@@ -22,6 +23,8 @@ abstract class Model
 {
     protected static ?Connection $connection = null;
 
+    protected static ?DatabaseManager $databaseManager = null;
+
     /**
      * @var array<class-string<Model>, array<string, list<callable(Model): void>>>
      */
@@ -35,6 +38,8 @@ abstract class Model
     protected string $primaryKey = 'id';
 
     protected ?string $table = null;
+
+    protected ?string $connectionName = null;
 
     protected bool $softDeletes = false;
 
@@ -107,6 +112,11 @@ abstract class Model
     public static function setConnection(?Connection $connection): void
     {
         static::$connection = $connection;
+    }
+
+    public static function setDatabaseManager(?DatabaseManager $databaseManager): void
+    {
+        static::$databaseManager = $databaseManager;
     }
 
     /**
@@ -343,11 +353,17 @@ abstract class Model
 
     protected static function connection(): Connection
     {
-        if (static::$connection === null) {
-            throw new RuntimeException('No database connection has been configured for ORM models.');
+        if (static::$connection !== null) {
+            return static::$connection;
         }
 
-        return static::$connection;
+        if (static::$databaseManager !== null) {
+            $model = new static();
+
+            return static::$databaseManager->connection($model->connectionName);
+        }
+
+        throw new RuntimeException('No database connection has been configured for ORM models.');
     }
 
     protected function tableName(): string

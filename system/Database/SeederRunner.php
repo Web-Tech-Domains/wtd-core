@@ -18,6 +18,14 @@ final class SeederRunner
     }
 
     /**
+     * Create a runner for another database connection while reusing the seeder path.
+     */
+    public function forConnection(Connection $connection): self
+    {
+        return new self($connection, $this->path);
+    }
+
+    /**
      * Run all seeders or a specific seeder by file name.
      *
      * @return list<string>

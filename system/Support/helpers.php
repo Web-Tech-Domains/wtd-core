@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use WTD\Application\Application;
+use WTD\Database\Connection;
+use WTD\Database\DatabaseManager;
 
 if (!function_exists('app')) {
     function app(?string $abstract = null): mixed
@@ -50,5 +52,12 @@ if (!function_exists('storage_path')) {
     function storage_path(string $path = ''): string
     {
         return base_path('storage' . ($path === '' ? '' : DIRECTORY_SEPARATOR . ltrim($path, DIRECTORY_SEPARATOR)));
+    }
+}
+
+if (!function_exists('db')) {
+    function db(?string $connection = null): Connection
+    {
+        return app(DatabaseManager::class)->connection($connection);
     }
 }

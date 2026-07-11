@@ -15,6 +15,7 @@ use WTD\Console\Kernel;
 use WTD\Console\Output;
 use WTD\Console\UnknownCommandException;
 use WTD\Container\Container;
+use WTD\Database\DatabaseManager;
 use WTD\Database\DatabaseServiceProvider;
 use WTD\Http\HttpServiceProvider;
 use WTD\Scheduler\SchedulerServiceProvider;
@@ -173,6 +174,34 @@ final class KernelTest extends TestCase
         self::assertStringContainsString('"deployable"', $contents);
     }
 
+    public function testMigrationCommandCanTargetNamedDatabaseConnection(): void
+    {
+        $app = $this->application();
+        $app->register(CoreServiceProvider::class);
+        $app->register(HttpServiceProvider::class);
+        $app->register(DatabaseServiceProvider::class);
+        $app->register(SchedulerServiceProvider::class);
+        $app->register(ConsoleServiceProvider::class);
+        /** @var Kernel $kernel */
+        $kernel = $app->container()->get(Kernel::class);
+        [$output] = $this->consoleOutput();
+
+        self::assertSame(0, $kernel->handle(new Input([
+            'migrate',
+            '--database=reporting',
+        ]), $output));
+
+        /** @var DatabaseManager $database */
+        $database = $app->container()->get(DatabaseManager::class);
+        $tables = $database->connection('reporting')->select(
+            "SELECT name FROM sqlite_master WHERE type = 'table' AND name = ?",
+            ['users'],
+        );
+
+        self::assertSame([['name' => 'users']], $tables);
+    }
+
+
     public function testHelpCommandCanDescribeSpecificCommand(): void
     {
         $app = $this->application();
@@ -220,6 +249,8 @@ final class KernelTest extends TestCase
                 'database.default' => 'sqlite',
                 'database.connections.sqlite.driver' => 'sqlite',
                 'database.connections.sqlite.database' => ':memory:',
+                'database.connections.reporting.driver' => 'sqlite',
+                'database.connections.reporting.database' => ':memory:',
             ]),
         );
     }

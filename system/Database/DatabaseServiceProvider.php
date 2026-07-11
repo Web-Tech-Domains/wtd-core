@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace WTD\Database;
 
+use WTD\ORM\Model;
 use WTD\Support\ServiceProvider;
 
 /**
@@ -47,5 +48,10 @@ final class DatabaseServiceProvider extends ServiceProvider
                 $this->app->basePath('database/seeders'),
             ),
         );
+    }
+
+    public function boot(): void
+    {
+        Model::setDatabaseManager($this->container()->get(DatabaseManager::class));
     }
 }

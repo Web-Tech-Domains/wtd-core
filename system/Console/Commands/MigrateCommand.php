@@ -7,6 +7,7 @@ namespace WTD\Console\Commands;
 use WTD\Console\Command;
 use WTD\Console\Input;
 use WTD\Console\Output;
+use WTD\Database\DatabaseManager;
 use WTD\Database\MigrationRunner;
 
 /**
@@ -14,8 +15,10 @@ use WTD\Database\MigrationRunner;
  */
 final class MigrateCommand implements Command
 {
-    public function __construct(private readonly MigrationRunner $runner)
-    {
+    public function __construct(
+        private readonly MigrationRunner $runner,
+        private readonly DatabaseManager $database,
+    ) {
     }
 
     public function name(): string
@@ -30,7 +33,7 @@ final class MigrateCommand implements Command
 
     public function handle(Input $input, Output $output): int
     {
-        $ran = $this->runner->migrate();
+        $ran = $this->runner($input)->migrate();
 
         if ($ran === []) {
             $output->line('Nothing to migrate');
@@ -42,5 +45,14 @@ final class MigrateCommand implements Command
         }
 
         return 0;
+    }
+
+    private function runner(Input $input): MigrationRunner
+    {
+        $connection = $input->option('database');
+
+        return is_string($connection)
+            ? $this->runner->forConnection($this->database->connection($connection))
+            : $this->runner;
     }
 }

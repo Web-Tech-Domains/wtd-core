@@ -7,6 +7,7 @@ namespace WTD\Console\Commands;
 use WTD\Console\Command;
 use WTD\Console\Input;
 use WTD\Console\Output;
+use WTD\Database\DatabaseManager;
 use WTD\Database\MigrationRunner;
 
 /**
@@ -14,8 +15,10 @@ use WTD\Database\MigrationRunner;
  */
 final class MigrateRollbackCommand implements Command
 {
-    public function __construct(private readonly MigrationRunner $runner)
-    {
+    public function __construct(
+        private readonly MigrationRunner $runner,
+        private readonly DatabaseManager $database,
+    ) {
     }
 
     public function name(): string
@@ -30,7 +33,7 @@ final class MigrateRollbackCommand implements Command
 
     public function handle(Input $input, Output $output): int
     {
-        $rolledBack = $this->runner->rollback();
+        $rolledBack = $this->runner($input)->rollback();
 
         if ($rolledBack === []) {
             $output->line('Nothing to roll back');
@@ -42,5 +45,14 @@ final class MigrateRollbackCommand implements Command
         }
 
         return 0;
+    }
+
+    private function runner(Input $input): MigrationRunner
+    {
+        $connection = $input->option('database');
+
+        return is_string($connection)
+            ? $this->runner->forConnection($this->database->connection($connection))
+            : $this->runner;
     }
 }

@@ -35,5 +35,13 @@ return [
             'username' => $_ENV['DB_USERNAME'] ?? 'postgres',
             'password' => $_ENV['DB_PASSWORD'] ?? '',
         ],
+        'sqlsrv' => [
+            'driver' => 'sqlsrv',
+            'host' => $_ENV['DB_HOST'] ?? '127.0.0.1',
+            'port' => $_ENV['DB_PORT'] ?? '1433',
+            'database' => $_ENV['DB_DATABASE'] ?? 'wtd',
+            'username' => $_ENV['DB_USERNAME'] ?? 'sa',
+            'password' => $_ENV['DB_PASSWORD'] ?? '',
+        ],
     ],
 ];

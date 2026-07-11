@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Database;
 
 use InvalidArgumentException;
+use PDO;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use WTD\Application\Application;
@@ -116,6 +117,28 @@ final class DatabaseManagerTest extends TestCase
             'port' => '5432',
             'database' => 'wtd',
         ]));
+        self::assertSame('sqlsrv:Server=127.0.0.1,1433;Database=wtd', $method->invoke($manager, [
+            'driver' => 'sqlsrv',
+            'host' => '127.0.0.1',
+            'port' => '1433',
+            'database' => 'wtd',
+        ]));
+    }
+
+    public function testDatabaseManagerListsConnectionsAndSupportsCustomProviders(): void
+    {
+        $manager = new DatabaseManager(new Repository([
+            'database.default' => 'custom',
+            'database.connections.custom.driver' => 'array',
+            'database.connections.reporting.driver' => 'sqlite',
+            'database.connections.reporting.database' => ':memory:',
+        ]));
+        $manager->extend('array', static fn (array $configuration): Connection => new Connection(new PDO('sqlite::memory:')));
+
+        self::assertTrue($manager->hasConnection('custom'));
+        self::assertFalse($manager->hasConnection('missing'));
+        self::assertSame(['custom', 'reporting'], $manager->connectionNames());
+        self::assertInstanceOf(Connection::class, $manager->connection('custom'));
     }
 
     public function testDatabaseServiceProviderRegistersServices(): void

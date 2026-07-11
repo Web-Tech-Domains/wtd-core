@@ -7,6 +7,7 @@ namespace WTD\Console\Commands;
 use WTD\Console\Command;
 use WTD\Console\Input;
 use WTD\Console\Output;
+use WTD\Database\DatabaseManager;
 use WTD\Database\SeederRunner;
 
 /**
@@ -14,8 +15,10 @@ use WTD\Database\SeederRunner;
  */
 final class SeedCommand implements Command
 {
-    public function __construct(private readonly SeederRunner $runner)
-    {
+    public function __construct(
+        private readonly SeederRunner $runner,
+        private readonly DatabaseManager $database,
+    ) {
     }
 
     public function name(): string
@@ -30,7 +33,7 @@ final class SeedCommand implements Command
 
     public function handle(Input $input, Output $output): int
     {
-        $ran = $this->runner->run($input->argument(0));
+        $ran = $this->runner($input)->run($input->argument(0));
 
         if ($ran === []) {
             $output->line('Nothing to seed');
@@ -42,5 +45,14 @@ final class SeedCommand implements Command
         }
 
         return 0;
+    }
+
+    private function runner(Input $input): SeederRunner
+    {
+        $connection = $input->option('database');
+
+        return is_string($connection)
+            ? $this->runner->forConnection($this->database->connection($connection))
+            : $this->runner;
     }
 }

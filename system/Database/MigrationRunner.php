@@ -19,6 +19,14 @@ final class MigrationRunner
     }
 
     /**
+     * Create a runner for another database connection while reusing the migration path.
+     */
+    public function forConnection(Connection $connection): self
+    {
+        return new self(new MigrationRepository($connection), new Schema($connection), $this->path);
+    }
+
+    /**
      * Run all pending migrations.
      *
      * @return list<string>
