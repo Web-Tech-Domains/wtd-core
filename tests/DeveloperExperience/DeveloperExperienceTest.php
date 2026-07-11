@@ -112,6 +112,10 @@ final class DeveloperExperienceTest extends TestCase
         self::assertSame(500, $response->status());
         self::assertStringContainsString('<!doctype html>', $response->content());
         self::assertStringContainsString('Debug failure', $response->content());
+        self::assertStringContainsString('WTD Core', $response->content());
+        self::assertStringContainsString('class="topbar"', $response->content());
+        self::assertStringContainsString('Back to Home', $response->content());
+        self::assertStringContainsString('Debug details', $response->content());
     }
 
     public function testDeveloperExperienceCliCommands(): void
