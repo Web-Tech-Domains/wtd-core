@@ -67,3 +67,6 @@ php core deploy
 
 The deployment helper reports readiness checks as JSON so CI or release automation can consume it.
 
+## Web Server Routing
+
+Nginx routing is documented in `docker/nginx/default.conf`. Apache deployments can use `docker/apache/vhost.conf` with `FallbackResource` or the front-controller rewrite rules in `public/.htaccess`.

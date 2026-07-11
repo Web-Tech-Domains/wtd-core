@@ -13,7 +13,7 @@ This matrix maps the architecture specification to implemented project assets.
 | RabbitMQ | Queue driver and Docker Compose service |
 | Docker | `Dockerfile`, `docker-compose.yml` |
 | Nginx | `docker/nginx/default.conf` |
-| Apache | `docker/apache/vhost.conf` |
+| Apache | `docker/apache/vhost.conf`, `public/.htaccess` |
 | PHP-FPM | `Dockerfile`, `docker/php-fpm/wtd.ini` |
 | OpenAPI | Developer experience OpenAPI generator |
 | JWT | Authentication JWT service |
@@ -49,4 +49,3 @@ This matrix maps the architecture specification to implemented project assets.
 | Notifications, mail, cache, storage | Implemented and tested |
 | CLI, documentation, developer experience | Implemented and tested |
 | Marketplace, multi-tenancy, AI integrations, monitoring/admin | Implemented and tested |
-

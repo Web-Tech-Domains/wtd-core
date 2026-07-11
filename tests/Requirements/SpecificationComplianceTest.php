@@ -13,6 +13,7 @@ final class SpecificationComplianceTest extends TestCase
         foreach ([
             'Dockerfile',
             'docker-compose.yml',
+            'public/.htaccess',
             'docker/nginx/default.conf',
             'docker/apache/vhost.conf',
             'docker/php-fpm/wtd.ini',
