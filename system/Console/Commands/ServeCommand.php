@@ -59,14 +59,12 @@ final class ServeCommand implements Command
 
     private function port(string $port): int
     {
-        $number = filter_var($port, FILTER_VALIDATE_INT, [
-            'options' => [
-                'default' => 8000,
-                'min_range' => 1,
-                'max_range' => 65535,
-            ],
-        ]);
+        $number = filter_var($port, FILTER_VALIDATE_INT);
 
-        return is_int($number) ? $number : 8000;
+        if (!is_int($number) || $number < 1 || $number > 65535) {
+            return 8000;
+        }
+
+        return $number;
     }
 }

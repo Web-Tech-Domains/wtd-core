@@ -48,6 +48,7 @@ php core help <command>
 | `route:cache` | Build the route cache. |
 | `route:clear` | Clear the route cache. |
 | `schedule:run` | Run due scheduled tasks. |
+| `serve` | Start the local PHP development server. |
 | `test` | Print or run the project test command. |
 | `tenant:list` | List configured tenants. |
 | `up` | Disable maintenance mode. |
@@ -79,5 +80,7 @@ php core db:seed UserSeeder --database=reporting
 php core queue:work
 php core schedule:run
 php core cache:clear
+php core serve
+php core serve --host=0.0.0.0 --port=8080
 php core deploy
 ```
