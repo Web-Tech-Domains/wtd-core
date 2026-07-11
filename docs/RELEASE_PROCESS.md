@@ -60,7 +60,7 @@ The default branch should require:
 
 - Pull requests before merging.
 - Code Owner review.
-- Passing CI.
+- Passing repository quality workflow checks.
 - Up-to-date branches.
 - No force pushes.
 - No branch deletions.

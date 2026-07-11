@@ -3,3 +3,5 @@ parameters:
     paths:
         - system
         - tests
+    excludePaths:
+        - tests/tmp

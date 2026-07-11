@@ -6,7 +6,7 @@ This matrix maps the architecture specification to implemented project assets.
 
 | Requirement | Status |
 | --- | --- |
-| PHP 8.3+ | `composer.json`, CI PHP 8.3 |
+| PHP 8.3+ | `composer.json`, repository quality workflow PHP 8.3 |
 | Composer | `composer.json` |
 | MySQL, MariaDB, PostgreSQL, SQLite, SQL Server | PDO database manager, named connections, and provider extension |
 | Redis | Cache and queue drivers |

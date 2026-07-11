@@ -14,6 +14,12 @@ WTD Core is a lightweight PHP 8.3+ framework core for APIs, SaaS products, and e
 composer install
 ```
 
+Composer runs `php core migrate` after `composer install` and `composer update`. To skip this during package builds, client deployments, automated quality workflows, or installs without a configured database, set:
+
+```bash
+WTD_AUTO_MIGRATE=false composer install
+```
+
 ## Run Quality Checks
 
 ```bash
@@ -56,4 +62,3 @@ php core make:command SyncCommand --command=app:sync
 ```bash
 php core app:new demo
 ```
-

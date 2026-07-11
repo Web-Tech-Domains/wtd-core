@@ -32,7 +32,14 @@
     "core"
   ],
   "scripts": {
+    "post-install-cmd": [
+      "@auto:migrate"
+    ],
+    "post-update-cmd": [
+      "@auto:migrate"
+    ],
     "serve": "php core serve",
+    "auto:migrate": "php system/Console/composer-auto-migrate.php",
     "test": "phpunit",
     "analyse": "phpstan analyse --configuration=phpstan.neon --memory-limit=512M",
     "cs:fix": "php-cs-fixer fix"

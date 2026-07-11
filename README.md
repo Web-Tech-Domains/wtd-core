@@ -91,6 +91,8 @@ php core health
 php core diagnostics
 ```
 
+`composer install` and `composer update` run pending migrations automatically. Set `WTD_AUTO_MIGRATE=false` when installing dependencies without a configured database.
+
 ## Local Server
 
 Use the `public` directory as the document root. For a quick local server:
