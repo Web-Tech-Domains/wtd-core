@@ -16,7 +16,7 @@ final class RoleCache
      */
     public function put(mixed $userId, array $roles): void
     {
-        $this->roles[(string) $userId] = array_values($roles);
+        $this->roles[(string) $userId] = $roles;
     }
 
     /**

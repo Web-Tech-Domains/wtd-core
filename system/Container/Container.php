@@ -132,7 +132,7 @@ final class Container implements ContainerInterface
             $this->tags[$tag][] = $abstract;
         }
 
-        $this->tags[$tag] = array_values(array_unique($this->tags[$tag] ?? []));
+        $this->tags[$tag] = array_unique($this->tags[$tag] ?? []);
     }
 
     /**
