@@ -235,7 +235,6 @@ CSS;
 
         return json_encode($value, JSON_THROW_ON_ERROR);
     }
-
     private function escape(string $value): string
     {
         return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
