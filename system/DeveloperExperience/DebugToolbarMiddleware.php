@@ -68,23 +68,34 @@ final class DebugToolbarMiddleware implements Middleware
         $statusClass = $status >= 500 ? 'danger' : ($status >= 400 ? 'warning' : 'success');
         $marks = $this->marks($profile['marks']);
         $sections = $this->sections($request, $response, $profile);
+        $history = $this->history($request, $response);
 
         return sprintf(
-            '<style>%s</style><aside id="wtd-debug-toolbar" class="wtd-debug-toolbar" aria-label="WTD debug toolbar"><details><summary><span class="wtd-brand">WTD</span><span class="wtd-chip">%s</span><span class="wtd-route">%s</span><span class="wtd-status %s">%d</span><span>%.2f ms</span><span>%.2f MB</span><span>%d queries</span><span>%d headers</span></summary><div class="wtd-panel"><div class="wtd-panel-head"><strong>Debug Toolbar</strong><span>%s / %s / PHP %s</span></div><div class="wtd-sections">%s<section class="wtd-section"><h2>Profiler Marks</h2>%s</section></div></div></details></aside>',
+            '<style>%s</style><aside id="wtd-debug-toolbar" class="wtd-debug-toolbar" aria-label="WTD debug toolbar"><input type="radio" name="wtd-debug-tab" id="wtd-tab-history" checked><input type="radio" name="wtd-debug-tab" id="wtd-tab-vars"><input type="radio" name="wtd-debug-tab" id="wtd-tab-events"><input type="radio" name="wtd-debug-tab" id="wtd-tab-routes"><input type="radio" name="wtd-debug-tab" id="wtd-tab-files"><input type="radio" name="wtd-debug-tab" id="wtd-tab-profiler"><input type="checkbox" id="wtd-debug-close"><div class="wtd-panels"><section class="wtd-tab-panel wtd-history"><h2>History</h2>%s</section><section class="wtd-tab-panel wtd-vars"><h2>Vars</h2><div class="wtd-sections">%s</div></section><section class="wtd-tab-panel wtd-events"><h2>Events</h2><p class="wtd-empty">No event timeline captured for this request.</p></section><section class="wtd-tab-panel wtd-routes"><h2>Routes</h2>%s</section><section class="wtd-tab-panel wtd-files"><h2>Files</h2>%s</section><section class="wtd-tab-panel wtd-profiler"><h2>Profiler Marks</h2>%s</section></div><nav class="wtd-bar"><span class="wtd-brand">WTD</span><span class="wtd-chip">%s</span><span class="wtd-route">%s</span><span class="wtd-status %s">%d</span><span>%.2f ms</span><span>%.2f MB</span><label for="wtd-tab-profiler">Profiler <b>%d</b></label><label for="wtd-tab-files">Files <b>%d</b></label><label for="wtd-tab-routes">Routes <b>%d</b></label><label for="wtd-tab-events">Events <b>0</b></label><label for="wtd-tab-history">History <b>1</b></label><label for="wtd-tab-vars">Vars</label><label class="wtd-close" for="wtd-debug-close">x</label></nav></aside>',
             $this->styles(),
+            $history,
+            $sections,
+            $this->section('Current Route', [
+                'Method' => $request->method(),
+                'Path' => $request->path(),
+                'Status' => (string) $response->status(),
+            ]),
+            $this->table('Loaded Configuration', [
+                'app' => $this->config->get('app.name', 'WTD Core'),
+                'environment' => $this->config->get('app.env', 'development'),
+                'database' => $this->config->get('database.default', 'n/a'),
+                'cache' => $this->config->get('cache.default', 'n/a'),
+            ]),
+            $marks,
             $method,
             $path,
             $statusClass,
             $status,
             $profile['elapsed_ms'],
             $profile['memory_peak'] / 1024 / 1024,
-            count($request->queryParams()),
-            count($request->headers()),
-            $this->escape((string) $this->config->get('app.env', 'development')),
-            (bool) $this->config->get('app.debug', false) ? 'enabled' : 'disabled',
-            PHP_VERSION,
-            $sections,
-            $marks,
+            count($profile['marks']),
+            count(get_included_files()),
+            1,
         );
     }
 
@@ -117,6 +128,21 @@ final class DebugToolbarMiddleware implements Middleware
         }
 
         return '<ol>' . $items . '</ol>';
+    }
+
+    private function history(Request $request, Response $response): string
+    {
+        $requestedWith = $request->header('x-requested-with') ?? '';
+
+        return sprintf(
+            '<table><thead><tr><th>Action</th><th>Datetime</th><th>Status</th><th>Method</th><th>URL</th><th>Content-Type</th><th>Is AJAX?</th></tr></thead><tbody><tr><td><button type="button">Load</button></td><td>%s</td><td>%d</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr></tbody></table>',
+            $this->escape((new \DateTimeImmutable())->format('Y-m-d H:i:s.u')),
+            $response->status(),
+            $this->escape($request->method()),
+            $this->escape($this->currentUrl($request)),
+            $this->escape($response->headers()['Content-Type'] ?? 'n/a'),
+            strtolower($requestedWith) === 'xmlhttprequest' ? 'Yes' : 'No',
+        );
     }
 
     /**
@@ -217,10 +243,21 @@ final class DebugToolbarMiddleware implements Middleware
         ];
     }
 
+    private function currentUrl(Request $request): string
+    {
+        $server = $request->server();
+        $scheme = ((string) ($server['HTTPS'] ?? '')) !== '' && strtolower((string) $server['HTTPS']) !== 'off'
+            ? 'https'
+            : 'http';
+        $host = $request->header('host') ?? (string) ($server['HTTP_HOST'] ?? $server['SERVER_NAME'] ?? 'localhost');
+
+        return $scheme . '://' . $host . $request->path();
+    }
+
     private function styles(): string
     {
         return <<<'CSS'
-.wtd-debug-toolbar{position:fixed;right:14px;bottom:14px;z-index:2147483647;max-width:min(1040px,calc(100vw - 28px));font:12px/1.45 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#e5e7eb}.wtd-debug-toolbar *{box-sizing:border-box}.wtd-debug-toolbar details{border:1px solid rgba(148,163,184,.32);border-radius:8px;background:#0f172a;box-shadow:0 18px 48px rgba(15,23,42,.26);overflow:hidden}.wtd-debug-toolbar summary{min-height:38px;display:flex;align-items:center;gap:7px;padding:6px 10px;cursor:pointer;list-style:none;overflow-x:auto;border-bottom:1px solid transparent}.wtd-debug-toolbar details[open] summary{border-bottom-color:rgba(148,163,184,.18)}.wtd-debug-toolbar summary::-webkit-details-marker{display:none}.wtd-brand{display:inline-flex;align-items:center;justify-content:center;width:38px;height:24px;border-radius:6px;background:#2563eb;color:#fff;font-weight:900;letter-spacing:0}.wtd-chip,.wtd-status,.wtd-debug-toolbar summary span:not(.wtd-brand){display:inline-flex;align-items:center;min-height:24px;border-radius:6px;background:#1e293b;padding:0 8px;font-weight:800;white-space:nowrap}.wtd-route{max-width:260px;overflow:hidden;text-overflow:ellipsis}.wtd-status.success{background:#064e3b;color:#a7f3d0}.wtd-status.warning{background:#713f12;color:#fde68a}.wtd-status.danger{background:#7f1d1d;color:#fecaca}.wtd-panel{width:min(1040px,calc(100vw - 28px));max-height:min(68vh,680px);overflow:auto;background:#0f172a;padding:0}.wtd-panel-head{position:sticky;top:0;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 14px;border-bottom:1px solid rgba(148,163,184,.18);background:#111827}.wtd-panel-head strong{font-size:13px;color:#f8fafc}.wtd-panel-head span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#94a3b8;font-weight:800}.wtd-sections{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0}.wtd-section{min-width:0;border-right:1px solid rgba(148,163,184,.14);border-bottom:1px solid rgba(148,163,184,.14);background:#0f172a;padding:12px 14px}.wtd-section h2{margin:0 0 8px;color:#cbd5e1;font-size:11px;text-transform:uppercase;letter-spacing:0}.wtd-section dl,.wtd-section ol{margin:0;padding:0;list-style:none}.wtd-row,.wtd-section li{display:grid;grid-template-columns:minmax(96px,.38fr)minmax(0,1fr);gap:14px;align-items:start;border-top:1px solid rgba(148,163,184,.12);padding:7px 0}.wtd-row:first-child,.wtd-section li:first-child{border-top:0}.wtd-panel dt,.wtd-section code{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#94a3b8;font-weight:800}.wtd-panel dd,.wtd-section li span{min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#f8fafc;font-weight:800}.wtd-section code{color:#bfdbfe}.wtd-empty{margin:0;color:#94a3b8}@media(max-width:820px){.wtd-debug-toolbar{right:8px;bottom:8px;left:8px;max-width:none}.wtd-panel{width:100%}.wtd-sections{grid-template-columns:1fr}.wtd-section{border-right:0}.wtd-route{max-width:170px}.wtd-row,.wtd-section li{grid-template-columns:1fr;gap:3px}}@media(max-width:520px){.wtd-panel-head{align-items:flex-start;flex-direction:column;gap:4px}}
+.wtd-debug-toolbar{position:fixed;left:4px;right:4px;bottom:4px;z-index:2147483647;font:13px/1.45 Arial,ui-sans-serif,system-ui,sans-serif;color:#172033}.wtd-debug-toolbar *{box-sizing:border-box}.wtd-debug-toolbar input{position:absolute;opacity:0;pointer-events:none}.wtd-panels{display:none;max-height:58vh;overflow:auto;border:1px solid #d7dce3;border-bottom:0;border-radius:8px 8px 0 0;background:#fff;box-shadow:0 -12px 36px rgba(15,23,42,.12)}#wtd-debug-close:checked~.wtd-panels,#wtd-debug-close:checked~.wtd-bar{display:none}.wtd-tab-panel{display:none;padding:24px 28px}.wtd-tab-panel>h2{margin:0 0 20px;font-size:18px;color:#172033}.wtd-debug-toolbar table{width:100%;border-collapse:collapse;background:#fff}.wtd-debug-toolbar th{padding:11px 12px;background:#f4f4f5;color:#444;text-align:left;font-weight:700}.wtd-debug-toolbar td{padding:12px;border-top:1px solid #eef0f3;white-space:nowrap}.wtd-history tbody tr:first-child{background:#ffd09b}.wtd-debug-toolbar button{border:1px solid #6b7280;border-radius:4px;background:#fff;padding:1px 8px;color:#111827}.wtd-bar{min-height:38px;display:flex;align-items:center;gap:12px;overflow-x:auto;border:1px solid #d7dce3;border-radius:0 0 8px 8px;background:rgba(255,255,255,.96);box-shadow:0 -8px 28px rgba(15,23,42,.10);padding:0 12px}.wtd-brand{display:inline-flex;align-items:center;justify-content:center;width:42px;height:25px;border-radius:6px;background:#2563eb;color:#fff;font-weight:900}.wtd-chip,.wtd-status,.wtd-bar>span:not(.wtd-brand){display:inline-flex;align-items:center;min-height:24px;border-radius:5px;background:#eef2f7;padding:0 8px;font-weight:700;white-space:nowrap}.wtd-route{max-width:220px;overflow:hidden;text-overflow:ellipsis}.wtd-status.success{background:#dcfce7;color:#166534}.wtd-status.warning{background:#fef3c7;color:#92400e}.wtd-status.danger{background:#fee2e2;color:#991b1b}.wtd-bar label{min-height:38px;display:inline-flex;align-items:center;gap:6px;padding:0 10px;border-left:1px solid transparent;border-right:1px solid transparent;white-space:nowrap;cursor:pointer;color:#374151}.wtd-bar label:hover{background:#f3f4f6}.wtd-bar b{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;border-radius:999px;background:#e63f19;color:#fff;font-size:11px}.wtd-close{margin-left:auto;font-size:18px;font-weight:700}.wtd-sections{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border:1px solid #e5e7eb}.wtd-section{min-width:0;padding:14px 16px;border-right:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb}.wtd-section h2{margin:0 0 10px;font-size:13px;text-transform:uppercase;color:#374151}.wtd-section dl,.wtd-section ol{margin:0;padding:0;list-style:none}.wtd-row,.wtd-section li{display:grid;grid-template-columns:minmax(120px,.34fr)minmax(0,1fr);gap:14px;padding:7px 0;border-top:1px solid #eef0f3}.wtd-row:first-child,.wtd-section li:first-child{border-top:0}.wtd-section dt,.wtd-section code{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#6b7280;font-weight:700}.wtd-section dd,.wtd-section li span{min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#111827;font-weight:600}.wtd-empty{margin:0;color:#6b7280}#wtd-tab-history:checked~.wtd-panels .wtd-history,#wtd-tab-vars:checked~.wtd-panels .wtd-vars,#wtd-tab-events:checked~.wtd-panels .wtd-events,#wtd-tab-routes:checked~.wtd-panels .wtd-routes,#wtd-tab-files:checked~.wtd-panels .wtd-files,#wtd-tab-profiler:checked~.wtd-panels .wtd-profiler{display:block}#wtd-tab-history:checked~.wtd-panels,#wtd-tab-vars:checked~.wtd-panels,#wtd-tab-events:checked~.wtd-panels,#wtd-tab-routes:checked~.wtd-panels,#wtd-tab-files:checked~.wtd-panels,#wtd-tab-profiler:checked~.wtd-panels{display:block}#wtd-tab-history:checked~.wtd-bar label[for=wtd-tab-history],#wtd-tab-vars:checked~.wtd-bar label[for=wtd-tab-vars],#wtd-tab-events:checked~.wtd-bar label[for=wtd-tab-events],#wtd-tab-routes:checked~.wtd-bar label[for=wtd-tab-routes],#wtd-tab-files:checked~.wtd-bar label[for=wtd-tab-files],#wtd-tab-profiler:checked~.wtd-bar label[for=wtd-tab-profiler]{background:#e5e7eb;color:#111827}@media(max-width:820px){.wtd-tab-panel{padding:18px}.wtd-sections{grid-template-columns:1fr}.wtd-section{border-right:0}.wtd-row,.wtd-section li{grid-template-columns:1fr;gap:3px}.wtd-debug-toolbar td,.wtd-debug-toolbar th{white-space:normal}.wtd-route{max-width:150px}}
 CSS;
     }
 
