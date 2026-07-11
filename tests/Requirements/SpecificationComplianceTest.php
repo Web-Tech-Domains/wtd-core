@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Requirements;
 
 use PHPUnit\Framework\TestCase;
+use WTD\Application\Application;
 
 final class SpecificationComplianceTest extends TestCase
 {
@@ -41,6 +42,19 @@ final class SpecificationComplianceTest extends TestCase
         ] as $path) {
             self::assertFileExists($this->root($path));
         }
+    }
+
+    public function testProjectVersionMetadataIsConsistent(): void
+    {
+        $version = trim((string) file_get_contents($this->root('VERSION')));
+
+        self::assertMatchesRegularExpression('/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/', $version);
+        self::assertSame(Application::VERSION, $version);
+
+        $package = json_decode((string) file_get_contents($this->root('package.json')), true, flags: JSON_THROW_ON_ERROR);
+
+        self::assertIsArray($package);
+        self::assertSame($version, $package['version'] ?? null);
     }
 
     public function testScaffoldedFrameworkFoldersContainRealModules(): void
