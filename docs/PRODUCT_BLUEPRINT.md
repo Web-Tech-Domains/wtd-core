@@ -223,6 +223,14 @@ tests/
 - Cache tags
 - Atomic cache locks
 - Cache events
+- Local storage disk
+- S3 storage disk
+- Cloudflare R2 storage disk
+- Azure storage disk
+- Google Cloud storage disk
+- FTP storage disk
+- SFTP storage disk
+- Storage signed URLs
 - Documentation
 
 ### 2.0 Enterprise
