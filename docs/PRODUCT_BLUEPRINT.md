@@ -263,5 +263,8 @@ tests/
 - Package config publishing
 - Installed provider auto-registration
 - Multi-tenancy
+- Tenant resolver middleware
 - AI package integrations
+- AI provider manager
 - Enterprise monitoring and administration
+- Admin system report

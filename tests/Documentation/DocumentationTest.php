@@ -88,6 +88,8 @@ final class DocumentationTest extends TestCase
             'OPERATIONS.md',
             'DEVELOPER_EXPERIENCE.md',
             'MARKETPLACE.md',
+            'ENTERPRISE.md',
+            'REQUIREMENTS_MATRIX.md',
             'PRODUCT_BLUEPRINT.md',
             'SOFTWARE_ARCHITECTURE_SPECIFICATION.md',
         ];

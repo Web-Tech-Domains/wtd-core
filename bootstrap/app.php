@@ -5,6 +5,7 @@ declare(strict_types=1);
 use WTD\Application\Application;
 use WTD\Application\CoreServiceProvider;
 use WTD\Application\ProviderBootstrapper;
+use WTD\AI\AIServiceProvider;
 use WTD\Config\Cache;
 use WTD\Config\Loader;
 use WTD\Config\Repository;
@@ -15,7 +16,9 @@ use WTD\DeveloperExperience\DeveloperExperienceServiceProvider;
 use WTD\Filesystem\Filesystem;
 use WTD\Http\HttpServiceProvider;
 use WTD\Marketplace\MarketplaceServiceProvider;
+use WTD\Monitoring\MonitoringServiceProvider;
 use WTD\Support\Env;
+use WTD\Tenancy\TenancyServiceProvider;
 use WTD\Validation\ValidationServiceProvider;
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
@@ -42,6 +45,9 @@ $app->register(ValidationServiceProvider::class);
 $app->register(DatabaseServiceProvider::class);
 $app->register(DeveloperExperienceServiceProvider::class);
 $app->register(MarketplaceServiceProvider::class);
+$app->register(TenancyServiceProvider::class);
+$app->register(AIServiceProvider::class);
+$app->register(MonitoringServiceProvider::class);
 
 $providers = $config->get('app.providers', []);
 if (is_array($providers)) {

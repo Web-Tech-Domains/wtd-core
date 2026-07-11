@@ -53,6 +53,9 @@ php core benchmark / --iterations=100
 php core marketplace:list
 php core marketplace:install vendor/package
 php core marketplace:publish vendor/package
+php core tenant:list
+php core ai:providers
+php core monitor:report
 php core migrate
 php core migrate:rollback
 php core db:seed

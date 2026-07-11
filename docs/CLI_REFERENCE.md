@@ -12,6 +12,7 @@ php core help <command>
 | Command | Purpose |
 | --- | --- |
 | `about` | Print framework name and version. |
+| `ai:providers` | List configured AI package providers. |
 | `api:docs` | Generate OpenAPI documentation. |
 | `app:new` | Create a minimal WTD Core project skeleton. |
 | `benchmark` | Benchmark an HTTP path through the framework kernel. |
@@ -35,6 +36,7 @@ php core help <command>
 | `marketplace:list` | List local marketplace packages. |
 | `marketplace:publish` | Publish package configuration files. |
 | `migrate` | Run pending database migrations. |
+| `monitor:report` | Print enterprise monitoring and administration report. |
 | `migrate:rollback` | Roll back the latest database migration batch. |
 | `optimize` | Build framework optimization caches. |
 | `optimize:clear` | Clear framework optimization caches. |
@@ -43,6 +45,7 @@ php core help <command>
 | `route:clear` | Clear the route cache. |
 | `schedule:run` | Run due scheduled tasks. |
 | `test` | Print or run the project test command. |
+| `tenant:list` | List configured tenants. |
 | `up` | Disable maintenance mode. |
 
 ## Common Workflows
@@ -58,6 +61,9 @@ php core benchmark / --iterations=100
 php core marketplace:list
 php core marketplace:install vendor/package
 php core marketplace:publish vendor/package
+php core tenant:list
+php core ai:providers
+php core monitor:report
 php core migrate
 php core db:seed
 php core queue:work
