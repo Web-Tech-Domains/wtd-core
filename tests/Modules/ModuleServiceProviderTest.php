@@ -100,30 +100,32 @@ use WTD\Routing\Router;
 $router->get('/auto-test', static fn (): Response => Response::make('auto-ok'));
 PHP);
 
-        $container = new Container();
-        $container->singleton(Filesystem::class);
+        try {
+            $container = new Container();
+            $container->singleton(Filesystem::class);
 
-        $app = new Application(
-            $basePath,
-            $container,
-            new Repository([
-                'modules.enabled' => [],
-                'modules.auto_discover' => true,
-            ]),
-        );
-        $app->register(HttpServiceProvider::class);
-        $app->register(ModuleServiceProvider::class);
-        $app->boot();
+            $app = new Application(
+                $basePath,
+                $container,
+                new Repository([
+                    'modules.enabled' => [],
+                    'modules.auto_discover' => true,
+                ]),
+            );
+            $app->register(HttpServiceProvider::class);
+            $app->register(ModuleServiceProvider::class);
+            $app->boot();
 
-        /** @var Router $router */
-        $router = $app->container()->get(Router::class);
-        $response = $router->dispatch(new Request('GET', '/auto-test'));
+            /** @var Router $router */
+            $router = $app->container()->get(Router::class);
+            $response = $router->dispatch(new Request('GET', '/auto-test'));
 
-        self::assertSame('auto-ok', $response->content());
-
-        @unlink($routePath);
-        @unlink($moduleRoot . '/module.php');
-        @rmdir($moduleRoot . '/Routes');
-        @rmdir($moduleRoot);
+            self::assertSame('auto-ok', $response->content());
+        } finally {
+            @unlink($routePath);
+            @unlink($moduleRoot . '/module.php');
+            @rmdir($moduleRoot . '/Routes');
+            @rmdir($moduleRoot);
+        }
     }
 }
