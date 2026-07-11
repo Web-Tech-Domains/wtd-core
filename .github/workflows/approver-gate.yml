@@ -1,0 +1,129 @@
+name: WTD Core Quality Gate
+
+on:
+  pull_request_target:
+    branches:
+      - master
+      - main
+      - develop
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+  pull_request_review:
+    types:
+      - submitted
+      - dismissed
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: approver-gate-${{ github.event.pull_request.number || github.event.review.pull_request_url }}
+  cancel-in-progress: false
+
+jobs:
+  request-approver-review:
+    name: Request Approver Review
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Request approver team review
+        uses: actions/github-script@v9
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            if (context.eventName !== 'pull_request_target') {
+              core.info('Review request is only needed on pull_request_target events.');
+              return;
+            }
+
+            const team_slug = 'approvers';
+            const { owner, repo } = context.repo;
+            const pull_number = context.payload.pull_request.number;
+
+            if (context.payload.pull_request.draft) {
+              core.info('Pull request is draft; approver team request skipped.');
+              return;
+            }
+
+            try {
+              await github.rest.pulls.requestReviewers({
+                owner,
+                repo,
+                pull_number,
+                team_reviewers: [team_slug],
+              });
+
+              core.info(`Requested review from @${owner}/${team_slug}.`);
+            } catch (error) {
+              if ([403, 404, 422].includes(error.status)) {
+                core.warning(`Could not request @${owner}/${team_slug}: ${error.message}`);
+                return;
+              }
+
+              throw error;
+            }
+
+  require-approver-review:
+    name: Approver Review
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Require approver team review
+        uses: actions/github-script@v9
+        with:
+          github-token: ${{ secrets.WTD_APPROVER_TOKEN || github.token }}
+          script: |
+            const org = 'Web-Tech-Domains';
+            const team_slug = 'approvers';
+            const { owner, repo } = context.repo;
+            const pull_number = context.payload.pull_request?.number
+              ?? Number(context.payload.review.pull_request_url.split('/').pop());
+
+            const reviews = await github.paginate(github.rest.pulls.listReviews, {
+              owner,
+              repo,
+              pull_number,
+              per_page: 100,
+            });
+
+            const latestStateByUser = new Map();
+
+            for (const review of reviews) {
+              if (
+                review.user?.type === 'User'
+                && ['APPROVED', 'CHANGES_REQUESTED', 'DISMISSED'].includes(review.state)
+              ) {
+                latestStateByUser.set(review.user.login, review.state);
+              }
+            }
+
+            const approvedUsers = [...latestStateByUser.entries()]
+              .filter(([, state]) => state === 'APPROVED')
+              .map(([login]) => login);
+
+            core.info(`Found active approval decisions from: ${approvedUsers.length > 0 ? approvedUsers.join(', ') : 'none'}.`);
+
+            for (const username of approvedUsers) {
+              try {
+                const membership = await github.rest.teams.getMembershipForUserInOrg({
+                  org,
+                  team_slug,
+                  username,
+                });
+
+                if (membership.data.state === 'active') {
+                  core.info(`Approved by @${username}, an active member of @${org}/${team_slug}.`);
+                  return;
+                }
+              } catch (error) {
+                if (error.status !== 404) {
+                  throw error;
+                }
+              }
+            }
+
+            core.setFailed(`This pull request requires at least one approval from @${org}/${team_slug}.`);
