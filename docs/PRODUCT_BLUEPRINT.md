@@ -179,7 +179,15 @@ tests/
 - Security headers
 - Audit logging
 - Secrets manager
-- Queue
+- Queue job contract
+- Queue workers
+- Failed jobs and retry
+- Job batches
+- Priority queue handling
+- Database queue driver
+- Redis queue driver
+- RabbitMQ queue driver
+- AWS SQS queue driver
 - Scheduler
 - Documentation
 
