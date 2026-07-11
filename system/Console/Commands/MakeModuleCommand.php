@@ -178,6 +178,8 @@ PHP;
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="{$module} module for WTD Core applications.">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="/site.webmanifest">
     <title>{$module} Module | WTD Core</title>
     <style>
         :root {
@@ -201,6 +203,7 @@ PHP;
         .module-nav { border-bottom: 1px solid var(--line); background: rgba(255, 255, 255, .92); }
         .module-nav-row { min-height: 68px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
         .module-brand { display: flex; align-items: center; gap: 10px; font-weight: 800; color: #172554; }
+        .module-logo { width: 36px; height: 36px; display: block; }
         .module-mark { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 8px; color: #fff; background: linear-gradient(135deg, var(--blue), var(--cyan)); }
         .module-links { display: flex; flex-wrap: wrap; gap: 10px; color: var(--muted); font-size: 14px; font-weight: 700; }
         .module-links a { padding: 8px 10px; border-radius: 8px; }
@@ -255,6 +258,8 @@ PHP;
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="{{ module }} module for WTD Core applications.">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="/site.webmanifest">
     <title>{{ module }} Module | WTD Core</title>
     <style>
         :root {
@@ -277,6 +282,7 @@ PHP;
         .nav { border-bottom: 1px solid var(--line); background: rgba(255, 255, 255, .92); }
         .nav-row { min-height: 68px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
         .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; color: #172554; }
+        .brand-logo { width: 36px; height: 36px; display: block; }
         .mark { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 8px; color: #fff; background: linear-gradient(135deg, var(--blue), var(--cyan)); }
         .links { display: flex; flex-wrap: wrap; gap: 10px; color: var(--muted); font-size: 14px; font-weight: 700; }
         .links a { padding: 8px 10px; border-radius: 8px; }
@@ -314,7 +320,7 @@ PHP;
     <header class="nav">
         <div class="wrap nav-row">
             <a class="brand" href="/">
-                <span class="mark">{$initial}</span>
+                <img class="brand-logo" src="/favicon.svg" alt="WTD Core">
                 <span>{{ module }} Module</span>
             </a>
             <nav class="links" aria-label="{{ module }} module navigation">
@@ -390,7 +396,7 @@ PHP;
 <header class="module-nav">
     <div class="module-wrap module-nav-row">
         <a class="module-brand" href="/">
-            <span class="module-mark">{$initial}</span>
+            <img class="module-logo" src="/favicon.svg" alt="WTD Core">
             <span>{$module} Module</span>
         </a>
         <nav class="module-links" aria-label="{$module} module navigation">
