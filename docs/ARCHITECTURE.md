@@ -32,6 +32,7 @@ The CLI flow is similar: `core` bootstraps the application, resolves the console
 - `Database`, `ORM`: query builder, schema, migrations, seeders, models, relationships
 - `Auth`, `Authorization`, `Security`: identity, policies, RBAC, tokens, encryption, rate limiting, headers
 - `Queue`, `Scheduler`, `Events`: background work and event-driven workflows
+- `Hooks`: plugin-style actions and filters for modules and application extensions
 - `Notification`, `Mail`: delivery abstractions
 - `Cache`, `Storage`, `Filesystem`: infrastructure utilities
 - `CLI`: executable console runtime wrapper
@@ -49,3 +50,7 @@ php core make:module Billing
 ```
 
 Generated modules include `Config`, `Database/Migrations`, `Database/Seeders`, `Http/Controllers`, `Http/Middleware`, `Models`, `Providers`, `Resources/views/layouts`, `Resources/views/pages`, `Resources/views/partials`, `Resources/views/components`, `Routes`, and `Tests`.
+
+## Hooks
+
+Use `app/Hooks.php` for application-level extension points and `config/hooks.php` to register additional hook files. Hooks support actions and filters through `app_hooks()`, `add_action()`, `do_action()`, `add_filter()`, and `apply_filters()`.

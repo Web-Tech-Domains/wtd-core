@@ -15,6 +15,7 @@ Current version: `0.1.0-alpha`
 
 The architecture baseline is documented in [docs/SOFTWARE_ARCHITECTURE_SPECIFICATION.md](docs/SOFTWARE_ARCHITECTURE_SPECIFICATION.md).
 Practical guides are available from [docs/README.md](docs/README.md).
+Application hook usage is documented in [docs/HOOKS.md](docs/HOOKS.md).
 
 ## Open Source
 

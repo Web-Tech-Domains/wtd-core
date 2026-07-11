@@ -5,6 +5,7 @@ declare(strict_types=1);
 use WTD\Application\Application;
 use WTD\Database\Connection;
 use WTD\Database\DatabaseManager;
+use WTD\Hooks\HookManager;
 use WTD\View\AssetManager;
 use WTD\View\ViewRenderer;
 
@@ -116,5 +117,40 @@ if (!function_exists('module_view')) {
     function module_view(string $module, string $view, array $data = []): string
     {
         return app(ViewRenderer::class)->renderModule($module, $view, $data);
+    }
+}
+
+if (!function_exists('app_hooks')) {
+    function app_hooks(): HookManager
+    {
+        return app(HookManager::class);
+    }
+}
+
+if (!function_exists('add_action')) {
+    function add_action(string $hook, callable $callback, int $priority = 10): void
+    {
+        app_hooks()->addAction($hook, $callback, $priority);
+    }
+}
+
+if (!function_exists('do_action')) {
+    function do_action(string $hook, mixed ...$payload): void
+    {
+        app_hooks()->doAction($hook, ...$payload);
+    }
+}
+
+if (!function_exists('add_filter')) {
+    function add_filter(string $hook, callable $callback, int $priority = 10): void
+    {
+        app_hooks()->addFilter($hook, $callback, $priority);
+    }
+}
+
+if (!function_exists('apply_filters')) {
+    function apply_filters(string $hook, mixed $value, mixed ...$payload): mixed
+    {
+        return app_hooks()->applyFilters($hook, $value, ...$payload);
     }
 }
