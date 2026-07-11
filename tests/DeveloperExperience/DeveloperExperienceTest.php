@@ -79,6 +79,13 @@ final class DeveloperExperienceTest extends TestCase
         self::assertStringContainsString('aria-label="WTD debug toolbar"', $response->content());
         self::assertStringContainsString('<details>', $response->content());
         self::assertStringContainsString('Profiler Marks', $response->content());
+        self::assertStringContainsString('Request', $response->content());
+        self::assertStringContainsString('Response', $response->content());
+        self::assertStringContainsString('Runtime', $response->content());
+        self::assertStringContainsString('Config', $response->content());
+        self::assertStringContainsString('Headers', $response->content());
+        self::assertStringContainsString('Cookies', $response->content());
+        self::assertStringContainsString('Server', $response->content());
         self::assertStringContainsString('request.start', $response->content());
         self::assertArrayHasKey('X-WTD-Profile-Time', $response->headers());
     }

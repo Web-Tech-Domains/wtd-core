@@ -89,6 +89,26 @@ final class Request
     }
 
     /**
+     * Return all request headers.
+     *
+     * @return array<string, string>
+     */
+    public function headers(): array
+    {
+        return $this->headers;
+    }
+
+    /**
+     * Return all query string values.
+     *
+     * @return array<string, mixed>
+     */
+    public function queryParams(): array
+    {
+        return $this->query;
+    }
+
+    /**
      * Return a query string value.
      */
     public function query(string $key, mixed $default = null): mixed
@@ -154,6 +174,16 @@ final class Request
     public function cookie(string $key, ?string $default = null): ?string
     {
         return $this->cookies[$key] ?? $default;
+    }
+
+    /**
+     * Return all request cookies.
+     *
+     * @return array<string, string>
+     */
+    public function cookies(): array
+    {
+        return $this->cookies;
     }
 
     /**
