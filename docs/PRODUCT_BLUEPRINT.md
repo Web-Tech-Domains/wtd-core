@@ -188,7 +188,12 @@ tests/
 - Redis queue driver
 - RabbitMQ queue driver
 - AWS SQS queue driver
-- Scheduler
+- Scheduler cron parser
+- Scheduler timezone support
+- Scheduler overlap protection
+- Scheduler background execution flag
+- Scheduler maintenance-mode filtering
+- CLI `schedule:run` command
 - Documentation
 
 ### 2.0 Enterprise

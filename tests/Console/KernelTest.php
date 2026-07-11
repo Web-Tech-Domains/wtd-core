@@ -17,6 +17,7 @@ use WTD\Console\UnknownCommandException;
 use WTD\Container\Container;
 use WTD\Database\DatabaseServiceProvider;
 use WTD\Http\HttpServiceProvider;
+use WTD\Scheduler\SchedulerServiceProvider;
 
 final class KernelTest extends TestCase
 {
@@ -47,6 +48,7 @@ final class KernelTest extends TestCase
         $app->register(CoreServiceProvider::class);
         $app->register(HttpServiceProvider::class);
         $app->register(DatabaseServiceProvider::class);
+        $app->register(SchedulerServiceProvider::class);
         $app->register(ConsoleServiceProvider::class);
 
         /** @var Kernel $kernel */
@@ -64,6 +66,7 @@ final class KernelTest extends TestCase
         self::assertArrayHasKey('optimize:clear', $kernel->commands());
         self::assertArrayHasKey('route:cache', $kernel->commands());
         self::assertArrayHasKey('route:clear', $kernel->commands());
+        self::assertArrayHasKey('schedule:run', $kernel->commands());
         self::assertArrayHasKey('db:seed', $kernel->commands());
     }
 
@@ -73,6 +76,7 @@ final class KernelTest extends TestCase
         $app->register(CoreServiceProvider::class);
         $app->register(HttpServiceProvider::class);
         $app->register(DatabaseServiceProvider::class);
+        $app->register(SchedulerServiceProvider::class);
         $app->register(ConsoleServiceProvider::class);
         /** @var Kernel $kernel */
         $kernel = $app->container()->get(Kernel::class);
