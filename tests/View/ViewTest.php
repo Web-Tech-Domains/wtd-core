@@ -65,4 +65,27 @@ final class ViewTest extends TestCase
             'name' => '<Blog>',
         ]));
     }
+
+    public function testHomeViewContainsProductBranding(): void
+    {
+        $basePath = dirname(__DIR__, 2);
+        self::assertNotSame('', $basePath);
+        /** @var non-empty-string $basePath */
+
+        $renderer = new ViewRenderer(
+            new Application($basePath, new Container(), new Repository()),
+            new Repository(),
+            new Filesystem(),
+        );
+
+        $html = $renderer->render('home', [
+            'name' => 'WTD Core',
+            'description' => 'A lightweight PHP 8.3 framework foundation.',
+        ]);
+
+        self::assertStringContainsString('Web Tech Domains', $html);
+        self::assertStringContainsString('Enterprise PHP 8.3 framework', $html);
+        self::assertStringContainsString('Vue or React friendly', $html);
+        self::assertStringContainsString('Multiple database drivers', $html);
+    }
 }
