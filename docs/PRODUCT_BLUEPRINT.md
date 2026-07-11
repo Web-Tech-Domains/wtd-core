@@ -200,6 +200,14 @@ tests/
 - Event broadcasting
 - Queued events and listeners
 - Event discovery
+- Email notifications
+- SMS notifications
+- WhatsApp notifications
+- Telegram notifications
+- Slack notifications
+- Firebase notifications
+- Database notifications
+- Webhook notifications
 - Documentation
 
 ### 2.0 Enterprise
