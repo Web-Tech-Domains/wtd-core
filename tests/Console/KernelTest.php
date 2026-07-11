@@ -150,6 +150,14 @@ final class KernelTest extends TestCase
         self::assertFileExists($moduleRoot . '/Providers/BillingServiceProvider.php');
         self::assertFileExists($moduleRoot . '/Routes/web.php');
         self::assertFileExists($moduleRoot . '/Http/Controllers/BillingController.php');
+        self::assertStringContainsString(
+            "\$this->views->renderModule('Billing', 'pages.index'",
+            (string) file_get_contents($moduleRoot . '/Http/Controllers/BillingController.php'),
+        );
+        self::assertStringNotContainsString(
+            'file_get_contents($view)',
+            (string) file_get_contents($moduleRoot . '/Http/Controllers/BillingController.php'),
+        );
         self::assertFileExists($moduleRoot . '/Http/Middleware/BillingMiddleware.php');
         self::assertFileExists($moduleRoot . '/Models/Billing.php');
         self::assertFileExists($moduleRoot . '/Database/Migrations/2026_01_01_000000_create_billings_table.php');

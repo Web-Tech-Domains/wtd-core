@@ -146,17 +146,22 @@ namespace {$namespace}\\Http\\Controllers;
 
 use WTD\\Http\\Request;
 use WTD\\Http\\Response;
+use WTD\\View\\ViewRenderer;
 
 final class {$module}Controller
 {
+    public function __construct(private readonly ViewRenderer \$views)
+    {
+    }
+
     /**
      * @param array<string, string> \$parameters
      */
     public function index(Request \$request, array \$parameters): Response
     {
-        \$view = dirname(__DIR__, 2) . '/Resources/views/pages/index.php';
-
-        return Response::make(is_file(\$view) ? (string) file_get_contents(\$view) : '{$module} module');
+        return Response::make(\$this->views->renderModule('{$module}', 'pages.index', [
+            'module' => '{$module}',
+        ]));
     }
 }
 
@@ -185,8 +190,8 @@ PHP;
     {
         return <<<PHP
 <section>
-    <h1>{$module}</h1>
-    <p>{$module} module is ready.</p>
+    <h1>{{ module }}</h1>
+    <p>{{ module }} module is ready.</p>
 </section>
 
 PHP;

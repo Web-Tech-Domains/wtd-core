@@ -28,8 +28,36 @@ final class ViewRenderer
     {
         $path = $this->path($view);
 
+        return $this->renderFile($path, $view, $data);
+    }
+
+    /**
+     * Render a module view from modules/<Module>/Resources/views.
+     *
+     * @param array<string, mixed> $data
+     */
+    public function renderModule(string $module, string $view, array $data = []): string
+    {
+        $module = preg_replace('/[^A-Za-z0-9_]+/', '', basename(str_replace('\\', '/', $module))) ?? '';
+
+        if ($module === '') {
+            throw new RuntimeException('Module view name is invalid.');
+        }
+
+        return $this->renderFile(
+            $this->app->basePath('modules/' . $module . '/Resources/views/' . str_replace('.', DIRECTORY_SEPARATOR, $view) . '.php'),
+            $module . '::' . $view,
+            $data,
+        );
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function renderFile(string $path, string $name, array $data): string
+    {
         if (!$this->files->exists($path)) {
-            throw new RuntimeException(sprintf('View [%s] was not found.', $view));
+            throw new RuntimeException(sprintf('View [%s] was not found.', $name));
         }
 
         $template = $this->files->get($path);
