@@ -70,6 +70,9 @@ Every pull request should:
 - Keep unrelated refactors out of the PR.
 - Update docs when developer workflow changes.
 - Pass CI.
+- Be approved by a member of `@Web-Tech-Domains/approvers`.
+
+The repository uses `.github/CODEOWNERS` to request reviews from the approvers team for every path. Maintainers should enable branch protection with "Require review from Code Owners" so this is enforced before merge.
 
 ## Security
 
