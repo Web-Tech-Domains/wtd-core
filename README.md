@@ -12,6 +12,15 @@ A modern, lightweight, enterprise-ready PHP framework by Web Tech Domains.
 The architecture baseline is documented in [docs/SOFTWARE_ARCHITECTURE_SPECIFICATION.md](docs/SOFTWARE_ARCHITECTURE_SPECIFICATION.md).
 Practical guides are available from [docs/README.md](docs/README.md).
 
+## Open Source
+
+- License: [MIT](LICENSE)
+- Contributing guide: [CONTRIBUTING.md](CONTRIBUTING.md)
+- Code of conduct: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
+- Security policy: [SECURITY.md](SECURITY.md)
+- Support policy: [SUPPORT.md](SUPPORT.md)
+- Changelog: [CHANGELOG.md](CHANGELOG.md)
+
 ## Initial Roadmap
 1. Foundation: kernel, bootstrap, container, config, environment, CLI
 2. HTTP engine: request/response, middleware, routing
