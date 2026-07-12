@@ -77,10 +77,13 @@ final class DeveloperExperienceTest extends TestCase
 
         self::assertStringContainsString('wtd-debug-toolbar', $response->content());
         self::assertStringContainsString('aria-label="WTD debug toolbar"', $response->content());
+        self::assertStringContainsString('id="wtd-debug-open"', $response->content());
+        self::assertStringContainsString('class="wtd-launcher"', $response->content());
+        self::assertStringContainsString('aria-label="Open debug toolbar"', $response->content());
         self::assertStringContainsString('id="wtd-tab-history"', $response->content());
-        self::assertStringContainsString('id="wtd-debug-close"', $response->content());
         self::assertStringContainsString('class="wtd-bar"', $response->content());
-        self::assertStringContainsString('display:none!important', $response->content());
+        self::assertStringContainsString('#wtd-debug-open:checked~.wtd-panels{display:block}', $response->content());
+        self::assertStringContainsString('#wtd-debug-open:checked~.wtd-bar{display:flex}', $response->content());
         self::assertStringContainsString('History', $response->content());
         self::assertStringContainsString('Profiler Marks', $response->content());
         self::assertStringContainsString('Request', $response->content());
