@@ -80,6 +80,16 @@ final class QueryBuilderTest extends TestCase
         self::assertSame('"contains""quote"', $grammar->wrap('contains"quote'));
     }
 
+    public function testQueryGrammarUsesBackticksForMysqlCompatibleDrivers(): void
+    {
+        $mysql = QueryGrammar::forDriver('mysql');
+        $mariadb = QueryGrammar::forDriver('mariadb');
+
+        self::assertSame('`forum_categories`', $mysql->wrap('forum_categories'));
+        self::assertSame('`forums`.`title`', $mysql->wrap('forums.title'));
+        self::assertSame('`contains``quote`', $mariadb->wrap('contains`quote'));
+    }
+
     public function testQueryBuilderCountsMatchingRows(): void
     {
         $connection = $this->connection();

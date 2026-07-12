@@ -36,7 +36,7 @@ final class Connection
      */
     public function table(string $table): QueryBuilder
     {
-        return new QueryBuilder($this, $table);
+        return new QueryBuilder($this, $table, QueryGrammar::forDriver($this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME)));
     }
 
     /**
