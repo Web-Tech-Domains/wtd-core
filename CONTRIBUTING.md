@@ -98,7 +98,7 @@ Maintainers should enable branch protection with:
 
 - Require review from Code Owners.
 - Require at least 1 approval.
-- Require the status check `WTD Core Quality Gate / Approver Review`.
+- Require the status check `WTD Core Quality Gate / Approver Review (pull_request_review)`.
 - Require status checks on `main`, `master`, `develop`, `release/*`, `hotfix/*`, and `bugfix/*`.
 
 If the approvers team is private, configure the `WTD_APPROVER_TOKEN` secret so the workflow can read team membership.

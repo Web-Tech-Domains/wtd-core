@@ -6,6 +6,6 @@
 # Enforcement requires GitHub branch protection with:
 # - Require a pull request before merging
 # - Require review from Code Owners
-# - Require status check: WTD Core Quality Gate / Approver Review
+# - Require status check: WTD Core Quality Gate / Approver Review (pull_request_review)
 
 * @Web-Tech-Domains/approvers

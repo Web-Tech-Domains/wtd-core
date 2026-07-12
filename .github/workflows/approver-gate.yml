@@ -30,6 +30,7 @@ concurrency:
 jobs:
   request-approver-review:
     name: Request Approver Review
+    if: github.event_name == 'pull_request_target'
     runs-on: ubuntu-latest
 
     steps:
@@ -38,11 +39,6 @@ jobs:
         with:
           github-token: ${{ github.token }}
           script: |
-            if (context.eventName !== 'pull_request_target') {
-              core.info('Review request is only needed on pull_request_target events.');
-              return;
-            }
-
             const team_slug = 'approvers';
             const { owner, repo } = context.repo;
             const pull_number = context.payload.pull_request.number;
@@ -72,6 +68,7 @@ jobs:
 
   require-approver-review:
     name: Approver Review
+    if: github.event_name == 'pull_request_review'
     runs-on: ubuntu-latest
 
     steps:
