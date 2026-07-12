@@ -124,7 +124,7 @@ final class ForumsModuleTest extends TestCase
 
             /** @var HttpKernel $kernel */
             $kernel = $app->container()->get(HttpKernel::class);
-            
+
             // Post a new topic
             $request = new Request(
                 'POST',
@@ -142,7 +142,7 @@ final class ForumsModuleTest extends TestCase
             $response = $kernel->handle($request);
 
             self::assertSame(201, $response->status());
-            
+
             $data = json_decode($response->content(), true);
             self::assertSame('New Thread Title', $data['title']);
             self::assertSame('Framework Help', $data['category']);
