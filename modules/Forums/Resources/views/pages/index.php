@@ -6,6 +6,7 @@
     <meta name="description" content="Open-source forum module for WTD Core applications.">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="manifest" href="/site.webmanifest">
+    <link rel="stylesheet" href="/assets/modules/forums.css">
     <title>Forums | WTD Core</title>
     {!! assetTags !!}
 </head>
@@ -123,4 +124,3 @@
     <script type="application/json" id="forums-initial-state">{!! forumPayload !!}</script>
 </body>
 </html>
-

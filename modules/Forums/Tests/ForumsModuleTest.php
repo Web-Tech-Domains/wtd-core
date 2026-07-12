@@ -23,6 +23,7 @@ final class ForumsModuleTest extends TestCase
 
         self::assertStringContainsString('data-forums-app', $view);
         self::assertStringContainsString('forums-initial-state', $view);
+        self::assertStringContainsString('/assets/modules/forums.css', $view);
         self::assertStringContainsString('{!! assetTags !!}', $view);
     }
 }

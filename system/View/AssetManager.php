@@ -30,7 +30,7 @@ final class AssetManager
             return rtrim($this->devServer(), '/') . '/' . ltrim($entry, '/');
         }
 
-        return '/' . ltrim($entry, '/');
+        return '';
     }
 
     /**
@@ -49,7 +49,11 @@ final class AssetManager
                 $tags[] = '<link rel="stylesheet" href="' . $this->escape($css) . '">';
             }
 
-            $tags[] = '<script type="module" src="' . $this->escape($this->url($entry)) . '"></script>';
+            $url = $this->url($entry);
+
+            if ($url !== '') {
+                $tags[] = '<script type="module" src="' . $this->escape($url) . '"></script>';
+            }
         }
 
         return implode(PHP_EOL, $tags);

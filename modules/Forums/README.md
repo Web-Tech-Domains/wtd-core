@@ -18,3 +18,6 @@ npm run build
 
 The page entry is `resources/js/modules/forums.js`.
 
+Production domains should point to `public/`. The module ships a public CSS fallback at
+`public/assets/modules/forums.css`, while Vue is loaded from Vite's `/build/...`
+manifest output after `npm run build`.
