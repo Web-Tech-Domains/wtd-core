@@ -40,7 +40,10 @@ final class HomeController
      */
     public function health(Request $request, array $parameters): array
     {
-        return ['status' => 'ok'];
+        return [
+            'status' => 'ok',
+            'ip' => $request->ip(),
+        ];
     }
 
     /**
@@ -55,6 +58,7 @@ final class HomeController
         return [
             'status' => 'ok',
             'scope' => 'api',
+            'ip' => $request->ip(),
         ];
     }
 

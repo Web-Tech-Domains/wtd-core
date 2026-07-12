@@ -3,9 +3,13 @@
 declare(strict_types=1);
 
 use WTD\Application\Application;
+use WTD\Cache\CacheManager;
+use WTD\Cache\CacheRepository;
+use WTD\Cookie\Cookie;
 use WTD\Database\Connection;
 use WTD\Database\DatabaseManager;
 use WTD\Hooks\HookManager;
+use WTD\Session\SessionStore;
 use WTD\View\AssetManager;
 use WTD\View\ViewRenderer;
 
@@ -87,6 +91,55 @@ if (!function_exists('db')) {
     function db(?string $connection = null): Connection
     {
         return app(DatabaseManager::class)->connection($connection);
+    }
+}
+
+if (!function_exists('session')) {
+    function session(?string $key = null, mixed $default = null): mixed
+    {
+        $session = app(SessionStore::class);
+
+        return $key === null ? $session : $session->get($key, $default);
+    }
+}
+
+if (!function_exists('cache')) {
+    function cache(?string $key = null, mixed $default = null): mixed
+    {
+        $cache = app(CacheRepository::class);
+
+        return $key === null ? $cache : $cache->get($key, $default);
+    }
+}
+
+if (!function_exists('cache_store')) {
+    function cache_store(?string $store = null): CacheRepository
+    {
+        return app(CacheManager::class)->store($store);
+    }
+}
+
+if (!function_exists('cookie')) {
+    function cookie(
+        string $name,
+        string $value,
+        int $minutes = 0,
+        string $path = '/',
+        ?string $domain = null,
+        bool $secure = false,
+        bool $httpOnly = true,
+        string $sameSite = 'Lax',
+    ): Cookie {
+        return new Cookie(
+            $name,
+            $value,
+            $minutes > 0 ? time() + ($minutes * 60) : 0,
+            $path,
+            $domain,
+            $secure,
+            $httpOnly,
+            $sameSite,
+        );
     }
 }
 
