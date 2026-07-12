@@ -56,6 +56,46 @@ final class ModelQueryBuilder
     /**
      * @return self<TModel>
      */
+    public function orderBy(string $column, string $direction = 'ASC'): self
+    {
+        $this->query->orderBy($column, $direction);
+
+        return $this;
+    }
+
+    /**
+     * @return self<TModel>
+     */
+    public function orderByDesc(string $column): self
+    {
+        $this->query->orderByDesc($column);
+
+        return $this;
+    }
+
+    /**
+     * @return self<TModel>
+     */
+    public function latest(string $column = 'created_at'): self
+    {
+        $this->query->latest($column);
+
+        return $this;
+    }
+
+    /**
+     * @return self<TModel>
+     */
+    public function oldest(string $column = 'created_at'): self
+    {
+        $this->query->oldest($column);
+
+        return $this;
+    }
+
+    /**
+     * @return self<TModel>
+     */
     public function limit(int $limit): self
     {
         $this->query->limit($limit);
@@ -66,9 +106,29 @@ final class ModelQueryBuilder
     /**
      * @return self<TModel>
      */
+    public function take(int $limit): self
+    {
+        $this->query->take($limit);
+
+        return $this;
+    }
+
+    /**
+     * @return self<TModel>
+     */
     public function offset(int $offset): self
     {
         $this->query->offset($offset);
+
+        return $this;
+    }
+
+    /**
+     * @return self<TModel>
+     */
+    public function skip(int $offset): self
+    {
+        $this->query->skip($offset);
 
         return $this;
     }

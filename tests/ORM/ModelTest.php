@@ -64,6 +64,22 @@ final class ModelTest extends TestCase
         self::assertNull(OrmUser::find(1));
     }
 
+    public function testModelQueryBuilderOrdersAndLimitsRows(): void
+    {
+        (new OrmUser(['name' => 'Taylor', 'active' => 1]))->save();
+        (new OrmUser(['name' => 'Ada', 'active' => 1]))->save();
+        (new OrmUser(['name' => 'Grace', 'active' => 0]))->save();
+
+        $users = OrmUser::query()
+            ->orderByDesc('active')
+            ->orderBy('name')
+            ->take(2)
+            ->get();
+
+        self::assertSame('Ada', $users[0]->getAttribute('name'));
+        self::assertSame('Taylor', $users[1]->getAttribute('name'));
+    }
+
     public function testModelRequiresConfiguredConnection(): void
     {
         UnconfiguredModel::setConnection(null);

@@ -70,6 +70,7 @@ final class DatabaseServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        Model::setConnection(null);
         Model::setDatabaseManager($this->container()->get(DatabaseManager::class));
     }
 }

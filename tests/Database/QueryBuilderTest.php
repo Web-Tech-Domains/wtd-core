@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Database;
 
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use WTD\Config\Repository;
 use WTD\Database\Connection;
@@ -42,6 +43,31 @@ final class QueryBuilderTest extends TestCase
         ], $query->get());
     }
 
+    public function testQueryBuilderOrdersRowsAndSupportsLimitAliases(): void
+    {
+        $connection = $this->connection();
+        $this->seedUsers($connection);
+
+        $rows = $connection->table('users')
+            ->select('name')
+            ->orderByDesc('name')
+            ->take(2)
+            ->skip(1)
+            ->get();
+
+        self::assertSame([
+            ['name' => 'Grace'],
+            ['name' => 'Ada'],
+        ], $rows);
+    }
+
+    public function testQueryBuilderRejectsInvalidOrderDirection(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $this->connection()->table('users')->orderBy('name', 'sideways');
+    }
+
     public function testQueryBuilderCanInsertUpdateAndDeleteRows(): void
     {
         $connection = $this->connection();
@@ -66,10 +92,11 @@ final class QueryBuilderTest extends TestCase
         $sql = $this->connection()->table('users')
             ->select('id', 'name')
             ->where('active', '=', 1)
+            ->orderBy('name')
             ->limit(10)
             ->toSql();
 
-        self::assertSame('SELECT "id", "name" FROM "users" WHERE "active" = ? LIMIT 10', $sql);
+        self::assertSame('SELECT "id", "name" FROM "users" WHERE "active" = ? ORDER BY "name" ASC LIMIT 10', $sql);
     }
 
     public function testQueryGrammarWrapsQualifiedIdentifiers(): void
