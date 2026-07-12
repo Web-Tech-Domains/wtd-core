@@ -6,6 +6,9 @@ on:
       - master
       - main
       - develop
+      - "release/**"
+      - "hotfix/**"
+      - "bugfix/**"
     types:
       - opened
       - reopened

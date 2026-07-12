@@ -20,7 +20,18 @@ The repository declares this in `.github/CODEOWNERS`:
 
 ## GitHub Branch Protection
 
-Repository administrators should protect the default branch and enable:
+Repository administrators should protect these branch names and patterns:
+
+```text
+main
+master
+develop
+release/*
+hotfix/*
+bugfix/*
+```
+
+Enable these rules for every protected branch target:
 
 - Require a pull request before merging.
 - Require at least 1 approval.
@@ -48,6 +59,9 @@ Use focused branch names:
 ```text
 feature/module-generator-views
 fix/error-renderer-layout
+bugfix/forum-asset-paths
+hotfix/release-workflow-checks
+release/0.1.0-alpha
 docs/git-workflow
 ```
 

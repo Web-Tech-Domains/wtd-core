@@ -45,7 +45,21 @@ Use short, descriptive branch names:
 ```text
 feature/module-discovery
 fix/error-page-rendering
+bugfix/forum-asset-paths
+hotfix/release-workflow-checks
+release/0.1.0-alpha
 docs/local-server-guide
+```
+
+Repository administrators should protect these branch targets:
+
+```text
+main
+master
+develop
+release/*
+hotfix/*
+bugfix/*
 ```
 
 ## Commits
@@ -85,6 +99,7 @@ Maintainers should enable branch protection with:
 - Require review from Code Owners.
 - Require at least 1 approval.
 - Require the status check `WTD Core Quality Gate / Approver Review`.
+- Require status checks on `main`, `master`, `develop`, `release/*`, `hotfix/*`, and `bugfix/*`.
 
 If the approvers team is private, configure the `WTD_APPROVER_TOKEN` secret so the workflow can read team membership.
 

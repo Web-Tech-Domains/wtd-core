@@ -34,7 +34,16 @@ Every pull request requires approval from a member of:
 @Web-Tech-Domains/approvers
 ```
 
-This is declared in `.github/CODEOWNERS`. Repository administrators must enable branch protection with Code Owner review for enforcement.
+This is declared in `.github/CODEOWNERS`. Repository administrators must enable branch protection with Code Owner review for enforcement on:
+
+```text
+main
+master
+develop
+release/*
+hotfix/*
+bugfix/*
+```
 
 ## Maintainer Responsibilities
 
