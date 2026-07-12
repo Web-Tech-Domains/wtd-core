@@ -14,6 +14,14 @@ const draftBody = ref('');
 const isSubmitting = ref(false);
 const errorMessage = ref('');
 
+// Authentication states
+const currentUser = ref(props.initialState.currentUser || null);
+const showLoginModal = ref(false);
+const loginEmail = ref('');
+const loginPassword = ref('');
+const loginError = ref('');
+const isLoggingIn = ref(false);
+
 const categories = ref(props.initialState.categories || []);
 const topics = ref(props.initialState.topics || []);
 const stats = ref(props.initialState.stats || []);
@@ -35,7 +43,69 @@ function badgeClass(topic) {
   };
 }
 
+function submitLogin() {
+  const email = loginEmail.value.trim();
+  const password = loginPassword.value.trim();
+
+  if (email === '' || password === '') {
+    loginError.value = 'Please provide both email and password.';
+    return;
+  }
+
+  isLoggingIn.value = true;
+  loginError.value = '';
+
+  const params = new URLSearchParams();
+  params.append('email', email);
+  params.append('password', password);
+
+  fetch('/forums/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: params
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Invalid email or password credentials.');
+    }
+    return response.json();
+  })
+  .then(user => {
+    currentUser.value = user;
+    showLoginModal.value = false;
+    loginEmail.value = '';
+    loginPassword.value = '';
+  })
+  .catch(error => {
+    loginError.value = error.message;
+  })
+  .finally(() => {
+    isLoggingIn.value = false;
+  });
+}
+
+function submitLogout() {
+  fetch('/forums/logout', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    }
+  })
+  .then(response => {
+    if (response.ok) {
+      currentUser.value = null;
+    }
+  });
+}
+
 function createDraft() {
+  if (!currentUser.value) {
+    showLoginModal.value = true;
+    return;
+  }
+
   const title = draftTitle.value.trim();
   const body = draftBody.value.trim();
   const category = filter.value === 'All categories' ? 'Framework Help' : filter.value;
@@ -107,11 +177,16 @@ function createDraft() {
       <img :src="'/favicon.svg'" alt="WTD Core">
       <span>WTD Forums</span>
     </a>
-    <nav aria-label="Forums navigation">
+    <nav aria-label="Forums navigation" class="forums-nav-list">
       <a href="/">Home</a>
       <a href="/forums" class="active">Forums</a>
       <a href="/docs/api">API Docs</a>
       <a href="/health">Health</a>
+      <div class="forums-user-menu" v-if="currentUser">
+        <span class="forums-user-name">👤 {{ currentUser.name }}</span>
+        <button @click="submitLogout" class="forums-logout-btn" type="button">Logout</button>
+      </div>
+      <button v-else @click="showLoginModal = true" class="forums-login-btn" type="button">Login</button>
     </nav>
   </header>
 
@@ -121,7 +196,7 @@ function createDraft() {
         <p class="forums-eyebrow">Open source discussion</p>
         <h1 id="forums-title">Forums</h1>
         <p>Discuss framework usage, package ideas, release workflows, and implementation questions.</p>
-        <a class="forums-primary" href="#new-topic">New topic</a>
+        <a class="forums-primary" :href="currentUser ? '#new-topic' : '#'" @click.prevent="!currentUser ? (showLoginModal = true) : null">New topic</a>
       </section>
 
       <section class="forums-panel" aria-labelledby="forums-categories-title">
@@ -198,7 +273,8 @@ function createDraft() {
         </div>
       </section>
 
-      <section id="new-topic" class="forums-composer" aria-labelledby="forums-composer-title">
+      <!-- Composer Panel conditionally rendered -->
+      <section v-if="currentUser" id="new-topic" class="forums-composer" aria-labelledby="forums-composer-title">
         <div>
           <p class="forums-eyebrow">Draft topic</p>
           <h2 id="forums-composer-title">Start a useful discussion</h2>
@@ -213,6 +289,46 @@ function createDraft() {
           </button>
         </form>
       </section>
+
+      <!-- Sign In CTA Panel if logged out -->
+      <section v-else class="forums-composer forums-login-prompt" id="new-topic">
+        <div class="forums-prompt-card">
+          <span class="forums-lock-icon">🔒</span>
+          <h3>Join the Discussion</h3>
+          <p>You must be signed in to create a new discussion thread or post replies.</p>
+          <button type="button" class="forums-primary" @click="showLoginModal = true">Sign In to Forums</button>
+        </div>
+      </section>
     </section>
   </main>
+
+  <!-- Login Modal Overlay -->
+  <div v-if="showLoginModal" class="forums-modal-overlay" @click.self="showLoginModal = false">
+    <div class="forums-modal-card">
+      <div class="forums-modal-header">
+        <h3>Sign In to WTD Forums</h3>
+        <button type="button" class="forums-modal-close" @click="showLoginModal = false">×</button>
+      </div>
+      <form @submit.prevent="submitLogin" class="forums-modal-form">
+        <p class="forums-modal-desc">Log in using seeded credentials: <code>admin@example.test</code> / <code>password</code></p>
+        
+        <label class="forums-modal-field">
+          <span>Email Address</span>
+          <input v-model="loginEmail" type="email" placeholder="admin@example.test" required :disabled="isLoggingIn">
+        </label>
+        
+        <label class="forums-modal-field">
+          <span>Password</span>
+          <input v-model="loginPassword" type="password" placeholder="••••••••" required :disabled="isLoggingIn">
+        </label>
+        
+        <div v-if="loginError" class="forums-modal-error">{{ loginError }}</div>
+        
+        <button type="submit" class="forums-primary" :disabled="isLoggingIn">
+          <span v-if="isLoggingIn">Signing In...</span>
+          <span v-else>Sign In</span>
+        </button>
+      </form>
+    </div>
+  </div>
 </template>

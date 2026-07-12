@@ -11,11 +11,14 @@ use App\Models\User;
 use WTD\Http\Request;
 use WTD\Http\Response;
 use WTD\View\ViewRenderer;
+use WTD\Session\SessionStore;
 
 final class ForumsController
 {
-    public function __construct(private readonly ViewRenderer $views)
-    {
+    public function __construct(
+        private readonly ViewRenderer $views,
+        private readonly SessionStore $session
+    ) {
     }
 
     /**
@@ -100,11 +103,24 @@ final class ForumsController
             'Include version, environment, and reproduction steps.',
         ];
 
+        // 5. Get current user session
+        $userId = $this->session->get('forums_user_id');
+        $currentUser = $userId ? User::find($userId) : null;
+        $currentUserData = null;
+        if ($currentUser) {
+            $currentUserData = [
+                'id' => $currentUser->getAttribute('id'),
+                'name' => $currentUser->getAttribute('name'),
+                'email' => $currentUser->getAttribute('email'),
+            ];
+        }
+
         $payload = [
             'stats' => $stats,
             'categories' => $categoriesData,
             'topics' => $topicsData,
             'guidelines' => $guidelines,
+            'currentUser' => $currentUserData,
         ];
 
         return Response::make($this->views->renderModule('Forums', 'pages.index', [
@@ -120,6 +136,13 @@ final class ForumsController
      */
     public function createTopic(Request $request, array $parameters): Response
     {
+        // Require user session
+        $userId = $this->session->get('forums_user_id');
+        $user = $userId ? User::find($userId) : null;
+        if ($user === null) {
+            return Response::json(['error' => 'Unauthorized. You must be logged in to create a topic.'], 401);
+        }
+
         $title = trim((string)$request->input('title'));
         $body = trim((string)$request->input('body'));
         $categoryName = trim((string)$request->input('category'));
@@ -147,7 +170,7 @@ final class ForumsController
             'title' => $title,
             'slug' => $slug,
             'body' => $body,
-            'author_name' => 'You',
+            'author_name' => $user->getAttribute('name'),
             'status' => 'Open',
             'is_pinned' => 0,
             'views' => 0,
@@ -162,7 +185,7 @@ final class ForumsController
         $post = new ForumPost([
             'forum_topic_id' => $topic->getAttribute('id'),
             'body' => $body,
-            'author_name' => 'You',
+            'author_name' => $user->getAttribute('name'),
             'is_solution' => 0,
         ]);
         $post->save();
@@ -172,7 +195,7 @@ final class ForumsController
             'title' => $topic->getAttribute('title'),
             'slug' => $topic->getAttribute('slug'),
             'category' => $category->getAttribute('name'),
-            'author' => 'You',
+            'author' => $user->getAttribute('name'),
             'replies' => 1,
             'views' => 0,
             'status' => 'Open',
@@ -180,5 +203,48 @@ final class ForumsController
         ];
 
         return Response::json($newTopicData, 201);
+    }
+
+    /**
+     * Authenticate user session.
+     *
+     * @param array<string, string> $parameters
+     */
+    public function login(Request $request, array $parameters): Response
+    {
+        $email = trim((string)$request->input('email'));
+        $password = trim((string)$request->input('password'));
+
+        if ($email === '' || $password === '') {
+            return Response::json(['error' => 'Email and password are required.'], 400);
+        }
+
+        $user = User::query()->where('email', $email)->first();
+
+        if ($user === null || !password_verify($password, (string)$user->getAttribute('password'))) {
+            return Response::json(['error' => 'Invalid email or password credentials.'], 401);
+        }
+
+        $this->session->put('forums_user_id', $user->getAttribute('id'));
+        $this->session->save();
+
+        return Response::json([
+            'id' => $user->getAttribute('id'),
+            'name' => $user->getAttribute('name'),
+            'email' => $user->getAttribute('email'),
+        ], 200);
+    }
+
+    /**
+     * Clear user session.
+     *
+     * @param array<string, string> $parameters
+     */
+    public function logout(Request $request, array $parameters): Response
+    {
+        $this->session->forget('forums_user_id');
+        $this->session->save();
+
+        return Response::json(['success' => true], 200);
     }
 }

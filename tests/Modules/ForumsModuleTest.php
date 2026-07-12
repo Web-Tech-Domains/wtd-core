@@ -114,6 +114,13 @@ final class ForumsModuleTest extends TestCase
             /** @var \WTD\Database\SeederRunner $seeder */
             $seeder = $app->container()->get(\WTD\Database\SeederRunner::class);
             $seeder->run('ForumsSeeder');
+            $seeder->run('UserSeeder');
+
+            /** @var \WTD\Session\SessionStore $session */
+            $session = $app->container()->get(\WTD\Session\SessionStore::class);
+            $session->start();
+            $session->put('forums_user_id', 1);
+            $session->save();
 
             /** @var HttpKernel $kernel */
             $kernel = $app->container()->get(HttpKernel::class);
@@ -128,7 +135,8 @@ final class ForumsModuleTest extends TestCase
                     'title' => 'New Thread Title',
                     'body' => 'Details of the new discussion.',
                     'category' => 'Framework Help',
-                ]
+                ],
+                ['wtd_session' => $session->id()] // cookies
             );
 
             $response = $kernel->handle($request);
@@ -138,7 +146,7 @@ final class ForumsModuleTest extends TestCase
             $data = json_decode($response->content(), true);
             self::assertSame('New Thread Title', $data['title']);
             self::assertSame('Framework Help', $data['category']);
-            self::assertSame('You', $data['author']);
+            self::assertSame('Admin User', $data['author']);
             self::assertSame(1, $data['replies']);
 
             // Verify topic is in database

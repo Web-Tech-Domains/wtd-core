@@ -520,6 +520,225 @@
   }
 
   .forums-board-head select {
-    width: 100%;
+    width: min(100%, 320px);
   }
+}
+
+/* Authentication Styles */
+.forums-nav-list {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.forums-user-menu {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--forums-line);
+  padding: 4px 10px;
+  border-radius: 8px;
+}
+
+.forums-user-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.forums-logout-btn,
+.forums-login-btn {
+  border: 0;
+  background: transparent;
+  color: var(--forums-muted);
+  font: inherit;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.forums-login-btn {
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--forums-blue);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.forums-login-btn:hover {
+  background: var(--forums-blue);
+  color: #fff;
+  border-color: var(--forums-blue);
+}
+
+.forums-logout-btn {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--forums-red);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.forums-logout-btn:hover {
+  background: var(--forums-red);
+  color: #fff;
+  border-color: var(--forums-red);
+}
+
+/* Prompt Card when logged out */
+.forums-login-prompt {
+  background: rgba(17, 24, 39, 0.8) !important;
+  border: 1px dashed rgba(59, 130, 246, 0.3) !important;
+  padding: 40px !important;
+  text-align: center;
+  justify-content: center;
+}
+
+.forums-prompt-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.forums-lock-icon {
+  font-size: 38px;
+  filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.4));
+  margin-bottom: 8px;
+}
+
+.forums-prompt-card h3 {
+  margin: 0;
+  color: #fff;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.forums-prompt-card p {
+  margin: 0 0 12px;
+  color: var(--forums-muted);
+  font-size: 14px;
+  max-width: 320px;
+  line-height: 1.6;
+}
+
+/* Modal Overlay */
+.forums-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(10px);
+  display: grid;
+  place-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.forums-modal-card {
+  width: min(440px, calc(100% - 32px));
+  background: #0f172a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+  position: relative;
+  animation: slideUp 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.forums-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--forums-line);
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+}
+
+.forums-modal-header h3 {
+  margin: 0;
+  font-size: 20px;
+  color: #fff;
+  font-weight: 800;
+}
+
+.forums-modal-close {
+  border: 0;
+  background: transparent;
+  color: var(--forums-muted);
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.2s;
+  padding: 4px;
+}
+
+.forums-modal-close:hover {
+  color: #fff;
+}
+
+.forums-modal-form {
+  display: grid;
+  gap: 16px;
+}
+
+.forums-modal-desc {
+  margin: 0 0 10px;
+  color: var(--forums-muted);
+  font-size: 13px;
+  line-height: 1.6;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--forums-line);
+}
+
+.forums-modal-desc code {
+  color: var(--forums-blue);
+  font-weight: 700;
+}
+
+.forums-modal-field {
+  display: grid;
+  gap: 8px;
+  color: var(--forums-muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.forums-modal-field input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--forums-line);
+  background: rgba(255, 255, 255, 0.02);
+  color: #fff;
+  font: inherit;
+  transition: all 0.2s;
+}
+
+.forums-modal-field input:focus {
+  outline: 0;
+  border-color: var(--forums-blue);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.forums-modal-error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 8px;
+  color: #f87171;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 600;
 }

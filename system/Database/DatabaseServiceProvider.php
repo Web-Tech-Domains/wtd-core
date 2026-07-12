@@ -35,18 +35,36 @@ final class DatabaseServiceProvider extends ServiceProvider
         );
         $this->container()->singleton(
             MigrationRunner::class,
-            fn (): MigrationRunner => new MigrationRunner(
-                $this->container()->get(MigrationRepository::class),
-                $this->container()->get(Schema::class),
-                $this->app->basePath('database/migrations'),
-            ),
+            function (): MigrationRunner {
+                $paths = [$this->app->basePath('database/migrations')];
+                $moduleMigrations = glob($this->app->basePath('modules/*/Database/Migrations'));
+                if ($moduleMigrations !== false) {
+                    foreach ($moduleMigrations as $modulePath) {
+                        $paths[] = $modulePath;
+                    }
+                }
+                return new MigrationRunner(
+                    $this->container()->get(MigrationRepository::class),
+                    $this->container()->get(Schema::class),
+                    $paths,
+                );
+            }
         );
         $this->container()->singleton(
             SeederRunner::class,
-            fn (): SeederRunner => new SeederRunner(
-                $this->container()->get(Connection::class),
-                $this->app->basePath('database/seeders'),
-            ),
+            function (): SeederRunner {
+                $paths = [$this->app->basePath('database/seeders')];
+                $moduleSeeders = glob($this->app->basePath('modules/*/Database/Seeders'));
+                if ($moduleSeeders !== false) {
+                    foreach ($moduleSeeders as $modulePath) {
+                        $paths[] = $modulePath;
+                    }
+                }
+                return new SeederRunner(
+                    $this->container()->get(Connection::class),
+                    $paths,
+                );
+            }
         );
     }
 

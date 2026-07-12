@@ -10,38 +10,139 @@ return new class implements Seeder {
     {
         $now = date('Y-m-d H:i:s');
 
-        $connection->table('forum_categories')->insert([
-            'name' => 'Announcements',
-            'slug' => 'announcements',
-            'description' => 'Project news, releases, and community updates.',
-            'sort_order' => 1,
-            'is_locked' => false,
-            'created_at' => $now,
-            'updated_at' => $now,
-        ]);
+        // Seed Categories
+        $categories = [
+            [
+                'id' => 1,
+                'name' => 'Announcements',
+                'slug' => 'announcements',
+                'description' => 'Project news, releases, and community updates.',
+                'sort_order' => 1,
+                'is_locked' => 0,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'id' => 2,
+                'name' => 'Framework Help',
+                'slug' => 'framework-help',
+                'description' => 'Get help with WTD Core features, configuration, and debugging.',
+                'sort_order' => 2,
+                'is_locked' => 0,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'id' => 3,
+                'name' => 'Packages',
+                'slug' => 'packages',
+                'description' => 'Discuss package development, integration, and marketplace.',
+                'sort_order' => 3,
+                'is_locked' => 0,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'id' => 4,
+                'name' => 'Security',
+                'slug' => 'security',
+                'description' => 'Report vulnerabilities and discuss security hardening.',
+                'sort_order' => 4,
+                'is_locked' => 0,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ]
+        ];
 
-        $connection->table('forum_topics')->insert([
-            'forum_category_id' => 1,
-            'title' => 'Welcome to the WTD Core forums',
-            'slug' => 'welcome-to-the-wtd-core-forums',
-            'body' => 'Use this space to discuss framework usage, packages, and open-source contributions.',
-            'author_name' => 'Web Tech Domains',
-            'status' => 'pinned',
-            'is_pinned' => true,
-            'views' => 1,
-            'last_activity_at' => $now,
-            'created_at' => $now,
-            'updated_at' => $now,
-        ]);
+        foreach ($categories as $category) {
+            $connection->table('forum_categories')->insert($category);
+        }
 
-        $connection->table('forum_posts')->insert([
-            'forum_topic_id' => 1,
-            'body' => 'Keep topics specific, respectful, and useful for future readers.',
-            'author_name' => 'Web Tech Domains',
-            'is_solution' => false,
-            'created_at' => $now,
-            'updated_at' => $now,
-        ]);
+        // Seed Topics
+        $topics = [
+            [
+                'id' => 1,
+                'forum_category_id' => 3, // Packages
+                'title' => 'How should forum modules expose package hooks?',
+                'slug' => 'how-should-forum-modules-expose-package-hooks',
+                'body' => 'We need a standardized way for package modules to define hook hooks in WTD core.',
+                'author_name' => 'Core Team',
+                'status' => 'Open',
+                'is_pinned' => 0,
+                'views' => 312,
+                'last_activity_at' => '12 min ago',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'id' => 2,
+                'forum_category_id' => 2, // Framework Help
+                'title' => 'Best practices for model events and moderation logs',
+                'slug' => 'best-practices-for-model-events-and-moderation-logs',
+                'body' => 'Should we use observers or inline events for logging moderator actions?',
+                'author_name' => 'Maintainer',
+                'status' => 'Answered',
+                'is_pinned' => 0,
+                'views' => 144,
+                'last_activity_at' => '1 hr ago',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'id' => 3,
+                'forum_category_id' => 1, // Announcements
+                'title' => 'Proposal: changelog module release notes workflow',
+                'slug' => 'proposal-changelog-module-release-notes-workflow',
+                'body' => 'We are proposing a new workflow for generating release notes from git commits automatically.',
+                'author_name' => 'Web Tech Domains',
+                'status' => 'Pinned',
+                'is_pinned' => 1,
+                'views' => 401,
+                'last_activity_at' => 'Today',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ]
+        ];
+
+        foreach ($topics as $topic) {
+            $connection->table('forum_topics')->insert($topic);
+        }
+
+        // Seed Posts (Replies)
+        // Topic 1 has 18 replies
+        for ($i = 1; $i <= 18; $i++) {
+            $connection->table('forum_posts')->insert([
+                'forum_topic_id' => 1,
+                'body' => "Excellent point! Here is reply #{$i} to discuss module hooks architecture and design.",
+                'author_name' => "Developer {$i}",
+                'is_solution' => 0,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ]);
+        }
+
+        // Topic 2 has 9 replies
+        for ($i = 1; $i <= 9; $i++) {
+            $connection->table('forum_posts')->insert([
+                'forum_topic_id' => 2,
+                'body' => "Reply #{$i} explaining best practices for observer patterns in models.",
+                'author_name' => "Contributor {$i}",
+                'is_solution' => $i === 5 ? 1 : 0,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ]);
+        }
+
+        // Topic 3 has 24 replies
+        for ($i = 1; $i <= 24; $i++) {
+            $connection->table('forum_posts')->insert([
+                'forum_topic_id' => 3,
+                'body' => "Changelog release note suggestion #{$i} for automation.",
+                'author_name' => "User {$i}",
+                'is_solution' => 0,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ]);
+        }
     }
 };
-
