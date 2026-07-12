@@ -66,9 +66,20 @@ git tag -a v0.1.0-alpha -m "Release v0.1.0-alpha"
 git push origin v0.1.0-alpha
 ```
 
-## Branch Protection
+## Protected Branches
 
-The default branch should require:
+Protect these branch targets:
+
+```text
+main
+master
+develop
+release/*
+hotfix/*
+bugfix/*
+```
+
+Every protected branch should require:
 
 - Pull requests before merging.
 - Code Owner review.

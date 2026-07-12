@@ -20,6 +20,17 @@ Required reviewer team:
 @Web-Tech-Domains/approvers
 ```
 
+Protected target branches:
+
+```text
+main
+master
+develop
+release/*
+hotfix/*
+bugfix/*
+```
+
 ## Checklist
 
 - [ ] I kept the change focused and reviewable.

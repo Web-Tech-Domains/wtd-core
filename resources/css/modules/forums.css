@@ -1,11 +1,13 @@
 :root {
   color-scheme: light;
-  --forums-bg: #f6f8fb;
-  --forums-panel: #ffffff;
-  --forums-ink: #111827;
+  --forums-bg: #f5f7fb;
+  --forums-surface: #ffffff;
+  --forums-surface-muted: #f8fafc;
+  --forums-ink: #101828;
   --forums-muted: #667085;
   --forums-line: #d9e1ec;
   --forums-blue: #2563eb;
+  --forums-blue-dark: #1d4ed8;
   --forums-green: #15803d;
   --forums-violet: #6d28d9;
   --forums-red: #b91c1c;
@@ -36,16 +38,16 @@
   gap: 20px;
   padding: 0 clamp(18px, 4vw, 54px);
   border-bottom: 1px solid var(--forums-line);
-  background: rgba(255, 255, 255, .94);
+  background: rgba(255, 255, 255, .96);
 }
 
 .forums-brand {
   display: flex;
   align-items: center;
   gap: 12px;
-  font-size: 19px;
-  font-weight: 900;
   color: #172554;
+  font-size: 20px;
+  font-weight: 900;
 }
 
 .forums-brand img {
@@ -57,17 +59,17 @@
 .forums-topbar nav {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
   color: var(--forums-muted);
   font-weight: 800;
 }
 
 .forums-topbar nav a {
-  min-height: 36px;
+  min-height: 38px;
   display: inline-flex;
   align-items: center;
   border-radius: 8px;
-  padding: 0 11px;
+  padding: 0 12px;
 }
 
 .forums-topbar nav a:hover {
@@ -76,11 +78,11 @@
 }
 
 .forums-shell {
-  width: min(1320px, calc(100% - 32px));
+  width: min(1400px, calc(100% - 32px));
   display: grid;
-  grid-template-columns: 320px minmax(0, 1fr);
+  grid-template-columns: minmax(260px, 300px) minmax(0, 1fr);
   gap: 18px;
-  margin: 28px auto 44px;
+  margin: 24px auto 44px;
 }
 
 .forums-sidebar,
@@ -100,12 +102,15 @@
 .forums-stats article {
   border: 1px solid var(--forums-line);
   border-radius: 8px;
-  background: var(--forums-panel);
-  box-shadow: 0 14px 38px rgba(15, 23, 42, .06);
+  background: var(--forums-surface);
 }
 
 .forums-panel {
-  padding: 20px;
+  padding: 18px;
+}
+
+.forums-intro {
+  background: linear-gradient(180deg, #fff 0%, #f8fbff 100%);
 }
 
 .forums-eyebrow {
@@ -126,7 +131,7 @@
 }
 
 .forums-panel h1 {
-  font-size: 44px;
+  font-size: clamp(34px, 5vw, 46px);
   line-height: 1;
 }
 
@@ -162,9 +167,14 @@
   margin-top: 18px;
 }
 
+.forums-primary:hover,
+.forums-composer button:hover {
+  background: var(--forums-blue-dark);
+}
+
 .forums-category {
   width: 100%;
-  min-height: 44px;
+  min-height: 42px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -180,9 +190,11 @@
   cursor: pointer;
 }
 
-.forums-category:hover {
-  border-color: #a9b8ca;
-  background: #f8fafc;
+.forums-category:hover,
+.forums-category-active {
+  border-color: #9bb9ff;
+  background: #eef4ff;
+  color: var(--forums-blue-dark);
 }
 
 .forums-category strong {
@@ -205,17 +217,17 @@
 
 .forums-stats {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
 }
 
 .forums-stats article {
-  padding: 18px;
+  padding: 16px 18px;
 }
 
 .forums-stats strong {
   display: block;
-  font-size: 30px;
+  font-size: 32px;
   line-height: 1;
 }
 
@@ -241,6 +253,7 @@
 
 .forums-board-head {
   border-bottom: 1px solid var(--forums-line);
+  background: var(--forums-surface);
 }
 
 .forums-board-head label {
@@ -263,7 +276,7 @@
 }
 
 .forums-board-head select {
-  min-width: 190px;
+  min-width: 210px;
   min-height: 42px;
   padding: 0 10px;
 }
@@ -274,14 +287,23 @@
 
 .forums-topic {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 270px;
+  grid-template-columns: minmax(0, 1fr) minmax(230px, 270px);
   gap: 20px;
   padding: 18px 20px;
   border-top: 1px solid var(--forums-line);
+  background: #fff;
 }
 
 .forums-topic:first-child {
   border-top: 0;
+}
+
+.forums-topic:hover {
+  background: var(--forums-surface-muted);
+}
+
+.forums-topic-main {
+  min-width: 0;
 }
 
 .forums-badge {
@@ -314,7 +336,7 @@
 
 .forums-topic h3 {
   margin: 10px 0 6px;
-  font-size: 18px;
+  font-size: 19px;
   line-height: 1.35;
 }
 
@@ -334,6 +356,7 @@
   min-width: 0;
   border: 1px solid var(--forums-line);
   border-radius: 8px;
+  background: #fff;
   padding: 10px;
 }
 
@@ -350,10 +373,11 @@
 
 .forums-composer {
   align-items: stretch;
+  background: #fff;
 }
 
 .forums-composer form {
-  width: min(520px, 100%);
+  width: min(560px, 100%);
   display: grid;
   gap: 10px;
 }
@@ -365,7 +389,7 @@
 }
 
 .forums-composer textarea {
-  min-height: 104px;
+  min-height: 110px;
   resize: vertical;
 }
 
@@ -389,7 +413,7 @@
   }
 
   .forums-shell {
-    width: min(100% - 20px, 1320px);
+    width: min(100% - 20px, 1400px);
     margin-top: 18px;
   }
 
@@ -401,5 +425,8 @@
   .forums-board-head {
     flex-direction: column;
   }
-}
 
+  .forums-board-head select {
+    width: min(100%, 320px);
+  }
+}

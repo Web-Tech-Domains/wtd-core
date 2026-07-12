@@ -6,11 +6,17 @@ on:
       - master
       - main
       - develop
+      - "release/**"
+      - "hotfix/**"
+      - "bugfix/**"
   pull_request:
     branches:
       - master
       - main
       - develop
+      - "release/**"
+      - "hotfix/**"
+      - "bugfix/**"
   schedule:
     - cron: "23 3 * * 1"
 
