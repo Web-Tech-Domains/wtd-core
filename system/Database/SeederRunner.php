@@ -23,7 +23,7 @@ final class SeederRunner
         private readonly Connection $connection,
         string|array $paths,
     ) {
-        $this->paths = is_string($paths) ? [$paths] : array_values($paths);
+        $this->paths = is_string($paths) ? [$paths] : $paths;
     }
 
     /**
