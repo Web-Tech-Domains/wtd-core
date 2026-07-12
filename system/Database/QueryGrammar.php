@@ -9,6 +9,19 @@ namespace WTD\Database;
  */
 final class QueryGrammar
 {
+    public function __construct(
+        private readonly string $identifierQuote = '"',
+    ) {
+    }
+
+    public static function forDriver(string $driver): self
+    {
+        return match (strtolower($driver)) {
+            'mysql', 'mariadb' => new self('`'),
+            default => new self(),
+        };
+    }
+
     /**
      * @param list<string> $columns
      * @param list<string> $wheres
@@ -99,7 +112,7 @@ final class QueryGrammar
         }
 
         return implode('.', array_map(
-            static fn (string $part): string => '"' . str_replace('"', '""', $part) . '"',
+            fn (string $part): string => $this->identifierQuote . str_replace($this->identifierQuote, $this->identifierQuote . $this->identifierQuote, $part) . $this->identifierQuote,
             explode('.', $identifier),
         ));
     }

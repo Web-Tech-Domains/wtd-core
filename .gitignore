@@ -4,7 +4,9 @@ composer.lock
 
 # Node / frontend
 /node_modules/
-/public/build/
+# Keep Vite production assets committed because shared PHP hosting may not run npm builds.
+!/public/build/
+!/public/build/**
 /public/hot
 npm-debug.log*
 yarn-debug.log*
@@ -58,7 +60,7 @@ desktop.ini
 
 # Coverage
 coverage/
-build/
+/build/
 .php-cs-fixer.cache
 
 # Tool caches

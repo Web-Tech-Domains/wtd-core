@@ -1,0 +1,25 @@
+{
+  "resources/css/app.css": {
+    "file": "assets/styles-C8mHimU9.css",
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-C1qR_aOx.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true,
+    "css": [
+      "assets/styles-C8mHimU9.css"
+    ]
+  },
+  "resources/js/modules/forums.js": {
+    "file": "assets/forums-DtwV1YVP.js",
+    "name": "forums",
+    "src": "resources/js/modules/forums.js",
+    "isEntry": true,
+    "css": [
+      "assets/forums-jXY-i9Ak.css"
+    ]
+  }
+}
