@@ -18,12 +18,13 @@ final class ComposerAutoMigrator
 
     public function run(): int
     {
-        if (!$this->enabled()) {
+        $env = $this->loadEnv($this->basePath . DIRECTORY_SEPARATOR . '.env');
+
+        if (!$this->enabled($env)) {
             echo "Auto migration skipped because WTD_AUTO_MIGRATE is disabled.\n";
             return 0;
         }
 
-        $env = $this->loadEnv($this->basePath . DIRECTORY_SEPARATOR . '.env');
         $connection = $env['DB_CONNECTION'] ?? 'sqlite';
         $database = $env['DB_DATABASE'] ?? ':memory:';
 
@@ -38,9 +39,22 @@ final class ComposerAutoMigrator
         return $this->migrate();
     }
 
-    private function enabled(): bool
+    /**
+     * @param array<string, string> $env
+     */
+    private function enabled(array $env): bool
     {
-        $enabled = strtolower((string) ($_SERVER['WTD_AUTO_MIGRATE'] ?? getenv('WTD_AUTO_MIGRATE') ?: 'true'));
+        $enabled = $_SERVER['WTD_AUTO_MIGRATE'] ?? false;
+
+        if ($enabled === false || $enabled === '') {
+            $enabled = getenv('WTD_AUTO_MIGRATE');
+        }
+
+        if ($enabled === false || $enabled === '') {
+            $enabled = $env['WTD_AUTO_MIGRATE'] ?? 'true';
+        }
+
+        $enabled = strtolower((string) $enabled);
 
         return !in_array($enabled, ['0', 'false', 'no', 'off'], true);
     }
@@ -65,8 +79,21 @@ final class ComposerAutoMigrator
 
     private function migrate(): int
     {
-        $command = escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($this->basePath . DIRECTORY_SEPARATOR . 'core') . ' migrate';
+        $command = escapeshellarg(PHP_BINARY)
+            . ' -d display_errors=1 '
+            . escapeshellarg($this->basePath . DIRECTORY_SEPARATOR . 'core')
+            . ' migrate';
         passthru($command, $exitCode);
+
+        if ($exitCode !== 0) {
+            fwrite(
+                STDERR,
+                sprintf(
+                    "Auto migration failed with exit code [%d]. Run [php core migrate] on the server to see the database error, or set WTD_AUTO_MIGRATE=false to skip migrations during dependency installation.\n",
+                    $exitCode,
+                ),
+            );
+        }
 
         return $exitCode;
     }

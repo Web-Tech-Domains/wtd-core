@@ -81,6 +81,32 @@ final class Request
     }
 
     /**
+     * Return the client IP address, honoring X-Forwarded-For only for trusted proxies.
+     *
+     * @param list<string> $trustedProxies
+     */
+    public function ip(array $trustedProxies = []): string
+    {
+        $remote = (string) ($this->server['REMOTE_ADDR'] ?? '');
+
+        if ($trustedProxies === [] && $remote !== '') {
+            return $remote;
+        }
+
+        if (!in_array('*', $trustedProxies, true) && !in_array($remote, $trustedProxies, true)) {
+            return $remote;
+        }
+
+        $forwarded = $this->header('x-forwarded-for');
+
+        if ($forwarded === null || trim($forwarded) === '') {
+            return $remote;
+        }
+
+        return trim(explode(',', $forwarded)[0]);
+    }
+
+    /**
      * Return a request header value.
      */
     public function header(string $name, ?string $default = null): ?string

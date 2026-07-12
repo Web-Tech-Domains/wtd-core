@@ -33,6 +33,20 @@ final class RequestResponseTest extends TestCase
         self::assertSame('example.test', $request->host());
     }
 
+    public function testRequestReturnsClientIpAndHonorsTrustedForwardedHeaders(): void
+    {
+        $request = new Request(
+            'GET',
+            '/',
+            ['x-forwarded-for' => '203.0.113.10, 198.51.100.2'],
+            server: ['REMOTE_ADDR' => '127.0.0.1'],
+        );
+
+        self::assertSame('127.0.0.1', $request->ip());
+        self::assertSame('203.0.113.10', $request->ip(['127.0.0.1']));
+        self::assertSame('203.0.113.10', $request->ip(['*']));
+    }
+
     public function testRequestCanReturnAndValidateInput(): void
     {
         $request = new Request(

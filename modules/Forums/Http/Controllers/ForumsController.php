@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Modules\Forums\Http\Controllers;
 
-use Modules\Forums\Models\ForumCategory;
-use Modules\Forums\Models\ForumTopic;
-use Modules\Forums\Models\ForumPost;
 use App\Models\User;
+use Modules\Forums\Models\ForumCategory;
+use Modules\Forums\Models\ForumPost;
+use Modules\Forums\Models\ForumTopic;
 use WTD\Http\Request;
 use WTD\Http\Response;
-use WTD\View\ViewRenderer;
 use WTD\Session\SessionStore;
+use WTD\View\ViewRenderer;
 
 final class ForumsController
 {
@@ -26,9 +26,7 @@ final class ForumsController
      */
     public function index(Request $request, array $parameters): Response
     {
-        // 1. Fetch categories and sort them in PHP (since QueryBuilder has no orderBy)
-        $categories = ForumCategory::all();
-        usort($categories, static fn ($a, $b) => $a->getAttribute('sort_order') <=> $b->getAttribute('sort_order'));
+        $categories = ForumCategory::query()->orderBy('sort_order')->get();
 
         $categoriesData = [];
         foreach ($categories as $cat) {
@@ -54,16 +52,10 @@ final class ForumsController
             ];
         }
 
-        // 2. Fetch topics, sort by pinned first, then by ID desc
-        $topics = ForumTopic::all();
-        usort($topics, static function ($a, $b): int {
-            $aPinned = (int)$a->getAttribute('is_pinned');
-            $bPinned = (int)$b->getAttribute('is_pinned');
-            if ($aPinned !== $bPinned) {
-                return $bPinned <=> $aPinned;
-            }
-            return $b->getAttribute('id') <=> $a->getAttribute('id');
-        });
+        $topics = ForumTopic::query()
+            ->orderByDesc('is_pinned')
+            ->orderByDesc('id')
+            ->get();
 
         $topicsData = [];
         foreach ($topics as $topic) {

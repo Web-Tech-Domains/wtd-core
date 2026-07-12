@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace WTD\Database;
 
+use InvalidArgumentException;
+
 /**
  * Builds and executes simple parameterized SQL queries.
  */
@@ -23,6 +25,11 @@ final class QueryBuilder
      * @var list<mixed>
      */
     private array $bindings = [];
+
+    /**
+     * @var list<array{column: string, direction: 'ASC'|'DESC'}>
+     */
+    private array $orders = [];
 
     private ?int $limit = null;
 
@@ -84,6 +91,50 @@ final class QueryBuilder
     }
 
     /**
+     * Add an order by clause.
+     */
+    public function orderBy(string $column, string $direction = 'ASC'): self
+    {
+        $direction = strtoupper($direction);
+
+        if (!in_array($direction, ['ASC', 'DESC'], true)) {
+            throw new InvalidArgumentException('Order direction must be ASC or DESC.');
+        }
+
+        /** @var 'ASC'|'DESC' $direction */
+        $this->orders[] = [
+            'column' => $column,
+            'direction' => $direction,
+        ];
+
+        return $this;
+    }
+
+    /**
+     * Add a descending order by clause.
+     */
+    public function orderByDesc(string $column): self
+    {
+        return $this->orderBy($column, 'DESC');
+    }
+
+    /**
+     * Order by newest rows first.
+     */
+    public function latest(string $column = 'created_at'): self
+    {
+        return $this->orderBy($column, 'DESC');
+    }
+
+    /**
+     * Order by oldest rows first.
+     */
+    public function oldest(string $column = 'created_at'): self
+    {
+        return $this->orderBy($column);
+    }
+
+    /**
      * Limit the number of rows returned.
      */
     public function limit(int $limit): self
@@ -94,6 +145,14 @@ final class QueryBuilder
     }
 
     /**
+     * Alias for limit().
+     */
+    public function take(int $limit): self
+    {
+        return $this->limit($limit);
+    }
+
+    /**
      * Offset the result set.
      */
     public function offset(int $offset): self
@@ -101,6 +160,14 @@ final class QueryBuilder
         $this->offset = max(0, $offset);
 
         return $this;
+    }
+
+    /**
+     * Alias for offset().
+     */
+    public function skip(int $offset): self
+    {
+        return $this->offset($offset);
     }
 
     /**
@@ -216,6 +283,13 @@ final class QueryBuilder
      */
     public function toSql(): string
     {
-        return $this->grammar->compileSelect($this->table, $this->columns, $this->wheres, $this->limit, $this->offset);
+        return $this->grammar->compileSelect(
+            $this->table,
+            $this->columns,
+            $this->wheres,
+            $this->orders,
+            $this->limit,
+            $this->offset,
+        );
     }
 }

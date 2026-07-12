@@ -3,9 +3,14 @@
 declare(strict_types=1);
 
 use WTD\Application\Application;
+use WTD\Cache\CacheManager;
+use WTD\Cache\CacheRepository;
+use WTD\Cookie\Cookie;
 use WTD\Database\Connection;
 use WTD\Database\DatabaseManager;
 use WTD\Hooks\HookManager;
+use WTD\Http\Client\HttpClient;
+use WTD\Session\SessionStore;
 use WTD\View\AssetManager;
 use WTD\View\ViewRenderer;
 
@@ -87,6 +92,97 @@ if (!function_exists('db')) {
     function db(?string $connection = null): Connection
     {
         return app(DatabaseManager::class)->connection($connection);
+    }
+}
+
+if (!function_exists('http')) {
+    function http(): HttpClient
+    {
+        return app(HttpClient::class);
+    }
+}
+
+if (!function_exists('session')) {
+    /**
+     * @param array<string, mixed>|string|null $key
+     */
+    function session(array|string|null $key = null, mixed $default = null): mixed
+    {
+        $session = app(SessionStore::class);
+
+        if (is_array($key)) {
+            foreach ($key as $name => $value) {
+                $session->put($name, $value);
+            }
+
+            return null;
+        }
+
+        return $key === null ? $session : $session->get($key, $default);
+    }
+}
+
+if (!function_exists('cache')) {
+    /**
+     * @param array<string, mixed>|string|null $key
+     */
+    function cache(array|string|null $key = null, mixed $default = null, ?int $ttlSeconds = null): mixed
+    {
+        $cache = app(CacheRepository::class);
+
+        if (is_array($key)) {
+            foreach ($key as $name => $value) {
+                $cache->put($name, $value, $ttlSeconds);
+            }
+
+            return null;
+        }
+
+        return $key === null ? $cache : $cache->get($key, $default);
+    }
+}
+
+if (!function_exists('cache_store')) {
+    function cache_store(?string $store = null): CacheRepository
+    {
+        return app(CacheManager::class)->store($store);
+    }
+}
+
+if (!function_exists('cookie')) {
+    function cookie(
+        string $name,
+        string $value,
+        int $minutes = 0,
+        string $path = '/',
+        ?string $domain = null,
+        bool $secure = false,
+        bool $httpOnly = true,
+        string $sameSite = 'Lax',
+    ): Cookie {
+        return new Cookie(
+            $name,
+            $value,
+            $minutes > 0 ? time() + ($minutes * 60) : 0,
+            $path,
+            $domain,
+            $secure,
+            $httpOnly,
+            $sameSite,
+        );
+    }
+}
+
+if (!function_exists('forget_cookie')) {
+    function forget_cookie(
+        string $name,
+        string $path = '/',
+        ?string $domain = null,
+        bool $secure = false,
+        bool $httpOnly = true,
+        string $sameSite = 'Lax',
+    ): Cookie {
+        return new Cookie($name, '', time() - 3600, $path, $domain, $secure, $httpOnly, $sameSite);
     }
 }
 

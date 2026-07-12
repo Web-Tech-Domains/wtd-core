@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace WTD\Http;
 
 use WTD\Exception\ExceptionRenderer;
+use WTD\Http\Client\HttpClient;
 use WTD\Kernel\HttpKernel;
 use WTD\Middleware\MiddlewareResolver;
 use WTD\Middleware\Pipeline;
@@ -25,6 +26,7 @@ final class HttpServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->container()->singleton(HttpClient::class);
         $this->container()->singleton(ControllerDispatcher::class);
         $this->container()->singleton(
             RouteCache::class,

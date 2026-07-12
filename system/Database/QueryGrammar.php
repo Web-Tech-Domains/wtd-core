@@ -25,15 +25,29 @@ final class QueryGrammar
     /**
      * @param list<string> $columns
      * @param list<string> $wheres
+     * @param list<array{column: string, direction: 'ASC'|'DESC'}> $orders
      */
-    public function compileSelect(string $table, array $columns, array $wheres, ?int $limit, ?int $offset): string
-    {
+    public function compileSelect(
+        string $table,
+        array $columns,
+        array $wheres,
+        array $orders,
+        ?int $limit,
+        ?int $offset,
+    ): string {
         $sql = sprintf(
             'SELECT %s FROM %s%s',
             implode(', ', array_map(fn (string $column): string => $this->column($column), $columns)),
             $this->wrap($table),
             $this->compileWheres($wheres),
         );
+
+        if ($orders !== []) {
+            $sql .= ' ORDER BY ' . implode(', ', array_map(
+                fn (array $order): string => $this->wrap($order['column']) . ' ' . $order['direction'],
+                $orders,
+            ));
+        }
 
         if ($limit !== null) {
             $sql .= ' LIMIT ' . $limit;

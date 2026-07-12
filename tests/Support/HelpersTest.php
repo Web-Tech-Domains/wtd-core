@@ -6,10 +6,15 @@ namespace Tests\Support;
 
 use PHPUnit\Framework\TestCase;
 use WTD\Application\Application;
+use WTD\Cache\CacheManager;
+use WTD\Cache\CacheRepository;
 use WTD\Config\Repository;
 use WTD\Container\Container;
+use WTD\Cookie\Cookie;
 use WTD\Filesystem\Filesystem;
 use WTD\Hooks\HookManager;
+use WTD\Http\Client\HttpClient;
+use WTD\Session\SessionStore;
 use WTD\View\AssetManager;
 use WTD\View\ViewRenderer;
 
@@ -123,6 +128,64 @@ final class HelpersTest extends TestCase
             @rmdir($basePath . '/tests/tmp/helper-assets/public/build');
             @rmdir($basePath . '/tests/tmp/helper-assets/public');
             @rmdir($basePath . '/tests/tmp/helper-assets');
+        }
+    }
+
+    public function testSessionCacheAndCookieHelpersExposeFrameworkServices(): void
+    {
+        require_once dirname(__DIR__, 2) . '/system/Support/helpers.php';
+
+        $basePath = dirname(__DIR__, 2);
+        $container = new Container();
+        $app = new Application($basePath, $container, new Repository());
+        $session = new SessionStore(new Filesystem(), $basePath . '/tests/tmp/helper-sessions');
+        $cache = new CacheRepository(new \WTD\Cache\FileStore());
+        $manager = new CacheManager('file');
+
+        $session->start('helper-session-1234');
+        $session->put('notice', 'Saved');
+        $cache->put('framework', 'WTD', 60);
+
+        $container->instance(SessionStore::class, $session);
+        $container->instance(CacheRepository::class, $cache);
+        $container->instance(CacheManager::class, $manager);
+        $GLOBALS['wtd_app'] = $app;
+
+        try {
+            self::assertSame($session, session());
+            self::assertSame('Saved', session('notice'));
+            session(['mode' => 'standard']);
+            self::assertSame('standard', session('mode'));
+            self::assertSame($cache, cache());
+            self::assertSame('WTD', cache('framework'));
+            cache(['runtime' => 'ready'], ttlSeconds: 60);
+            self::assertSame('ready', cache('runtime'));
+            self::assertInstanceOf(CacheRepository::class, cache_store());
+            self::assertInstanceOf(Cookie::class, cookie('theme', 'dark', 5));
+            self::assertStringContainsString('theme=dark', cookie('theme', 'dark', 5)->toHeader());
+            self::assertStringContainsString('Expires=', forget_cookie('theme')->toHeader());
+        } finally {
+            unset($GLOBALS['wtd_app']);
+            @unlink($basePath . '/tests/tmp/helper-sessions/helper-session-1234');
+            @rmdir($basePath . '/tests/tmp/helper-sessions');
+        }
+    }
+
+    public function testHttpHelperReturnsFrameworkHttpClient(): void
+    {
+        require_once dirname(__DIR__, 2) . '/system/Support/helpers.php';
+
+        $basePath = dirname(__DIR__, 2);
+        $container = new Container();
+        $client = new HttpClient();
+        $app = new Application($basePath, $container, new Repository());
+        $container->instance(HttpClient::class, $client);
+        $GLOBALS['wtd_app'] = $app;
+
+        try {
+            self::assertSame($client, http());
+        } finally {
+            unset($GLOBALS['wtd_app']);
         }
     }
 
