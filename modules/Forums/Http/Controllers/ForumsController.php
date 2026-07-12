@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Modules\Forums\Http\Controllers;
 
+use Modules\Forums\Models\ForumCategory;
+use Modules\Forums\Models\ForumTopic;
+use Modules\Forums\Models\ForumPost;
+use App\Models\User;
 use WTD\Http\Request;
 use WTD\Http\Response;
 use WTD\View\ViewRenderer;
@@ -19,57 +23,162 @@ final class ForumsController
      */
     public function index(Request $request, array $parameters): Response
     {
+        // 1. Fetch categories and sort them in PHP (since QueryBuilder has no orderBy)
+        $categories = ForumCategory::all();
+        usort($categories, static fn ($a, $b) => $a->getAttribute('sort_order') <=> $b->getAttribute('sort_order'));
+
+        $categoriesData = [];
+        foreach ($categories as $cat) {
+            $count = ForumTopic::query()->where('forum_category_id', $cat->getAttribute('id'))->count();
+            
+            $tone = 'blue';
+            $name = $cat->getAttribute('name');
+            if ($name === 'Framework Help') {
+                $tone = 'green';
+            } elseif ($name === 'Announcements') {
+                $tone = 'violet';
+            } elseif ($name === 'Security') {
+                $tone = 'red';
+            }
+
+            $categoriesData[] = [
+                'id' => $cat->getAttribute('id'),
+                'name' => $cat->getAttribute('name'),
+                'slug' => $cat->getAttribute('slug'),
+                'description' => $cat->getAttribute('description'),
+                'count' => $count,
+                'tone' => $tone,
+            ];
+        }
+
+        // 2. Fetch topics, sort by pinned first, then by ID desc
+        $topics = ForumTopic::all();
+        usort($topics, static function ($a, $b): int {
+            $aPinned = (int)$a->getAttribute('is_pinned');
+            $bPinned = (int)$b->getAttribute('is_pinned');
+            if ($aPinned !== $bPinned) {
+                return $bPinned <=> $aPinned;
+            }
+            return $b->getAttribute('id') <=> $a->getAttribute('id');
+        });
+
+        $topicsData = [];
+        foreach ($topics as $topic) {
+            $catName = 'General';
+            foreach ($categoriesData as $c) {
+                if ($c['id'] == $topic->getAttribute('forum_category_id')) {
+                    $catName = $c['name'];
+                    break;
+                }
+            }
+            $replies = ForumPost::query()->where('forum_topic_id', $topic->getAttribute('id'))->count();
+
+            $topicsData[] = [
+                'id' => $topic->getAttribute('id'),
+                'title' => $topic->getAttribute('title'),
+                'slug' => $topic->getAttribute('slug'),
+                'category' => $catName,
+                'author' => $topic->getAttribute('author_name'),
+                'replies' => $replies,
+                'views' => $topic->getAttribute('views'),
+                'status' => $topic->getAttribute('status'),
+                'updated' => $topic->getAttribute('last_activity_at'),
+            ];
+        }
+
+        // 3. Dynamic statistics
+        $stats = [
+            ['label' => 'Topics', 'value' => number_format(count($topicsData))],
+            ['label' => 'Replies', 'value' => number_format(ForumPost::query()->count())],
+            ['label' => 'Members', 'value' => number_format(max(342, User::query()->count()))],
+        ];
+
+        // 4. Default community guidelines
+        $guidelines = [
+            'Search before opening a duplicate topic.',
+            'Keep titles specific and actionable.',
+            'Include version, environment, and reproduction steps.',
+        ];
+
         $payload = [
-            'stats' => [
-                ['label' => 'Topics', 'value' => '128'],
-                ['label' => 'Replies', 'value' => '1,482'],
-                ['label' => 'Members', 'value' => '342'],
-            ],
-            'categories' => [
-                ['name' => 'Announcements', 'count' => 12, 'tone' => 'blue'],
-                ['name' => 'Framework Help', 'count' => 46, 'tone' => 'green'],
-                ['name' => 'Packages', 'count' => 28, 'tone' => 'violet'],
-                ['name' => 'Security', 'count' => 9, 'tone' => 'red'],
-            ],
-            'topics' => [
-                [
-                    'title' => 'How should forum modules expose package hooks?',
-                    'category' => 'Packages',
-                    'author' => 'Core Team',
-                    'replies' => 18,
-                    'views' => 312,
-                    'status' => 'Open',
-                    'updated' => '12 min ago',
-                ],
-                [
-                    'title' => 'Best practices for model events and moderation logs',
-                    'category' => 'Framework Help',
-                    'author' => 'Maintainer',
-                    'replies' => 9,
-                    'views' => 144,
-                    'status' => 'Answered',
-                    'updated' => '1 hr ago',
-                ],
-                [
-                    'title' => 'Proposal: changelog module release notes workflow',
-                    'category' => 'Announcements',
-                    'author' => 'Web Tech Domains',
-                    'replies' => 24,
-                    'views' => 401,
-                    'status' => 'Pinned',
-                    'updated' => 'Today',
-                ],
-            ],
-            'guidelines' => [
-                'Search before opening a duplicate topic.',
-                'Keep titles specific and actionable.',
-                'Include version, environment, and reproduction steps.',
-            ],
+            'stats' => $stats,
+            'categories' => $categoriesData,
+            'topics' => $topicsData,
+            'guidelines' => $guidelines,
         ];
 
         return Response::make($this->views->renderModule('Forums', 'pages.index', [
             'assetTags' => \vite('resources/js/modules/forums.js'),
             'forumPayload' => json_encode($payload, JSON_THROW_ON_ERROR | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT),
         ]));
+    }
+
+    /**
+     * Create a new forum topic via AJAX POST.
+     *
+     * @param array<string, string> $parameters
+     */
+    public function createTopic(Request $request, array $parameters): Response
+    {
+        $title = trim((string)$request->input('title'));
+        $body = trim((string)$request->input('body'));
+        $categoryName = trim((string)$request->input('category'));
+
+        if ($title === '' || $body === '' || $categoryName === '') {
+            return Response::json(['error' => 'All fields (title, body, category) are required.'], 400);
+        }
+
+        // Find or fallback the category
+        $category = ForumCategory::query()->where('name', $categoryName)->first();
+        if ($category === null) {
+            $category = ForumCategory::query()->where('id', 2)->first() ?? ForumCategory::all()[0] ?? null;
+        }
+
+        if ($category === null) {
+            return Response::json(['error' => 'No category found.'], 500);
+        }
+
+        $slug = strtolower(preg_replace('/[^A-Za-z0-9-]+/', '-', $title));
+        $slug = trim($slug, '-');
+
+        // Create the topic
+        $topic = new ForumTopic([
+            'forum_category_id' => $category->getAttribute('id'),
+            'title' => $title,
+            'slug' => $slug,
+            'body' => $body,
+            'author_name' => 'You',
+            'status' => 'Open',
+            'is_pinned' => 0,
+            'views' => 0,
+            'last_activity_at' => 'Now',
+        ]);
+
+        if (!$topic->save()) {
+            return Response::json(['error' => 'Unable to save topic.'], 500);
+        }
+
+        // Create the first post
+        $post = new ForumPost([
+            'forum_topic_id' => $topic->getAttribute('id'),
+            'body' => $body,
+            'author_name' => 'You',
+            'is_solution' => 0,
+        ]);
+        $post->save();
+
+        $newTopicData = [
+            'id' => $topic->getAttribute('id'),
+            'title' => $topic->getAttribute('title'),
+            'slug' => $topic->getAttribute('slug'),
+            'category' => $category->getAttribute('name'),
+            'author' => 'You',
+            'replies' => 1,
+            'views' => 0,
+            'status' => 'Open',
+            'updated' => 'Now',
+        ];
+
+        return Response::json($newTopicData, 201);
     }
 }

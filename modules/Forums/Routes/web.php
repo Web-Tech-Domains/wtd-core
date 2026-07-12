@@ -7,4 +7,5 @@ use WTD\Routing\Router;
 
 /** @var Router $router */
 $router->get('/forums', [ForumsController::class, 'index'])->name('forums.index');
+$router->post('/forums/topics', [ForumsController::class, 'createTopic'])->name('forums.topics.store');
 

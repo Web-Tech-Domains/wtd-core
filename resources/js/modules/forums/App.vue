@@ -11,6 +11,9 @@ const props = defineProps({
 const filter = ref('All categories');
 const draftTitle = ref('');
 const draftBody = ref('');
+const isSubmitting = ref(false);
+const errorMessage = ref('');
+
 const categories = ref(props.initialState.categories || []);
 const topics = ref(props.initialState.topics || []);
 const stats = ref(props.initialState.stats || []);
@@ -20,7 +23,6 @@ const filteredTopics = computed(() => {
   if (filter.value === 'All categories') {
     return topics.value;
   }
-
   return topics.value.filter((topic) => topic.category === filter.value);
 });
 
@@ -35,23 +37,67 @@ function badgeClass(topic) {
 
 function createDraft() {
   const title = draftTitle.value.trim();
+  const body = draftBody.value.trim();
+  const category = filter.value === 'All categories' ? 'Framework Help' : filter.value;
 
-  if (title === '') {
+  if (title === '' || body === '') {
+    errorMessage.value = 'Please provide both a title and details for your topic.';
     return;
   }
 
-  topics.value.unshift({
-    title,
-    category: filter.value === 'All categories' ? 'Framework Help' : filter.value,
-    author: 'You',
-    replies: 0,
-    views: 0,
-    status: 'Draft',
-    updated: 'Now'
-  });
+  isSubmitting.value = true;
+  errorMessage.value = '';
 
-  draftTitle.value = '';
-  draftBody.value = '';
+  const params = new URLSearchParams();
+  params.append('title', title);
+  params.append('body', body);
+  params.append('category', category);
+
+  fetch('/forums/topics', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: params
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Failed to create topic. Please try again.');
+    }
+    return response.json();
+  })
+  .then(newTopic => {
+    // Add the new topic to the start of the list
+    topics.value.unshift(newTopic);
+    
+    // Increment the category topic count dynamically!
+    const cat = categories.value.find(c => c.name === newTopic.category);
+    if (cat) {
+      cat.count++;
+    }
+    
+    // Increment the total topics stat!
+    const topicsStat = stats.value.find(s => s.label === 'Topics');
+    if (topicsStat) {
+      topicsStat.value = (parseInt(topicsStat.value.replace(/,/g, '')) + 1).toLocaleString();
+    }
+
+    // Reset inputs
+    draftTitle.value = '';
+    draftBody.value = '';
+    
+    // Smooth scroll to top of latest activity
+    const boardHead = document.querySelector('.forums-board-head');
+    if (boardHead) {
+      boardHead.scrollIntoView({ behavior: 'smooth' });
+    }
+  })
+  .catch(error => {
+    errorMessage.value = error.message;
+  })
+  .finally(() => {
+    isSubmitting.value = false;
+  });
 }
 </script>
 
@@ -62,7 +108,8 @@ function createDraft() {
       <span>WTD Forums</span>
     </a>
     <nav aria-label="Forums navigation">
-      <a href="/forums">Forums</a>
+      <a href="/">Home</a>
+      <a href="/forums" class="active">Forums</a>
       <a href="/docs/api">API Docs</a>
       <a href="/health">Health</a>
     </nav>
@@ -79,6 +126,15 @@ function createDraft() {
 
       <section class="forums-panel" aria-labelledby="forums-categories-title">
         <h2 id="forums-categories-title">Categories</h2>
+        <button
+          type="button"
+          class="forums-category"
+          :class="{ 'forums-category-active': filter === 'All categories' }"
+          @click="filter = 'All categories'"
+        >
+          <span>All categories</span>
+          <strong>{{ topics.length }}</strong>
+        </button>
         <button
           v-for="category in categories"
           :key="category.name"
@@ -124,6 +180,9 @@ function createDraft() {
         </div>
 
         <div class="forums-topic-list">
+          <div v-if="filteredTopics.length === 0" class="forums-no-topics">
+            No topics found in this category.
+          </div>
           <article v-for="topic in filteredTopics" :key="topic.title" class="forums-topic">
             <div class="forums-topic-main">
               <span :class="badgeClass(topic)">{{ topic.category }}</span>
@@ -145,9 +204,13 @@ function createDraft() {
           <h2 id="forums-composer-title">Start a useful discussion</h2>
         </div>
         <form @submit.prevent="createDraft">
-          <input v-model="draftTitle" type="text" placeholder="Topic title" aria-label="Topic title">
-          <textarea v-model="draftBody" placeholder="Describe the question, decision, or proposal." aria-label="Topic body"></textarea>
-          <button type="submit">Create draft</button>
+          <input v-model="draftTitle" type="text" placeholder="Topic title" aria-label="Topic title" :disabled="isSubmitting" required>
+          <textarea v-model="draftBody" placeholder="Describe the question, decision, or proposal." aria-label="Topic body" :disabled="isSubmitting" required></textarea>
+          <div v-if="errorMessage" class="forums-error-box">{{ errorMessage }}</div>
+          <button type="submit" :disabled="isSubmitting">
+            <span v-if="isSubmitting">Creating topic...</span>
+            <span v-else>Create topic</span>
+          </button>
         </form>
       </section>
     </section>
