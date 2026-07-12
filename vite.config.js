@@ -11,6 +11,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         app: 'resources/js/app.js',
+        forums: 'resources/js/modules/forums.js',
         styles: 'resources/css/app.css'
       }
     }
@@ -21,4 +22,3 @@ export default defineConfig({
     strictPort: true
   }
 });
-
