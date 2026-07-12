@@ -27,6 +27,7 @@ final class HomeController
         return Response::make($this->views->render('home', [
             'name' => 'WTD Core',
             'description' => 'A lightweight PHP 8.3 framework foundation for APIs, SaaS products, enterprise applications, and modular cloud-native projects.',
+            'assetTags' => \vite(['resources/js/app.js']),
         ]));
     }
 
