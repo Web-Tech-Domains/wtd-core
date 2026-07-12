@@ -106,6 +106,12 @@ final class ViewTest extends TestCase
         ]);
 
         self::assertStringContainsString('Web Tech Domains', $html);
+        self::assertStringContainsString('<link rel="stylesheet" href="/assets/app.css">', $html);
+        self::assertStringContainsString('width="40" height="40"', $html);
+        self::assertStringContainsString('href="/forums"', $html);
+        self::assertStringContainsString('href="/health"', $html);
+        self::assertStringContainsString('href="/api/status"', $html);
+        self::assertStringContainsString('href="/docs/api"', $html);
         self::assertStringContainsString('Enterprise PHP 8.3 framework', $html);
         self::assertStringContainsString('Vue or React friendly', $html);
         self::assertStringContainsString('Multiple database drivers', $html);

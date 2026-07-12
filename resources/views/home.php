@@ -6,6 +6,7 @@
     <meta name="description" content="{{ description }}">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="manifest" href="/site.webmanifest">
+    <link rel="stylesheet" href="/assets/app.css">
     <title>{{ name }} | Web Tech Domains</title>
     {!! assetTags !!}
 </head>
@@ -13,7 +14,7 @@
     <header class="topbar">
         <div class="wrap nav">
             <a class="brand" href="/">
-                <img class="brand-logo" src="/favicon.svg" alt="WTD Core">
+                <img class="brand-logo" src="/favicon.svg" width="40" height="40" alt="WTD Core">
                 <span>Web Tech Domains / {{ name }}</span>
             </a>
             <nav class="navlinks" aria-label="Primary navigation">
@@ -50,9 +51,9 @@
                     <div class="terminal-head"><span></span><span></span><span></span></div>
                     <div class="terminal-body">
                         <div><span class="muted-code">$</span> php core make:module Billing</div>
-                        <div class="ok">✓ module structure created</div>
+                        <div class="ok">OK module structure created</div>
                         <div><span class="muted-code">$</span> php core make:model Invoice --migration</div>
-                        <div class="ok">✓ model, repository, timestamps, migration ready</div>
+                        <div class="ok">OK model, repository, timestamps, migration ready</div>
                         <br>
                         <div><span class="info">Route::middleware</span>(['web', 'auth'])</div>
                         <div><span class="info">Database::connection</span>('tenant')</div>
