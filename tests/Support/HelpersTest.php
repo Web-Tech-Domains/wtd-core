@@ -153,11 +153,16 @@ final class HelpersTest extends TestCase
         try {
             self::assertSame($session, session());
             self::assertSame('Saved', session('notice'));
+            session(['mode' => 'standard']);
+            self::assertSame('standard', session('mode'));
             self::assertSame($cache, cache());
             self::assertSame('WTD', cache('framework'));
+            cache(['runtime' => 'ready'], ttlSeconds: 60);
+            self::assertSame('ready', cache('runtime'));
             self::assertInstanceOf(CacheRepository::class, cache_store());
             self::assertInstanceOf(Cookie::class, cookie('theme', 'dark', 5));
             self::assertStringContainsString('theme=dark', cookie('theme', 'dark', 5)->toHeader());
+            self::assertStringContainsString('Expires=', forget_cookie('theme')->toHeader());
         } finally {
             unset($GLOBALS['wtd_app']);
             @unlink($basePath . '/tests/tmp/helper-sessions/helper-session-1234');

@@ -95,18 +95,40 @@ if (!function_exists('db')) {
 }
 
 if (!function_exists('session')) {
-    function session(?string $key = null, mixed $default = null): mixed
+    /**
+     * @param array<string, mixed>|string|null $key
+     */
+    function session(array|string|null $key = null, mixed $default = null): mixed
     {
         $session = app(SessionStore::class);
+
+        if (is_array($key)) {
+            foreach ($key as $name => $value) {
+                $session->put($name, $value);
+            }
+
+            return null;
+        }
 
         return $key === null ? $session : $session->get($key, $default);
     }
 }
 
 if (!function_exists('cache')) {
-    function cache(?string $key = null, mixed $default = null): mixed
+    /**
+     * @param array<string, mixed>|string|null $key
+     */
+    function cache(array|string|null $key = null, mixed $default = null, ?int $ttlSeconds = null): mixed
     {
         $cache = app(CacheRepository::class);
+
+        if (is_array($key)) {
+            foreach ($key as $name => $value) {
+                $cache->put($name, $value, $ttlSeconds);
+            }
+
+            return null;
+        }
 
         return $key === null ? $cache : $cache->get($key, $default);
     }
@@ -140,6 +162,19 @@ if (!function_exists('cookie')) {
             $httpOnly,
             $sameSite,
         );
+    }
+}
+
+if (!function_exists('forget_cookie')) {
+    function forget_cookie(
+        string $name,
+        string $path = '/',
+        ?string $domain = null,
+        bool $secure = false,
+        bool $httpOnly = true,
+        string $sameSite = 'Lax',
+    ): Cookie {
+        return new Cookie($name, '', time() - 3600, $path, $domain, $secure, $httpOnly, $sameSite);
     }
 }
 

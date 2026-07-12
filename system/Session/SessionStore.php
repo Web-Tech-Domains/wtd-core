@@ -78,6 +78,27 @@ final class SessionStore
     }
 
     /**
+     * Remove all session values while keeping the current session ID.
+     */
+    public function flush(): void
+    {
+        $this->data = [];
+    }
+
+    /**
+     * Remove all session values and delete the persisted session file.
+     */
+    public function destroy(): void
+    {
+        if ($this->id !== null) {
+            $this->filesystem->delete($this->filePath());
+        }
+
+        $this->id = null;
+        $this->data = [];
+    }
+
+    /**
      * Regenerate the session ID, optionally deleting the old persisted session.
      */
     public function regenerate(bool $destroy = true): string

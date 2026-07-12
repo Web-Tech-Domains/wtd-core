@@ -36,6 +36,35 @@ final class SessionStoreTest extends TestCase
         $store->start('../bad');
     }
 
+    public function testSessionStoreCanFlushAndDestroySession(): void
+    {
+        $path = dirname(__DIR__) . '/tmp/sessions';
+        $store = new SessionStore(new Filesystem(), $path);
+        $store->start('destroy-session-1234');
+        $store->put('name', 'WTD');
+        $store->save();
+
+        $store->flush();
+
+        self::assertSame([], $store->all());
+
+        $store->put('name', 'WTD');
+        $store->save();
+        $store->destroy();
+
+        self::assertSame([], $store->all());
+        self::assertFileDoesNotExist($path . '/destroy-session-1234');
+    }
+
+    public function testSessionDestroyWithoutStartedSessionClearsData(): void
+    {
+        $store = new SessionStore(new Filesystem(), dirname(__DIR__) . '/tmp/sessions');
+
+        $store->destroy();
+
+        self::assertSame([], $store->all());
+    }
+
     public function testSessionStoreRegeneratesIdsAndSupportsFlashData(): void
     {
         $store = new SessionStore(new Filesystem(), dirname(__DIR__) . '/tmp/sessions');
