@@ -9,6 +9,7 @@ use WTD\Cookie\Cookie;
 use WTD\Database\Connection;
 use WTD\Database\DatabaseManager;
 use WTD\Hooks\HookManager;
+use WTD\Http\Client\HttpClient;
 use WTD\Session\SessionStore;
 use WTD\View\AssetManager;
 use WTD\View\ViewRenderer;
@@ -91,6 +92,13 @@ if (!function_exists('db')) {
     function db(?string $connection = null): Connection
     {
         return app(DatabaseManager::class)->connection($connection);
+    }
+}
+
+if (!function_exists('http')) {
+    function http(): HttpClient
+    {
+        return app(HttpClient::class);
     }
 }
 

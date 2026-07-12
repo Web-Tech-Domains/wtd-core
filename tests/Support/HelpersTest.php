@@ -13,6 +13,7 @@ use WTD\Container\Container;
 use WTD\Cookie\Cookie;
 use WTD\Filesystem\Filesystem;
 use WTD\Hooks\HookManager;
+use WTD\Http\Client\HttpClient;
 use WTD\Session\SessionStore;
 use WTD\View\AssetManager;
 use WTD\View\ViewRenderer;
@@ -167,6 +168,24 @@ final class HelpersTest extends TestCase
             unset($GLOBALS['wtd_app']);
             @unlink($basePath . '/tests/tmp/helper-sessions/helper-session-1234');
             @rmdir($basePath . '/tests/tmp/helper-sessions');
+        }
+    }
+
+    public function testHttpHelperReturnsFrameworkHttpClient(): void
+    {
+        require_once dirname(__DIR__, 2) . '/system/Support/helpers.php';
+
+        $basePath = dirname(__DIR__, 2);
+        $container = new Container();
+        $client = new HttpClient();
+        $app = new Application($basePath, $container, new Repository());
+        $container->instance(HttpClient::class, $client);
+        $GLOBALS['wtd_app'] = $app;
+
+        try {
+            self::assertSame($client, http());
+        } finally {
+            unset($GLOBALS['wtd_app']);
         }
     }
 
