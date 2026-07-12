@@ -54,7 +54,8 @@ final class ForumsModuleTest extends TestCase
 
             self::assertSame(200, $response->status());
             self::assertStringContainsString('data-forums-app', $response->content());
-            self::assertStringContainsString('resources/js/modules/forums.js', $response->content());
+            self::assertStringContainsString('/assets/modules/forums.css', $response->content());
+            self::assertStringNotContainsString('/resources/js/modules/forums.js', $response->content());
             self::assertStringContainsString('Community topics', $response->content());
             self::assertStringContainsString('forums-initial-state', $response->content());
         } finally {

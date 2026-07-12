@@ -26,6 +26,7 @@ final class SpecificationComplianceTest extends TestCase
             'resources/js/vue.js',
             'resources/js/react.jsx',
             'resources/css/app.css',
+            'public/assets/modules/forums.css',
             'config/hooks.php',
             'app/Hooks.php',
             'docs/HOOKS.md',

@@ -49,4 +49,22 @@ final class AssetManagerTest extends TestCase
         self::assertStringContainsString('/build/assets/app.css', $tags);
         self::assertStringContainsString('/build/assets/app.js', $tags);
     }
+
+    public function testAssetManagerDoesNotExposeSourcePathsWithoutManifestOrHotServer(): void
+    {
+        $basePath = dirname(__DIR__, 2);
+        self::assertNotSame('', $basePath);
+        /** @var non-empty-string $basePath */
+
+        $assets = new AssetManager(
+            new Application($basePath, new Container(), new Repository()),
+            new Repository([
+                'assets.manifest' => 'tests/tmp/assets/missing-manifest.json',
+                'assets.hot_file' => 'tests/tmp/assets/missing-hot',
+            ]),
+        );
+
+        self::assertSame('', $assets->url('resources/js/modules/forums.js'));
+        self::assertSame('', $assets->tags(['resources/js/modules/forums.js']));
+    }
 }
